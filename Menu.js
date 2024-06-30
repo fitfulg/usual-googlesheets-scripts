@@ -5,10 +5,10 @@ function onOpen() {
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
         .addItem('Set Ceil Background Colors from TODO sheet', 'customCeilBGColorTODO')
-        .addItem('Log Hello World from github to googlesheets', 'logHelloWorld') // Añadir nueva función al menú
+        .addItem('Log Hello World', 'logHelloWorld') // Añadir nueva función al menú
         .addToUi();
 }
 
 function logHelloWorld() {
-    Logger.log("Hello, World!!");
+    Logger.log("Hello, World from Github to GoogleSheets!");
 }
