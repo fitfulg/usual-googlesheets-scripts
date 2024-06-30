@@ -1,5 +1,5 @@
 function onOpen() {
-    var ui = SpreadsheetApp.getUi();
+    let ui = SpreadsheetApp.getUi();
     // Add a custom menu
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')

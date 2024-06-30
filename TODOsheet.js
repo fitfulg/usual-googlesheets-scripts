@@ -1,13 +1,13 @@
 function setColumnBackground(sheet, col, color) {
-    var lastRow = sheet.getLastRow();
+    let lastRow = sheet.getLastRow();
     if (lastRow > 1) { // Ensure there are more than one row
-        var range = sheet.getRange(2, col, lastRow - 1, 1);
+        let range = sheet.getRange(2, col, lastRow - 1, 1);
         range.setBackground(color);
     }
 }
 
 function customCeilBGColorTODO() {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3'); // Column A: Light gray 3
