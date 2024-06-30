@@ -4,7 +4,7 @@ function onOpen() {
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormat')
         .addItem('Apply Format to All', 'applyFormatToAll')
-        .addItem('Set Background Colors TODO', 'backgroundColorsTODO')
+        .addItem('Set Ceil Background Colors from TODO sheet', 'customCeilBGColorTODO')
         .addItem('Log Hello World from github to googlesheets', 'logHelloWorld') // Añadir nueva función al menú
         .addToUi();
 }
