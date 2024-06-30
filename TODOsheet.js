@@ -6,7 +6,7 @@ function setColumnBackground(sheet, col, color) {
     }
 }
 
-function backgroundColorsTODO() {
+function customCeilBGColorTODO() {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
     // Apply background colors to specific columns
