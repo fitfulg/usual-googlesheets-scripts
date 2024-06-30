@@ -1,7 +1,7 @@
-function setColumnBackground(sheet, col, color) {
+function setColumnBackground(sheet, col, color, startRow = 2) {
     let lastRow = sheet.getLastRow();
     if (lastRow > 1) { // Ensure there are more than one row
-        let range = sheet.getRange(2, col, lastRow - 1, 1);
+        let range = sheet.getRange(startRow, col, lastRow - startRow + 1, 1);
         range.setBackground(color);
     }
 }
@@ -13,4 +13,14 @@ function customCeilBGColorTODO() {
     setColumnBackground(sheet, 1, '#d3d3d3'); // Column A: Light gray 3
     setColumnBackground(sheet, 6, '#fff1f1'); // Column F: Light pink
     setColumnBackground(sheet, 7, '#d3d3d3'); // Column G: Light gray 3
+
+    // Apply white background to columns B, C, D, E, H, I starting from row 2
+    let whiteColumns = [2, 3, 4, 5, 8, 9]; // Columns B, C, D, E, H, I
+    for (let col of whiteColumns) {
+        setColumnBackground(sheet, col, '#ffffff');
+    }
+
+    // Apply dark yellow background to specific cells in column B
+    sheet.getRange('B3').setBackground('#b5a642'); // Dark yellow 3
+    sheet.getRange('B8').setBackground('#b5a642'); // Dark yellow 3
 }
