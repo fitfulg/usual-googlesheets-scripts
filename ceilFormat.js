@@ -50,12 +50,11 @@ function checkAndSetColumn(column, limit) {
     if (occupied > limit) {
         // Set border color to red
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID);
-        // Set cell value
         sheet.getRange(column + "1").setValue("⚠️limite de celdas alcanzadas⚠️");
+        SpreadsheetApp.getUi().alert("⚠️limite de celdas alcanzadas para la prioridad: " + column + "⚠️");
     } else {
         // Set border color to black
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
-        // Set cell value
         sheet.getRange(column + "1").setValue(column === "C" ? "PRIORIDAD ALTA" : column === "D" ? "PRIORIDAD MEDIA" : "PRIORIDAD BAJA");
     }
 }

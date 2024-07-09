@@ -11,5 +11,6 @@ function onOpen() {
 }
 
 function logHelloWorld() {
-    Logger.log("Hello, World from Github to GoogleSheets!");
+    const ui = SpreadsheetApp.getUi();
+    ui.alert("Hello, World from Github to GoogleSheets!");
 }
