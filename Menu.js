@@ -5,7 +5,8 @@ function onOpen() {
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
         .addItem('Set Ceil Background Colors from TODO sheet', 'customCeilBGColorTODO')
-        .addItem('Log Hello World', 'logHelloWorld') // Añadir nueva función al menú
+        .addItem('Log Hello World', 'logHelloWorld')
+        .addItem('Create Pie Chart', 'createPieChart')
         .addToUi();
 }
 
