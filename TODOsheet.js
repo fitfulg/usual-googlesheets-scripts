@@ -39,6 +39,9 @@ function applyFormatToAll() {
     checkAndSetColumn("C", 10, "ALTA");
     checkAndSetColumn("D", 20, "MEDIA");
     checkAndSetColumn("E", 20, "BAJA");
+
+    // Set the specific content and styles in the specified cells
+    setCellContentAndStyle();
 }
 
 function checkAndSetColumn(column, limit, priority) {
@@ -57,6 +60,53 @@ function checkAndSetColumn(column, limit, priority) {
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
         sheet.getRange(column + "1").setValue("PRIORIDAD " + priority);
     }
+}
+
+function setCellContentAndStyle() {
+    // Set content and style for A1
+    sheet.getRange("A1").setValue("QUICKPATTERNS")
+        .setFontWeight("bold")
+        .setFontColor("#FFFFFF")
+        .setBackground("#000000")
+        .setHorizontalAlignment("center");
+
+    // Set content and style for B1
+    sheet.getRange("B1").setValue("TOMORROW")
+        .setFontWeight("bold")
+        .setFontColor("#FFFFFF")
+        .setHorizontalAlignment("center");
+
+    // Set content and style for B3
+    sheet.getRange("B3").setValue("WEEK")
+        .setFontWeight("bold")
+        .setFontColor("#FFFFFF")
+        .setHorizontalAlignment("center");
+
+    // Set content and style for B8
+    sheet.getRange("B8").setValue("MONTH")
+        .setFontWeight("bold")
+        .setFontColor("#FFFFFF")
+        .setHorizontalAlignment("center");
+
+    // Set content and style for F1
+    sheet.getRange("F1").setValue("💡IDEAS Y PLANES")
+        .setFontWeight("bold")
+        .setFontColor("#000000")
+        .setBackground("#FFC0CB")
+        .setHorizontalAlignment("center");
+
+    // Set content and style for G1
+    sheet.getRange("G1").setValue("👀 EYES ON")
+        .setFontWeight("bold")
+        .setFontColor("#000000")
+        .setBackground("#D3D3D3")
+        .setHorizontalAlignment("center");
+
+    // Set content and style for H1
+    sheet.getRange("H1").setValue("IN QUARANTINE BEFORE BEING CANCELED")
+        .setFontWeight("bold")
+        .setFontColor("#FF0000")
+        .setHorizontalAlignment("center");
 }
 
 function setColumnBackground(sheet, col, color, startRow = 2) {
