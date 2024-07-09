@@ -25,5 +25,27 @@ function applyFormatToAll() {
     let range = sheet.getDataRange();
     // Apply formatting to the entire data range
     Format(range);
-    applyBorders(range)
+    applyBorders(range);
+
+    // Check the number of occupied cells in columns C, D, and E
+    checkAndSetColumn("C", 10);
+    checkAndSetColumn("D", 20);
+    checkAndSetColumn("E", 20);
+}
+
+function checkAndSetColumn(column, limit) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const dataRange = sheet.getDataRange();
+    const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
+    const occupied = values.filter(String).length;
+
+    if (occupied > limit) {
+        // Set border color to red
+        sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID);
+        sheet.getRange(column + "1").setValue("⚠️limite de celdas alcanzadas⚠️");
+    } else {
+        // Set border color to black
+        sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
+        sheet.getRange(column + "1").setValue(column === "C" ? "PRIORIDAD ALTA" : column === "D" ? "PRIORIDAD MEDIA" : "PRIORIDAD BAJA");
+    }
 }

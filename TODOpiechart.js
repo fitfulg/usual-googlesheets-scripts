@@ -1,20 +1,20 @@
 function createPieChart() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const dataRange = sheet.getDataRange();
-    const valuesB = sheet.getRange("B2:B" + dataRange.getLastRow()).getValues().flat();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
+    const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
     const valuesE = sheet.getRange("E2:E" + dataRange.getLastRow()).getValues().flat();
 
-    const occupiedB = valuesB.filter(String).length;
     const occupiedC = valuesC.filter(String).length;
+    const occupiedD = valuesD.filter(String).length;
     const occupiedE = valuesE.filter(String).length;
 
     const chartDataRange = sheet.getRange("J1:K4");
     chartDataRange.setValues([
         ["Column", "Occupied Cells"],
-        ["B", occupiedB],
-        ["C", occupiedC],
-        ["E", occupiedE]
+        ["ALTA", occupiedC],
+        ["MEDIA", occupiedD],
+        ["BAJA", occupiedE]
     ]);
 
     const chart = sheet.newChart()
