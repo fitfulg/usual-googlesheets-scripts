@@ -36,12 +36,12 @@ function applyFormatToAll() {
     }
 
     // Check the number of occupied cells in columns C, D, and E
-    checkAndSetColumn("C", 10);
-    checkAndSetColumn("D", 20);
-    checkAndSetColumn("E", 20);
+    checkAndSetColumn("C", 10, "ALTA");
+    checkAndSetColumn("D", 20, "MEDIA");
+    checkAndSetColumn("E", 20, "BAJA");
 }
 
-function checkAndSetColumn(column, limit) {
+function checkAndSetColumn(column, limit, priority) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const dataRange = sheet.getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
@@ -51,10 +51,10 @@ function checkAndSetColumn(column, limit) {
         // Set border color to red
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID);
         sheet.getRange(column + "1").setValue("⚠️limite de celdas alcanzadas⚠️");
-        SpreadsheetApp.getUi().alert("⚠️limite de celdas alcanzadas para la prioridad: " + column + "⚠️");
+        SpreadsheetApp.getUi().alert("⚠️limite de celdas alcanzadas para la prioridad: " + priority + "⚠️");
     } else {
         // Set border color to black
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
-        sheet.getRange(column + "1").setValue(column === "C" ? "PRIORIDAD ALTA" : column === "D" ? "PRIORIDAD MEDIA" : "PRIORIDAD BAJA");
+        sheet.getRange(column + "1").setValue("PRIORIDAD " + priority);
     }
 }
