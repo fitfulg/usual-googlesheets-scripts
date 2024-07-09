@@ -8,6 +8,11 @@ function onOpen() {
         .addItem('Log Hello World', 'logHelloWorld')
         .addItem('Create Pie Chart', 'createPieChart')
         .addToUi();
+
+    // Call func when the document is opened
+    applyFormatToAll();
+    createPieChart();
+    customCeilBGColorTODO();
 }
 
 function logHelloWorld() {
