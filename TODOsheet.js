@@ -99,7 +99,7 @@ function setCellContentAndStyle() {
     sheet.getRange("G1").setValue("👀 EYES ON")
         .setFontWeight("bold")
         .setFontColor("#000000")
-        .setBackground("#D3D3D3")
+        .setBackground("#b7b7b7")
         .setHorizontalAlignment("center");
 
     // Set content and style for H1
