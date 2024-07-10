@@ -1,4 +1,4 @@
-function createPieChart() {
+function createPieChartTODO() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const dataRange = sheet.getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();

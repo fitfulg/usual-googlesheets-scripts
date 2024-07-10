@@ -12,7 +12,7 @@ function onOpen() {
 
     // Call func when the document is opened or F5ed
     applyFormatToAllTODO();
-    createPieChart();
+    createPieChartTODO();
     customCeilBGColorTODO();
 }
 
