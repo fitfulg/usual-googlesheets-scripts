@@ -7,9 +7,9 @@ function applyFormatToAllTODO() {
     }
 
     // Check the number of occupied cells in columns C, D, and E
-    checkAndSetColumn("C", 10, "ALTA");
-    checkAndSetColumn("D", 20, "MEDIA");
-    checkAndSetColumn("E", 20, "BAJA");
+    checkAndSetColumn("C", 10, "HIGH");
+    checkAndSetColumn("D", 20, "MEDIUM");
+    checkAndSetColumn("E", 20, "LOW");
 
     setCellContentAndStyle();
 }
