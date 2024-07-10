@@ -47,7 +47,7 @@ function setCellContentAndStyle() {
     setCellStyle("B1", "TOMORROW", "bold", "#FFFFFF", null, "center");
     setCellStyle("B3", "WEEK", "bold", "#FFFFFF", null, "center");
     setCellStyle("B8", "MONTH", "bold", "#FFFFFF", null, "center");
-    setCellStyle("F1", "💡IDEAS Y PLANES", "bold", "#000000", "#FFC0CB", "center");
+    setCellStyle("F1", "💡IDEAS AND PLANS", "bold", "#000000", "#FFC0CB", "center");
     setCellStyle("G1", "👀 EYES ON", "bold", "#000000", "#b7b7b7", "center");
     setCellStyle("H1", "IN QUARANTINE BEFORE BEING CANCELED", "bold", "#FF0000", null, "center");
 }
