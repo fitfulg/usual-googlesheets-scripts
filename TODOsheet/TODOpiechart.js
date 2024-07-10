@@ -12,9 +12,9 @@ function createPieChart() {
     const chartDataRange = sheet.getRange("J1:K4");
     chartDataRange.setValues([
         ["Column", "Occupied Cells"],
-        ["ALTA", occupiedC],
-        ["MEDIA", occupiedD],
-        ["BAJA", occupiedE]
+        ["HIGH", occupiedC],
+        ["MEDIUM", occupiedD],
+        ["LOW", occupiedE]
     ]);
 
     const chart = sheet.newChart()
