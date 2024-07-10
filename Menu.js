@@ -10,13 +10,23 @@ function onOpen() {
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
-    // Call func when the document is opened or F5ed
+    // Call function when the document is opened or refreshed
+    // showLoading();
     applyFormatToAllTODO();
-    createPieChartTODO();
+    createPieChart();
     customCeilBGColorTODO();
+    // hideLoading();
 }
 
 function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
     ui.alert("Hello, World from Github to GoogleSheets!");
 }
+//TODO
+// function showLoading() {
+//     SpreadsheetApp.getActiveSpreadsheet().toast('Loading, please wait...', 'Loading', -1);
+// }
+
+// function hideLoading() {
+//     SpreadsheetApp.getUi().alert('Loading complete!');
+// }
