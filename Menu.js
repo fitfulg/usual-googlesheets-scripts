@@ -4,13 +4,14 @@ function onOpen() {
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
-        .addItem('Set Ceil Background Colors from TODO sheet', 'customCeilBGColorTODO')
+        .addItem('TODOsheet: Apply Format to All', 'applyFormatToAllTODO')
+        .addItem('TODOsheet: Set Ceil Background Colors', 'customCeilBGColorTODO')
+        .addItem('TODOsheet: Create Pie Chart', 'createPieChart')
         .addItem('Log Hello World', 'logHelloWorld')
-        .addItem('Create Pie Chart', 'createPieChart')
         .addToUi();
 
-    // Call func when the document is opened
-    applyFormatToAll();
+    // Call func when the document is opened or F5ed
+    applyFormatToAllTODO();
     createPieChart();
     customCeilBGColorTODO();
 }
