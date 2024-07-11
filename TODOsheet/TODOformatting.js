@@ -1,6 +1,6 @@
 function applyFormatToAllTODO() {
     // Get the active sheet and the entire data range
-    let range = sheet.getDataRange();
+    let range = sheet.getDataRange(1, 1, 20, sheet.getLastColumn());
     if (range) {
         Format(range);
         applyBorders(range);
@@ -14,12 +14,9 @@ function applyFormatToAllTODO() {
     setCellContentAndStyle();
 }
 
-function setColumnBackground(sheet, col, color, startRow = 2) {
-    let lastRow = sheet.getLastRow();
-    if (lastRow > 1) { // Ensure there are more than one row
-        let range = sheet.getRange(startRow, col, lastRow - startRow + 1, 1);
-        range.setBackground(color);
-    }
+function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
+    let range = sheet.getRange(startRow, col, endRow - startRow + 1, 1);
+    range.setBackground(color);
 }
 
 function customCeilBGColorTODO() {
@@ -33,7 +30,7 @@ function customCeilBGColorTODO() {
     // Apply white background to columns B, C, D, E, H, I starting from row 2
     let whiteColumns = [2, 3, 4, 5, 8, 9]; // Columns B, C, D, E, H, I
     for (let col of whiteColumns) {
-        setColumnBackground(sheet, col, '#ffffff');
+        setColumnBackground(sheet, col, '#ffffff', 2, 20);
     }
 
     // Apply dark yellow background to specific cells in column B
