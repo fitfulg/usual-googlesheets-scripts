@@ -8,9 +8,9 @@ Apps Script uses Javascript and runs on Google Cloud.
 
 ## Quick Testing in Google Apps Script
 
-To quickly test the code in Google Apps Script, you can copy the raw contents of the concatenated JavaScript file (`combined-scripts.js`) and paste it into the Apps Script editor. Follow these steps:
+To quickly test the code in Google Apps Script, you can copy the raw contents of the concatenated JavaScript file [combined-scripts.js](https://raw.githubusercontent.com/fitfulg/usual-googlesheets-scripts/main/combined-scripts.js) and paste it into the Apps Script editor. Follow these steps:
 
-1. **Open the `combined-scripts.js` file and copy its contents.**
+1. **Open the [combined-scripts.js](https://raw.githubusercontent.com/fitfulg/usual-googlesheets-scripts/main/combined-scripts.js) file and copy its contents.**[]
 
 2. **Open your Google Sheets document.**
 
