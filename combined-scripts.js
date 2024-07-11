@@ -79,7 +79,7 @@ function applyFormatToAll() {
 
 function applyFormatToAllTODO() {
     // Get the active sheet and the entire data range
-    let range = sheet.getDataRange(1, 1, 20, sheet.getLastColumn());
+    let range = sheet.getRange(1, 1, 20, sheet.getLastColumn());
     if (range) {
         Format(range);
         applyBorders(range);
