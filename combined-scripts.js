@@ -78,19 +78,20 @@ function applyFormatToAll() {
 // Contents of ./TODOsheet/TODOformatting.js
 
 function applyFormatToAllTODO() {
-    // Get the active sheet and the entire data range
+    // Get the active sheet and the entire data range up to row 20 and column I (9)
     let range = sheet.getRange(1, 1, 20, 9); // A1:I20
     if (range) {
         Format(range);
         applyBorders(range);
     }
 
-    // Check the number of occupied cells in columns C, D, and E
-    checkAndSetColumn("C", 10, "HIGH");
-    checkAndSetColumn("D", 20, "MEDIUM");
-    checkAndSetColumn("E", 20, "LOW");
-
+    // Set the specific content and styles in the specified cells
     setCellContentAndStyle();
+
+    // Check the number of occupied cells in columns C, D, and E
+    checkAndSetColumn("C", 10, "HIGH PRIORITY");
+    checkAndSetColumn("D", 20, "MEDIUM PRIORITY");
+    checkAndSetColumn("E", 20, "LOW PRIORITY");
 }
 
 function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
@@ -189,6 +190,6 @@ function checkAndSetColumn(column, limit, priority) {
     } else {
         // Set border color to black
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
-        sheet.getRange(column + "1").setValue(priority + " PRIORITY");
+        sheet.getRange(column + "1").setValue("PRIORITY " + priority);
     }
 }

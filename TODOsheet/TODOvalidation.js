@@ -12,6 +12,6 @@ function checkAndSetColumn(column, limit, priority) {
     } else {
         // Set border color to black
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
-        sheet.getRange(column + "1").setValue(priority + " PRIORITY");
+        sheet.getRange(column + "1").setValue("PRIORITY " + priority);
     }
 }
