@@ -6,14 +6,14 @@ function onOpen() {
         .addItem('Apply Format to All', 'applyFormatToAll')
         .addItem('TODOsheet: Apply Format to All', 'applyFormatToAllTODO')
         .addItem('TODOsheet: Set Ceil Background Colors', 'customCeilBGColorTODO')
-        .addItem('TODOsheet: Create Pie Chart', 'createPieChart')
+        .addItem('TODOsheet: Create Pie Chart', 'createPieChartTODO')
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
     // Call function when the document is opened or refreshed
     // showLoading();
     applyFormatToAllTODO();
-    createPieChart();
+    createPieChartTODO();
     customCeilBGColorTODO();
     // hideLoading();
 }

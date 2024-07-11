@@ -50,6 +50,9 @@ function setCellContentAndStyle() {
     setCellStyle("F1", "💡IDEAS AND PLANS", "bold", "#000000", "#FFC0CB", "center");
     setCellStyle("G1", "👀 EYES ON", "bold", "#000000", "#b7b7b7", "center");
     setCellStyle("H1", "IN QUARANTINE BEFORE BEING CANCELED", "bold", "#FF0000", null, "center");
+    setCellStyle("C1", "HIGH PRIORITY", "bold", null, "#fce5cd", "center");
+    setCellStyle("D1", "MEDIUM PRIORITY", "bold", null, "#fff2cc", "center");
+    setCellStyle("E1", "LOW PRIORITY", "bold", null, "#d9ead3", "center");
 }
 
 function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment) {
