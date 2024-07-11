@@ -22,7 +22,7 @@ function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
     ui.alert("Hello, World from Github to GoogleSheets!");
 }
-//TODO
+// IDEA:
 // function showLoading() {
 //     SpreadsheetApp.getActiveSpreadsheet().toast('Loading, please wait...', 'Loading', -1);
 // }
