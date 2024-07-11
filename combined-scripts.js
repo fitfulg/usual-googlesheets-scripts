@@ -16,9 +16,9 @@ function onOpen() {
 
     // Call function when the document is opened or refreshed
     // showLoading();
-    applyFormatToAllTODO();
     createPieChartTODO();
     customCeilBGColorTODO();
+    applyFormatToAllTODO();
     // hideLoading();
 }
 
