@@ -1,4 +1,4 @@
-# Google Sheets Scripts
+# My own customized "Google Apps Script" code
 
 Personal repo for my own customized "Google - Apps Scripts" code to enhance Google Sheets with additional formatting, validation, and chart creation capabilities.
 
