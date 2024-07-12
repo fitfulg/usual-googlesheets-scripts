@@ -229,8 +229,8 @@ const exampleTexts = {
     "D": { text: "Example: Submit that pending data science task.", color: "#A9A9A9" },
     "E": { text: "Example: Buy a new mattress.", color: "#A9A9A9" },
     "F": { text: "Example: Santiago route.", color: "#A9A9A9" },
-    "G": { text: "Example: Change front brake pad at 44500km", color: "#A9A9A9" },
-    "H": { text: "Example: Join that Crossfit club", color: "#FFFFFF" },
+    "G": { text: "Example: Change front brake pad at 44500km", color: "#FFFFFF" },
+    "H": { text: "Example: Join that Crossfit club", color: "#A9A9A9" },
 };
 
 // Contents of ./TODOsheet/TODOtriggers.js
