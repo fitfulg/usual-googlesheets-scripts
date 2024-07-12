@@ -120,16 +120,21 @@ function exampleTextTODO(column, exampleText) {
 
 
 function applyFormatToAllTODO() {
-    // Get the active sheet and the entire data range up to row 21 and column I (9)
-    let range = sheet.getRange(1, 1, 21, 9); // A1:I21 
+    // Get the active sheet and determine the total number of rows
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const totalRows = sheet.getMaxRows();
+
+    // Get the range for all the columns A to H up to the last row
+    let range = sheet.getRange(1, 1, totalRows, 8); // A1:H(last row)
     if (range) {
         Format(range);
         applyBorders(range);
     }
-    // Apply thicker borders to specific columns
-    applyThickBorders(sheet.getRange(1, 3, 12, 1)); // C1:C12 
-    applyThickBorders(sheet.getRange(1, 4, 22, 1)); // D1:D22 
-    applyThickBorders(sheet.getRange(1, 5, 22, 1)); // E1:E22 
+
+    // Apply thicker borders to specific columns C, D, and E for defined rows
+    applyThickBorders(sheet.getRange(1, 3, 11, 1)); // C1:C11
+    applyThickBorders(sheet.getRange(1, 4, 21, 1)); // D1:D21
+    applyThickBorders(sheet.getRange(1, 5, 21, 1)); // E1:E21
 
     // Set the specific content and styles in the specified cells
     setCellContentAndStyleTODO();
@@ -145,7 +150,6 @@ function applyFormatToAllTODO() {
         exampleTextTODO(column, text);
     }
 }
-
 function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
     let range = sheet.getRange(startRow, col, endRow - startRow + 1, 1);
     range.setBackground(color);
