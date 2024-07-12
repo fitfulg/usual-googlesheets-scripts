@@ -5,6 +5,10 @@ function applyFormatToAllTODO() {
         Format(range);
         applyBorders(range);
     }
+    // Apply thicker borders to specific columns
+    applyThickBorders(sheet.getRange(1, 3, 11, 1)); // C1:C11
+    applyThickBorders(sheet.getRange(1, 4, 21, 1)); // D1:D21
+    applyThickBorders(sheet.getRange(1, 5, 21, 1)); // E1:E21
 
     // Set the specific content and styles in the specified cells
     setCellContentAndStyle();

@@ -55,6 +55,13 @@ function applyBorders(range) {
     }
 }
 
+function applyThickBorders(range) {
+    if (range) {
+        // Apply black borders with thicker lines
+        range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    }
+}
+
 function applyFormatToSelected() {
     // Get the active sheet and the selected range
     let range = sheet.getActiveRange();
@@ -84,6 +91,10 @@ function applyFormatToAllTODO() {
         Format(range);
         applyBorders(range);
     }
+    // Apply thicker borders to specific columns
+    applyThickBorders(sheet.getRange(1, 3, 11, 1)); // C1:C11
+    applyThickBorders(sheet.getRange(1, 4, 21, 1)); // D1:D21
+    applyThickBorders(sheet.getRange(1, 5, 21, 1)); // E1:E21
 
     // Set the specific content and styles in the specified cells
     setCellContentAndStyle();
@@ -183,12 +194,14 @@ function checkAndSetColumn(column, limit, priority) {
     const occupied = values.filter(String).length;
 
     if (occupied > limit) {
-        // Set border color to red
+        // Set border color to red with thicker border
+        applyThickBorders(sheet.getRange(column + "2:" + column + dataRange.getLastRow()));
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID);
         sheet.getRange(column + "1").setValue("⚠️CELL LIMIT REACHED⚠️");
         SpreadsheetApp.getUi().alert("⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority);
     } else {
-        // Set border color to black
+        // Set border color to black with thicker border
+        applyThickBorders(sheet.getRange(column + "2:" + column + dataRange.getLastRow()));
         sheet.getRange(column + "2:" + column + dataRange.getLastRow()).setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
         sheet.getRange(column + "1").setValue("PRIORITY " + priority);
     }

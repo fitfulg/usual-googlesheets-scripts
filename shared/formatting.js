@@ -16,6 +16,13 @@ function applyBorders(range) {
     }
 }
 
+function applyThickBorders(range) {
+    if (range) {
+        // Apply black borders with thicker lines
+        range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    }
+}
+
 function applyFormatToSelected() {
     // Get the active sheet and the selected range
     let range = sheet.getActiveRange();
