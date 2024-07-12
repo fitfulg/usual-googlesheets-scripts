@@ -129,9 +129,14 @@ function applyFormatToAllTODO() {
     checkAndSetColumn("E", 20, "LOW PRIORITY");
 
     // Add example text to specific columns if empty
-    exampleTextTODO("C", "Example text for HIGH PRIORITY");
-    exampleTextTODO("D", "Example text for MEDIUM PRIORITY");
-    exampleTextTODO("E", "Example text for LOW PRIORITY");
+    exampleTextTODO("A", "Example: Do it with fear but do it.");
+    exampleTextTODO("B", "Example: 45min of cardio");
+    exampleTextTODO("C", "Example: Join that gym club");
+    exampleTextTODO("D", "Example: Submit that pending data science task.");
+    exampleTextTODO("E", "Example: Buy a new mattress.");
+    exampleTextTODO("F", "Example: Santiago route.");
+    exampleTextTODO("G", "Example: Change front brake pad at 44500km");
+    exampleTextTODO("H", "Example: Join that Crossfit club");
 }
 
 function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
