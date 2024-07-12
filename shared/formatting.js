@@ -42,3 +42,15 @@ function applyFormatToAll() {
         applyBorders(range);
     }
 }
+
+function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment) {
+    let range = sheet.getRange(cell);
+    range.setValue(value)
+        .setFontWeight(fontWeight)
+        .setFontColor(fontColor)
+        .setHorizontalAlignment(alignment);
+
+    if (backgroundColor) {
+        range.setBackground(backgroundColor);
+    }
+}

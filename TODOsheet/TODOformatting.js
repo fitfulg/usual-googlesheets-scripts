@@ -1,3 +1,16 @@
+function exampleTextTODO(column, exampleText) {
+    const dataRange = sheet.getDataRange();
+    const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
+    const isEmpty = values.every(value => !value.trim());
+
+    if (isEmpty) {
+        const cell = sheet.getRange(column + "2");
+        cell.setValue(exampleText)
+            .setFontStyle("italic")
+            .setFontColor("#A9A9A9"); // Dark gray color
+    }
+}
+
 function applyFormatToAllTODO() {
     // Get the active sheet and the entire data range up to row 20 and column I (9)
     let range = sheet.getRange(1, 1, 20, 9); // A1:I20
@@ -11,12 +24,17 @@ function applyFormatToAllTODO() {
     applyThickBorders(sheet.getRange(1, 5, 21, 1)); // E1:E21
 
     // Set the specific content and styles in the specified cells
-    setCellContentAndStyle();
+    setCellContentAndStyleTODO();
 
     // Check the number of occupied cells in columns C, D, and E
     checkAndSetColumn("C", 10, "HIGH PRIORITY");
     checkAndSetColumn("D", 20, "MEDIUM PRIORITY");
     checkAndSetColumn("E", 20, "LOW PRIORITY");
+
+    // Add example text to specific columns if empty
+    exampleTextTODO("C", "Example text for HIGH PRIORITY");
+    exampleTextTODO("D", "Example text for MEDIUM PRIORITY");
+    exampleTextTODO("E", "Example text for LOW PRIORITY");
 }
 
 function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
@@ -44,7 +62,7 @@ function customCeilBGColorTODO() {
 }
 
 
-function setCellContentAndStyle() {
+function setCellContentAndStyleTODO() {
     setCellStyle("A1", "QUICK PATTERNS", "bold", "#FFFFFF", "#000000", "center");
     setCellStyle("B1", "TOMORROW", "bold", "#FFFFFF", "#b5a642", "center");
     setCellStyle("B3", "WEEK", "bold", "#FFFFFF", "#b5a642", "center");
@@ -55,16 +73,4 @@ function setCellContentAndStyle() {
     setCellStyle("C1", "HIGH PRIORITY", "bold", null, "#fce5cd", "center");
     setCellStyle("D1", "MEDIUM PRIORITY", "bold", null, "#fff2cc", "center");
     setCellStyle("E1", "LOW PRIORITY", "bold", null, "#d9ead3", "center");
-}
-
-function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment) {
-    let range = sheet.getRange(cell);
-    range.setValue(value)
-        .setFontWeight(fontWeight)
-        .setFontColor(fontColor)
-        .setHorizontalAlignment(alignment);
-
-    if (backgroundColor) {
-        range.setBackground(backgroundColor);
-    }
 }
