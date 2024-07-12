@@ -45,7 +45,7 @@ function customCeilBGColorTODO() {
 
 
 function setCellContentAndStyle() {
-    setCellStyle("A1", "QUICKPATTERNS", "bold", "#FFFFFF", "#000000", "center");
+    setCellStyle("A1", "QUICK PATTERNS", "bold", "#FFFFFF", "#000000", "center");
     setCellStyle("B1", "TOMORROW", "bold", "#FFFFFF", "#b5a642", "center");
     setCellStyle("B3", "WEEK", "bold", "#FFFFFF", "#b5a642", "center");
     setCellStyle("B8", "MONTH", "bold", "#FFFFFF", "#b5a642", "center");
