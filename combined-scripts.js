@@ -231,7 +231,6 @@ const exampleTexts = {
     "F": { text: "Example: Santiago route.", color: "#A9A9A9" },
     "G": { text: "Example: Change front brake pad at 44500km", color: "#A9A9A9" },
     "H": { text: "Example: Join that Crossfit club", color: "#FFFFFF" },
-    "I": { text: "Example: Additional Info", color: "#A9A9A9" }
 };
 
 // Contents of ./TODOsheet/TODOtriggers.js
