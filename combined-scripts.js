@@ -95,16 +95,26 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
 }
 // Contents of ./TODOsheet/TODOformatting.js
 
-function exampleTextTODO(column, exampleText) {
+function exampleTextTODO(column, exampleText, fontColor = "#A9A9A9") {
     const dataRange = sheet.getDataRange();
-    const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
+    let values;
+    if (column === "B") {
+        // Exclude cells B3 and B8
+        values = sheet.getRange(column + "2:" + column + "2").getValues().flat().concat(
+            sheet.getRange(column + "4:" + column + "7").getValues().flat(),
+            sheet.getRange(column + "9:" + column + dataRange.getLastRow()).getValues().flat()
+        );
+    } else {
+        values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
+    }
+
     const isEmpty = values.every(value => !value.trim());
 
     if (isEmpty) {
         const cell = sheet.getRange(column + "2");
         cell.setValue(exampleText)
             .setFontStyle("italic")
-            .setFontColor("#A9A9A9"); // Dark gray color
+            .setFontColor(fontColor); // Custom font color
     }
 }
 
