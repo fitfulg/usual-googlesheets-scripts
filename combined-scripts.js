@@ -95,7 +95,7 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
 }
 // Contents of ./TODOsheet/TODOformatting.js
 
-function exampleTextTODO(column, exampleText, fontColor = "#A9A9A9") {
+function exampleTextTODO(column, exampleText) {
     const dataRange = sheet.getDataRange();
     let values;
 
@@ -114,9 +114,7 @@ function exampleTextTODO(column, exampleText, fontColor = "#A9A9A9") {
 
     if (isEmpty) {
         const cell = sheet.getRange(column + "2");
-        cell.setValue(exampleText)
-            .setFontStyle("italic")
-            .setFontColor(fontColor); // Custom font color
+        cell.setValue(exampleText);
     }
 }
 
@@ -238,22 +236,22 @@ const exampleTexts = {
 
 // Contents of ./TODOsheet/TODOtriggers.js
 
-function onEdit(e) {
-    const sheet = e.source.getActiveSheet();
-    const range = e.range;
-    const columnLetter = range.getA1Notation().charAt(0);
+// function onEdit(e) {
+//     const sheet = e.source.getActiveSheet();
+//     const range = e.range;
+//     const columnLetter = range.getA1Notation().charAt(0);
 
-    if (exampleTexts[columnLetter]) {
-        const { text, color } = exampleTexts[columnLetter];
+//     if (exampleTexts[columnLetter]) {
+//         const { text, color } = exampleTexts[columnLetter];
 
-        // If the cell contains the example text, clear it
-        if (range.getValue() === text) {
-            range.setValue("")
-                .setFontStyle("normal")
-                .setFontColor("#000000"); // Set font color to black or default
-        }
-    }
-}
+//         // If the cell contains the example text, clear it
+//         if (range.getValue() === text) {
+//             range.setValue("")
+//                 .setFontStyle("normal")
+//                 .setFontColor("#000000"); // Set font color to black or default
+//         }
+//     }
+// }
 
 // Contents of ./TODOsheet/TODOvalidation.js
 

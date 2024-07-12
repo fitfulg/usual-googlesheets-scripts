@@ -1,4 +1,4 @@
-function exampleTextTODO(column, exampleText, fontColor = "#A9A9A9") {
+function exampleTextTODO(column, exampleText) {
     const dataRange = sheet.getDataRange();
     let values;
 
@@ -17,9 +17,7 @@ function exampleTextTODO(column, exampleText, fontColor = "#A9A9A9") {
 
     if (isEmpty) {
         const cell = sheet.getRange(column + "2");
-        cell.setValue(exampleText)
-            .setFontStyle("italic")
-            .setFontColor(fontColor); // Custom font color
+        cell.setValue(exampleText);
     }
 }
 
