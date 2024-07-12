@@ -53,23 +53,24 @@ function applyFormatToAllTODO() {
         exampleTextTODO(column, text);
     }
 }
-function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
-    let range = sheet.getRange(startRow, col, endRow - startRow + 1, 1);
+function setColumnBackground(sheet, col, color, startRow = 2) {
+    let totalRows = sheet.getMaxRows();
+    let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
 }
-
 function customCeilBGColorTODO() {
     let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const totalRows = sheet.getMaxRows();
 
     // Apply background colors to specific columns
-    setColumnBackground(sheet, 1, '#d3d3d3'); // Column A: Light gray 3
-    setColumnBackground(sheet, 6, '#fff1f1'); // Column F: Light pink
-    setColumnBackground(sheet, 7, '#d3d3d3'); // Column G: Light gray 3
+    setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
+    setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
+    setColumnBackground(sheet, 7, '#d3d3d3', 2); // Column G: Light gray 3
 
     // Apply white background to columns B, C, D, E, H, I starting from row 2
     let whiteColumns = [2, 3, 4, 5, 8, 9]; // Columns B, C, D, E, H, I
     for (let col of whiteColumns) {
-        setColumnBackground(sheet, col, '#ffffff', 2, 20);
+        setColumnBackground(sheet, col, '#ffffff', 2);
     }
 
     // Apply dark yellow background to specific cells in column B
