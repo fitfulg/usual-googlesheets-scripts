@@ -139,7 +139,7 @@ function applyFormatToAllTODO() {
     checkAndSetColumn("E", 20, "LOW PRIORITY");
 
     // Add example text to specific columns if empty
-    exampleTextTODO("A", "Example: Do it with fear but do it.");
+    exampleTextTODO("A", "Example: Do it with fear but do it.", "#FFFFFF");
     exampleTextTODO("B", "Example: 45min of cardio");
     exampleTextTODO("C", "Example: Join that gym club");
     exampleTextTODO("D", "Example: Submit that pending data science task.");
