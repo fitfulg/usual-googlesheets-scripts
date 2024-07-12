@@ -42,14 +42,10 @@ function applyFormatToAllTODO() {
     checkAndSetColumn("E", 20, "LOW PRIORITY");
 
     // Add example text to specific columns if empty
-    exampleTextTODO("A", "Example: Do it with fear but do it.", "#FFFFFF");
-    exampleTextTODO("B", "Example: 45min of cardio");
-    exampleTextTODO("C", "Example: Join that gym club");
-    exampleTextTODO("D", "Example: Submit that pending data science task.");
-    exampleTextTODO("E", "Example: Buy a new mattress.");
-    exampleTextTODO("F", "Example: Santiago route.");
-    exampleTextTODO("G", "Example: Change front brake pad at 44500km");
-    exampleTextTODO("H", "Example: Join that Crossfit club");
+    for (const column in exampleTexts) {
+        const { text, color } = exampleTexts[column];
+        exampleTextTODO(column, text, color);
+    }
 }
 
 function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
@@ -78,14 +74,8 @@ function customCeilBGColorTODO() {
 
 
 function setCellContentAndStyleTODO() {
-    setCellStyle("A1", "QUICK PATTERNS", "bold", "#FFFFFF", "#000000", "center");
-    setCellStyle("B1", "TOMORROW", "bold", "#FFFFFF", "#b5a642", "center");
-    setCellStyle("B3", "WEEK", "bold", "#FFFFFF", "#b5a642", "center");
-    setCellStyle("B8", "MONTH", "bold", "#FFFFFF", "#b5a642", "center");
-    setCellStyle("F1", "💡IDEAS AND PLANS", "bold", "#000000", "#FFC0CB", "center");
-    setCellStyle("G1", "👀 EYES ON", "bold", "#000000", "#b7b7b7", "center");
-    setCellStyle("H1", "IN QUARANTINE BEFORE BEING CANCELED", "bold", "#FF0000", null, "center");
-    setCellStyle("C1", "HIGH PRIORITY", "bold", null, "#fce5cd", "center");
-    setCellStyle("D1", "MEDIUM PRIORITY", "bold", null, "#fff2cc", "center");
-    setCellStyle("E1", "LOW PRIORITY", "bold", null, "#d9ead3", "center");
+    for (const cell in cellStyles) {
+        const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
+        setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment);
+    }
 }

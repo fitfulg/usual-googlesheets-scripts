@@ -139,14 +139,10 @@ function applyFormatToAllTODO() {
     checkAndSetColumn("E", 20, "LOW PRIORITY");
 
     // Add example text to specific columns if empty
-    exampleTextTODO("A", "Example: Do it with fear but do it.", "#FFFFFF");
-    exampleTextTODO("B", "Example: 45min of cardio");
-    exampleTextTODO("C", "Example: Join that gym club");
-    exampleTextTODO("D", "Example: Submit that pending data science task.");
-    exampleTextTODO("E", "Example: Buy a new mattress.");
-    exampleTextTODO("F", "Example: Santiago route.");
-    exampleTextTODO("G", "Example: Change front brake pad at 44500km");
-    exampleTextTODO("H", "Example: Join that Crossfit club");
+    for (const column in exampleTexts) {
+        const { text, color } = exampleTexts[column];
+        exampleTextTODO(column, text, color);
+    }
 }
 
 function setColumnBackground(sheet, col, color, startRow = 2, endRow = 20) {
@@ -175,16 +171,10 @@ function customCeilBGColorTODO() {
 
 
 function setCellContentAndStyleTODO() {
-    setCellStyle("A1", "QUICK PATTERNS", "bold", "#FFFFFF", "#000000", "center");
-    setCellStyle("B1", "TOMORROW", "bold", "#FFFFFF", "#b5a642", "center");
-    setCellStyle("B3", "WEEK", "bold", "#FFFFFF", "#b5a642", "center");
-    setCellStyle("B8", "MONTH", "bold", "#FFFFFF", "#b5a642", "center");
-    setCellStyle("F1", "💡IDEAS AND PLANS", "bold", "#000000", "#FFC0CB", "center");
-    setCellStyle("G1", "👀 EYES ON", "bold", "#000000", "#b7b7b7", "center");
-    setCellStyle("H1", "IN QUARANTINE BEFORE BEING CANCELED", "bold", "#FF0000", null, "center");
-    setCellStyle("C1", "HIGH PRIORITY", "bold", null, "#fce5cd", "center");
-    setCellStyle("D1", "MEDIUM PRIORITY", "bold", null, "#fff2cc", "center");
-    setCellStyle("E1", "LOW PRIORITY", "bold", null, "#d9ead3", "center");
+    for (const cell in cellStyles) {
+        const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
+        setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment);
+    }
 }
 
 // Contents of ./TODOsheet/TODOpiechart.js
@@ -215,6 +205,49 @@ function createPieChartTODO() {
         .build();
 
     sheet.insertChart(chart);
+}
+
+// Contents of ./TODOsheet/TODOtextObjects.js
+
+const cellStyles = {
+    "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
+    "B1": { value: "TOMORROW", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#b5a642", alignment: "center" },
+    "B3": { value: "WEEK", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#b5a642", alignment: "center" },
+    "B8": { value: "MONTH", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#b5a642", alignment: "center" },
+    "F1": { value: "💡IDEAS AND PLANS", fontWeight: "bold", fontColor: "#000000", backgroundColor: "#FFC0CB", alignment: "center" },
+    "G1": { value: "👀 EYES ON", fontWeight: "bold", fontColor: "#000000", backgroundColor: "#b7b7b7", alignment: "center" },
+    "H1": { value: "IN QUARANTINE BEFORE BEING CANCELED", fontWeight: "bold", fontColor: "#FF0000", backgroundColor: null, alignment: "center" },
+    "C1": { value: "HIGH PRIORITY", fontWeight: "bold", fontColor: null, backgroundColor: "#fce5cd", alignment: "center" },
+    "D1": { value: "MEDIUM PRIORITY", fontWeight: "bold", fontColor: null, backgroundColor: "#fff2cc", alignment: "center" },
+    "E1": { value: "LOW PRIORITY", fontWeight: "bold", fontColor: null, backgroundColor: "#d9ead3", alignment: "center" }
+};
+
+const exampleTexts = {
+    "A": { text: "Example: Do it with fear but do it.", color: "#FFFFFF" },
+    "B": { text: "Example: 45min of cardio", color: "#A9A9A9" },
+    "C": { text: "Example: Join that gym club", color: "#A9A9A9" },
+    "D": { text: "Example: Submit that pending data science task.", color: "#A9A9A9" },
+    "E": { text: "Example: Buy a new mattress.", color: "#A9A9A9" },
+    "F": { text: "Example: Santiago route.", color: "#A9A9A9" },
+    "G": { text: "Example: Change front brake pad at 44500km", color: "#A9A9A9" },
+    "H": { text: "Example: Join that Crossfit club", color: "#FFFFFF" },
+    "I": { text: "Example: Additional Info", color: "#A9A9A9" }
+};
+
+// Contents of ./TODOsheet/TODOtriggers.js
+
+function onEdit(e) {
+    const range = e.range;
+    const value = e.value;
+
+    // Check if the cell is in the specified columns and contains example text
+    const columnLetter = range.getA1Notation().charAt(0);
+
+    if (exampleTexts[columnLetter] && value === exampleTexts[columnLetter].text) {
+        // Remove the example text formatting
+        range.setFontStyle("normal")
+            .setFontColor("#000000"); // Set font color to black or default
+    }
 }
 
 // Contents of ./TODOsheet/TODOvalidation.js
