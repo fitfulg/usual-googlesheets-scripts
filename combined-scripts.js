@@ -276,6 +276,6 @@ function checkAndSetColumn(column, limit, priority) {
     } else {
         // Set border color to black with thicker border
         range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-        sheet.getRange(column + "1").setValue("PRIORITY " + priority);
+        sheet.getRange(column + "1").setValue(priority);
     }
 }
