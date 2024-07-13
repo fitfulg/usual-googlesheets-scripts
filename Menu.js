@@ -20,7 +20,7 @@ function onOpen() {
 
 function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
-    ui.alert("Hello, World from Github to GoogleSheets!");
+    ui.alert("Hello, World from Github to GoogleSheets!!!");
 }
 // IDEA to implement :
 // function showLoading() {

@@ -24,7 +24,7 @@ function onOpen() {
 
 function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
-    ui.alert("Hello, World from Github to GoogleSheets!");
+    ui.alert("Hello, World from Github to GoogleSheets!!!");
 }
 // IDEA to implement :
 // function showLoading() {
@@ -235,26 +235,6 @@ const exampleTexts = {
     "G": { text: "Example: Change front brake pad at 44500km", color: "#FFFFFF" },
     "H": { text: "Example: Join that Crossfit club", color: "#A9A9A9" },
 };
-
-// Contents of ./TODOsheet/TODOtriggers.js
-
-// IDEA
-// function onEdit(e) {
-//     const sheet = e.source.getActiveSheet();
-//     const range = e.range;
-//     const columnLetter = range.getA1Notation().charAt(0);
-
-//     if (exampleTexts[columnLetter]) {
-//         const { text, color } = exampleTexts[columnLetter];
-
-//         // If the cell contains the example text, clear it
-//         if (range.getValue() === text) {
-//             range.setValue("")
-//                 .setFontStyle("normal")
-//                 .setFontColor("#000000"); // Set font color to black or default
-//         }
-//     }
-// }
 
 // Contents of ./TODOsheet/TODOvalidation.js
 
