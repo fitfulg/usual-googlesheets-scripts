@@ -1,4 +1,3 @@
-// Add the onEdit function to track changes in specified columns and add the date
 function onEdit(e) {
     const sheet = e.source.getActiveSheet();
     const range = e.range;
@@ -11,28 +10,28 @@ function onEdit(e) {
         const date = new Date();
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
 
-        // Create a RichTextValueBuilder to combine text and style
-        let richTextBuilder = SpreadsheetApp.newRichTextValue()
+        // RichTextValueBuilder to combine text and style
+        const richTextValueBuilder = SpreadsheetApp.newRichTextValue()
             .setText(cellValue + ' ' + formattedDate);
 
-        // current text styles
+        // Get current text styles
         const textStyle = SpreadsheetApp.newTextStyle()
             .setFontStyle('normal')
             .setForegroundColor('#000000')
             .build();
 
-        richTextBuilder = richTextBuilder.setTextStyle(0, cellValue.length, textStyle);
+        richTextValueBuilder.setTextStyle(0, cellValue.length, textStyle);
 
-        // styles just for the date
+        // Create styles for the date only
         const dateStyle = SpreadsheetApp.newTextStyle()
             .setFontStyle('italic')
             .setForegroundColor('#555555')
             .build();
 
-        richTextBuilder = richTextBuilder.setTextStyle(cellValue.length, cellValue.length + formattedDate.length + 1, dateStyle);
+        richTextValueBuilder.setTextStyle(cellValue.length, cellValue.length + formattedDate.length + 1, dateStyle);
 
-        // Set the RichTextValue in the cell
-        range.setRichTextValue(richTextBuilder.build());
+        // Build the RichTextValue and set it in the cell
+        const richTextValue = richTextValueBuilder.build();
+        range.setRichTextValue(richTextValue);
     }
 }
-
