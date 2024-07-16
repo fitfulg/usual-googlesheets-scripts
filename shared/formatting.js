@@ -50,3 +50,23 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
         range.setBackground(backgroundColor);
     }
 }
+
+// Append DATE in italic and dark gray without changing the original cell text
+function appendDateWithStyle(cellValue, dateFormatted) {
+    const richTextValue = SpreadsheetApp.newRichTextValue()
+        .setText(cellValue + dateFormatted)
+        .setTextStyle(cellValue.length, (cellValue + dateFormatted).length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
+        .build();
+
+    return richTextValue;
+}
+
+// Function to reset the text style of a cell
+function resetTextStyle(range) {
+    const richTextValue = SpreadsheetApp.newRichTextValue()
+        .setText(range.getValue())
+        .setTextStyle(SpreadsheetApp.newTextStyle().build())
+        .build();
+
+    range.setRichTextValue(richTextValue);
+}

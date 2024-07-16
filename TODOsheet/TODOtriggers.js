@@ -9,6 +9,7 @@ function onEdit(e) {
     if (column >= 3 && column <= 8 && row >= 2) {
         const cellValue = range.getValue();
         if (cellValue.trim() === "") {
+            resetTextStyle(range);
             return;
         }
         const date = new Date();
@@ -21,14 +22,4 @@ function onEdit(e) {
         const richTextValue = appendDateWithStyle(cellValue, dateFormatted);
         range.setRichTextValue(richTextValue);
     }
-}
-
-// Format date in italic and dark gray without changing the original cell text
-function appendDateWithStyle(cellValue, dateFormatted) {
-    const richTextValue = SpreadsheetApp.newRichTextValue()
-        .setText(cellValue + dateFormatted)
-        .setTextStyle(cellValue.length, (cellValue + dateFormatted).length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
-        .build();
-
-    return richTextValue;
 }
