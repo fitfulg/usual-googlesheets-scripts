@@ -14,27 +14,15 @@ function onOpen() {
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
-    // Call function when the document is opened or refreshed
-    // showLoading();
     createPieChartTODO();
     customCeilBGColorTODO();
     applyFormatToAllTODO();
-    // hideLoading();
 }
 
 function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
-    ui.alert("Hello, World from Github to GoogleSheets!!!");
+    ui.alert("Hello, World from Github to GoogleSheets!!!!!!!!!");
 }
-// IDEA to implement :
-// function showLoading() {
-//     SpreadsheetApp.getActiveSpreadsheet().toast('Loading, please wait...', 'Loading', -1);
-// }
-
-// function hideLoading() {
-//     SpreadsheetApp.getUi().alert('Loading complete!');
-// }
-
 // Contents of ./shared/formatting.js
 
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -235,6 +223,29 @@ const exampleTexts = {
     "G": { text: "Example: Change front brake pad at 44500km", color: "#FFFFFF" },
     "H": { text: "Example: Join that Crossfit club", color: "#A9A9A9" },
 };
+
+// Contents of ./TODOsheet/TODOtriggers.js
+
+// Add the onEdit function to track changes in specified columns and add the date
+function onEdit(e) {
+    const sheet = e.source.getActiveSheet();
+    const range = e.range;
+    const column = range.getColumn();
+    const row = range.getRow();
+
+    // Check if the edition is in columns C, D, E, F, G, H and from row 2 down
+    if (column >= 3 && column <= 8 && row >= 2) {
+        const cellValue = range.getValue();
+        const date = new Date();
+        const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
+
+        // Formatear la fecha en cursiva y gris oscuro
+        const dateFormatted = ` ${formattedDate}`;
+        range.setValue(cellValue + dateFormatted)
+            .setFontStyle('italic')
+            .setFontColor('#555555');
+    }
+}
 
 // Contents of ./TODOsheet/TODOvalidation.js
 
