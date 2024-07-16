@@ -8,6 +8,9 @@ function onEdit(e) {
     // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
     if (column >= 3 && column <= 8 && row >= 2) {
         const cellValue = range.getValue();
+        if (cellValue.trim() === "") {
+            return;
+        }
         const date = new Date();
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
 
