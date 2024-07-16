@@ -241,10 +241,22 @@ function onEdit(e) {
 
         // Append the formatted date at the end of the cell content
         const dateFormatted = ` ${formattedDate}`;
-        range.setValue(cellValue + dateFormatted);
+
+        // Set the value with the date and apply the rich text formatting
+        const richTextValue = appendDateWithStyle(cellValue, dateFormatted);
+        range.setRichTextValue(richTextValue);
     }
 }
 
+// Format date in italic and dark gray without changing the original cell text
+function appendDateWithStyle(cellValue, dateFormatted) {
+    const richTextValue = SpreadsheetApp.newRichTextValue()
+        .setText(cellValue + dateFormatted)
+        .setTextStyle(cellValue.length, (cellValue + dateFormatted).length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
+        .build();
+
+    return richTextValue;
+}
 // Contents of ./TODOsheet/TODOvalidation.js
 
 function checkAndSetColumn(column, limit, priority) {
