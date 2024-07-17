@@ -6,6 +6,7 @@ function onEdit(e) {
     const range = e.range;
     const column = range.getColumn();
     const row = range.getRow();
+    const columnLetter = String.fromCharCode(64 + column);
 
     // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
     if (column >= 3 && column <= 8 && row >= 2) {
@@ -20,8 +21,8 @@ function onEdit(e) {
         const dateFormatted = `\n${formattedDate}`;
 
         const richTextValue = datePattern.test(cellValue)
-            ? updateDateWithStyle(cellValue, dateFormatted)
-            : appendDateWithStyle(cellValue, dateFormatted);
+            ? updateDateWithStyle(cellValue, dateFormatted, columnLetter)
+            : appendDateWithStyle(cellValue, dateFormatted, columnLetter);
 
         // Set the value with the date and apply the rich text formatting
         range.setRichTextValue(richTextValue);
