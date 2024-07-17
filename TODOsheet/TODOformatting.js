@@ -1,4 +1,8 @@
+// globals.js: sheet, getDataRange
+// shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
+
 function exampleTextTODO(column, exampleText) {
+    const dataRange = getDataRange();
     let values;
 
     if (column === "B") {

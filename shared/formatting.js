@@ -1,3 +1,5 @@
+// globals.js: sheet, getDataRange
+
 // Higher-order function to apply formatting to a range only if it is valid
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
@@ -18,7 +20,7 @@ function applyFormatToSelected() {
 }
 
 function applyFormatToAll() {
-    let range = dataRange;
+    let range = getDataRange();
     Format(range);
     applyBorders(range);
 }

@@ -1,5 +1,7 @@
+// globals.js: sheet, getDataRange
+
 function checkAndSetColumn(column, limit, priority) {
-    const dataRange = dataRange;
+    const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());

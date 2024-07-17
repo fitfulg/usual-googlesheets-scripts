@@ -1,3 +1,6 @@
+// globals.js: ui
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO
+
 function onOpen() {
     // custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')

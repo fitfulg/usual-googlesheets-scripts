@@ -1,4 +1,7 @@
+// globals.js: sheet, getDataRange
+
 function createPieChartTODO() {
+    const dataRange = getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
     const valuesE = sheet.getRange("E2:E" + dataRange.getLastRow()).getValues().flat();

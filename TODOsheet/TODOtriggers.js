@@ -1,3 +1,6 @@
+// globals.js: sheet, datePattern, getDataRange
+// shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
+
 // Add the onEdit function to track changes in specified columns and add the date
 function onEdit(e) {
     const range = e.range;

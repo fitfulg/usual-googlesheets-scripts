@@ -4,9 +4,12 @@
 
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+const getDataRange = () => sheet.getDataRange();
 const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
-const dataRange = sheet.getDataRange();
 // Contents of ./Menu.js
+
+// globals.js: ui
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO
 
 function onOpen() {
     // custom menu
@@ -34,6 +37,8 @@ function logHelloWorld() {
 }
 // Contents of ./shared/formatting.js
 
+// globals.js: sheet, getDataRange
+
 // Higher-order function to apply formatting to a range only if it is valid
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
@@ -54,7 +59,7 @@ function applyFormatToSelected() {
 }
 
 function applyFormatToAll() {
-    let range = dataRange;
+    let range = getDataRange();
     Format(range);
     applyBorders(range);
 }
@@ -103,7 +108,11 @@ function resetTextStyle(range) {
 
 // Contents of ./TODOsheet/TODOformatting.js
 
+// globals.js: sheet, getDataRange
+// shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
+
 function exampleTextTODO(column, exampleText) {
+    const dataRange = getDataRange();
     let values;
 
     if (column === "B") {
@@ -187,7 +196,10 @@ function setCellContentAndStyleTODO() {
 
 // Contents of ./TODOsheet/TODOpiechart.js
 
+// globals.js: sheet, getDataRange
+
 function createPieChartTODO() {
+    const dataRange = getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
     const valuesE = sheet.getRange("E2:E" + dataRange.getLastRow()).getValues().flat();
@@ -241,6 +253,9 @@ const exampleTexts = {
 
 // Contents of ./TODOsheet/TODOtriggers.js
 
+// globals.js: sheet, datePattern, getDataRange
+// shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
+
 // Add the onEdit function to track changes in specified columns and add the date
 function onEdit(e) {
     const range = e.range;
@@ -270,8 +285,10 @@ function onEdit(e) {
 
 // Contents of ./TODOsheet/TODOvalidation.js
 
+// globals.js: sheet, getDataRange
+
 function checkAndSetColumn(column, limit, priority) {
-    const dataRange = dataRange;
+    const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());
