@@ -214,7 +214,11 @@ function updateDateColorsTODO() {
                 const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
 
                 let color = '#A9A9A9'; // Default color (dark gray)
-                if (diffDays >= config.danger) {
+                if (column === 'G') {
+                    color = '#A9A9A9'; // Always gray
+                } else if (column === 'H') {
+                    color = '#FF0000'; // Always red
+                } else if (diffDays >= config.danger) {
                     color = config.dangerColor;
                 } else if (diffDays >= config.warning) {
                     color = config.warningColor;
@@ -230,7 +234,6 @@ function updateDateColorsTODO() {
         }
     });
 }
-
 // Contents of ./TODOsheet/TODOlibrary.js
 
 const cellStyles = {
