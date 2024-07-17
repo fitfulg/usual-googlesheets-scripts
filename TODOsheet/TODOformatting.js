@@ -1,5 +1,6 @@
 // globals.js: sheet, getDataRange
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
+// TODOsheet/TODOlibrary.js: dateColorConfig
 
 function exampleTextTODO(column, exampleText) {
     const dataRange = getDataRange();
@@ -82,4 +83,39 @@ function setCellContentAndStyleTODO() {
         const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
         setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment);
     }
+}
+
+// Function to update date colors based on time passed
+function updateDateColorsTODO() {
+    const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
+    const dataRange = getDataRange();
+    const lastRow = dataRange.getLastRow();
+
+    columns.forEach((column, index) => {
+        const config = dateColorConfig[column];
+        for (let row = 2; row <= lastRow; row++) {
+            const cell = sheet.getRange(`${column}${row}`);
+            const cellValue = cell.getValue();
+            if (datePattern.test(cellValue)) {
+                const dateText = cellValue.match(datePattern)[0].trim();
+                const cellDate = new Date(dateText.split('/').reverse().join('/'));
+                const today = new Date();
+                const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
+
+                let color = '#A9A9A9'; // Default color (dark gray)
+                if (diffDays >= config.danger) {
+                    color = config.dangerColor;
+                } else if (diffDays >= config.warning) {
+                    color = config.warningColor;
+                }
+
+                const richTextValue = SpreadsheetApp.newRichTextValue()
+                    .setText(cellValue)
+                    .setTextStyle(cellValue.length - dateText.length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())
+                    .build();
+
+                cell.setRichTextValue(richTextValue);
+            }
+        }
+    });
 }

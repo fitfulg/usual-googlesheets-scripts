@@ -21,3 +21,12 @@ const exampleTexts = {
     "G": { text: "Example: Change front brake pad at 44500km", color: "#FFFFFF" },
     "H": { text: "Example: Join that Crossfit club", color: "#A9A9A9" },
 };
+
+const dateColorConfig = {
+    C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 1 week, 1 month
+    D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 3 months, 6 months
+    E: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 6 months, 1 year
+    F: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 6 months, 1 year
+    G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9' }, // Always default
+    H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000' } // Always red
+};

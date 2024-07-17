@@ -1,5 +1,5 @@
 // globals.js: ui
-// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO
 
 function onOpen() {
     // custom menu
@@ -19,6 +19,7 @@ function onOpen() {
     createPieChartTODO();
     customCeilBGColorTODO();
     applyFormatToAllTODO();
+    updateDateColorsTODO();
 }
 
 function logHelloWorld() {
