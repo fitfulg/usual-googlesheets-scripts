@@ -77,25 +77,38 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
     }
 }
 
-// append DATE to cell
-function appendDateWithStyle(cellValue, dateFormatted) {
+// Append DATE to cell
+function appendDateWithStyle(cellValue, dateFormatted, column) {
     const newText = cellValue + '\n' + dateFormatted;
-    return createRichTextValue(newText, dateFormatted);
+    return createRichTextValue(newText, dateFormatted, column);
 }
 
 // Update DATE in cell if it already exists
-function updateDateWithStyle(cellValue, dateFormatted) {
+function updateDateWithStyle(cellValue, dateFormatted, column) {
     const newText = cellValue.replace(datePattern, '\n' + dateFormatted);
-    return createRichTextValue(newText, dateFormatted);
+    return createRichTextValue(newText, dateFormatted, column);
 }
 
-// create rich text value with italic date
-function createRichTextValue(text, dateFormatted) {
+// Create rich text value with italic date
+function createRichTextValue(text, dateFormatted, column) {
+    let color;
+    switch (column) {
+        case 'G':
+            color = '#A9A9A9'; // Always gray
+            break;
+        case 'H':
+            color = '#FF0000'; // Always red
+            break;
+        default:
+            color = '#A9A9A9'; // Default color (dark gray)
+            break;
+    }
     return SpreadsheetApp.newRichTextValue()
         .setText(text)
-        .setTextStyle(text.length - dateFormatted.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
+        .setTextStyle(text.length - dateFormatted.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())
         .build();
 }
+
 
 // Reset the text style of a cell
 function resetTextStyle(range) {
