@@ -9,26 +9,18 @@ function onEdit(e) {
     if (column >= 3 && column <= 8 && row >= 2) {
         const cellValue = range.getValue();
 
-        // If the cell is empty, reset text style and do nothing else
-        if (cellValue.trim() === "") {
-            resetTextStyle(range);
-            return;
-        }
+        if (cellValue.trim() === "") return resetTextStyle(range);
 
         const date = new Date();
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
 
         // Append or update the formatted date at the end of the cell content
-        const dateFormatted = ` ${formattedDate}`;
-        const datePattern = /\s\d{2}\/\d{2}\/\d{2}$/;
+        const dateFormatted = `\n${formattedDate}`;
+        const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/;
 
-        // Check if there is already a date, and update it if so; otherwise, append it
-        let richTextValue;
-        if (datePattern.test(cellValue)) {
-            richTextValue = updateDateWithStyle(cellValue, dateFormatted);
-        } else {
-            richTextValue = appendDateWithStyle(cellValue, dateFormatted);
-        }
+        const richTextValue = datePattern.test(cellValue)
+            ? updateDateWithStyle(cellValue, dateFormatted)
+            : appendDateWithStyle(cellValue, dateFormatted);
 
         // Set the value with the date and apply the rich text formatting
         range.setRichTextValue(richTextValue);

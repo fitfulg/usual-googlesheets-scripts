@@ -1,40 +1,26 @@
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-function withValidRange(fn) {
-    return function (range, ...args) {
-        if (range) {
-            fn(range, ...args);
-        }
-    };
-}
+// Higher-order function to apply formatting to a range only if it is valid
+const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
-const Format = withValidRange(function (range) {
-    // Apply the desired formats
+const Format = withValidRange((range) => {
     range.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
     range.setHorizontalAlignment("center");
     range.setVerticalAlignment("middle");
 });
 
-const applyBordersWithStyle = withValidRange(function (range, borderStyle) {
-    // Apply borders with specified style
-    range.setBorder(true, true, true, true, true, true, "#000000", borderStyle);
-});
-
+const applyBordersWithStyle = withValidRange((range, borderStyle) => range.setBorder(true, true, true, true, true, true, "#000000", borderStyle));
 const applyBorders = range => applyBordersWithStyle(range, SpreadsheetApp.BorderStyle.SOLID);
 const applyThickBorders = range => applyBordersWithStyle(range, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 
 function applyFormatToSelected() {
-    // Get the active sheet and the selected range
     let range = sheet.getActiveRange();
-    // Apply formatting to the selected range
     Format(range);
     applyBorders(range);
 }
 
 function applyFormatToAll() {
-    // Get the active sheet and the entire data range
     let range = sheet.getDataRange();
-    // Apply formatting to the entire data range
     Format(range);
     applyBorders(range);
 }
@@ -51,17 +37,28 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
     }
 }
 
-// Append DATE in italic and dark gray without changing the original cell text
+// append DATE to cell
 function appendDateWithStyle(cellValue, dateFormatted) {
-    const richTextValue = SpreadsheetApp.newRichTextValue()
-        .setText(cellValue + dateFormatted)
-        .setTextStyle(cellValue.length, (cellValue + dateFormatted).length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
-        .build();
-
-    return richTextValue;
+    const newText = cellValue + '\n' + dateFormatted;
+    return createRichTextValue(newText, dateFormatted);
 }
 
-// Function to reset the text style of a cell
+// Update DATE in cell if it already exists
+function updateDateWithStyle(cellValue, dateFormatted) {
+    const datePattern = /\s\d{2}\/\d{2}\/\d{2}$/;
+    const newText = cellValue.replace(datePattern, '\n' + dateFormatted);
+    return createRichTextValue(newText, dateFormatted);
+}
+
+// create rich text value with italic date
+function createRichTextValue(text, dateFormatted) {
+    return SpreadsheetApp.newRichTextValue()
+        .setText(text)
+        .setTextStyle(text.length - dateFormatted.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
+        .build();
+}
+
+// Reset the text style of a cell
 function resetTextStyle(range) {
     const richTextValue = SpreadsheetApp.newRichTextValue()
         .setText(range.getValue())
