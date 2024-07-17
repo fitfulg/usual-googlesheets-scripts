@@ -1,5 +1,4 @@
 function onOpen() {
-    let ui = SpreadsheetApp.getUi();
     // custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')

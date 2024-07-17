@@ -1,6 +1,5 @@
 // Add the onEdit function to track changes in specified columns and add the date
 function onEdit(e) {
-    const sheet = e.source.getActiveSheet();
     const range = e.range;
     const column = range.getColumn();
     const row = range.getRow();
@@ -16,7 +15,6 @@ function onEdit(e) {
 
         // Append or update the formatted date at the end of the cell content
         const dateFormatted = `\n${formattedDate}`;
-        const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/;
 
         const richTextValue = datePattern.test(cellValue)
             ? updateDateWithStyle(cellValue, dateFormatted)

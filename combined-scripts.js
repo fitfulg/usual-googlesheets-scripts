@@ -1,9 +1,14 @@
 // Auto-generated file with all JS scripts
 
+// Contents of ./globals.js
+
+const ui = SpreadsheetApp.getUi();
+const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
+
 // Contents of ./Menu.js
 
 function onOpen() {
-    let ui = SpreadsheetApp.getUi();
     // custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
@@ -28,8 +33,6 @@ function logHelloWorld() {
     console.log('Hello World from Custom Menu!');
 }
 // Contents of ./shared/formatting.js
-
-const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
 // Higher-order function to apply formatting to a range only if it is valid
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
@@ -76,7 +79,6 @@ function appendDateWithStyle(cellValue, dateFormatted) {
 
 // Update DATE in cell if it already exists
 function updateDateWithStyle(cellValue, dateFormatted) {
-    const datePattern = /\s\d{2}\/\d{2}\/\d{2}$/;
     const newText = cellValue.replace(datePattern, '\n' + dateFormatted);
     return createRichTextValue(newText, dateFormatted);
 }
@@ -126,8 +128,6 @@ function exampleTextTODO(column, exampleText) {
 
 
 function applyFormatToAllTODO() {
-    // Get the active sheet and determine the total number of rows
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const totalRows = sheet.getMaxRows();
 
     // Get the range for all the columns A to H up to the last row
@@ -162,9 +162,6 @@ function setColumnBackground(sheet, col, color, startRow = 2) {
     range.setBackground(color);
 }
 function customCeilBGColorTODO() {
-    let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const totalRows = sheet.getMaxRows();
-
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
     setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
@@ -192,7 +189,6 @@ function setCellContentAndStyleTODO() {
 // Contents of ./TODOsheet/TODOpiechart.js
 
 function createPieChartTODO() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const dataRange = sheet.getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
@@ -249,7 +245,6 @@ const exampleTexts = {
 
 // Add the onEdit function to track changes in specified columns and add the date
 function onEdit(e) {
-    const sheet = e.source.getActiveSheet();
     const range = e.range;
     const column = range.getColumn();
     const row = range.getRow();
@@ -265,7 +260,6 @@ function onEdit(e) {
 
         // Append or update the formatted date at the end of the cell content
         const dateFormatted = `\n${formattedDate}`;
-        const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/;
 
         const richTextValue = datePattern.test(cellValue)
             ? updateDateWithStyle(cellValue, dateFormatted)
@@ -279,7 +273,6 @@ function onEdit(e) {
 // Contents of ./TODOsheet/TODOvalidation.js
 
 function checkAndSetColumn(column, limit, priority) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const dataRange = sheet.getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;

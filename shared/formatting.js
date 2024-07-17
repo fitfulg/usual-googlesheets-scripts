@@ -1,5 +1,3 @@
-const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
 // Higher-order function to apply formatting to a range only if it is valid
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
@@ -45,7 +43,6 @@ function appendDateWithStyle(cellValue, dateFormatted) {
 
 // Update DATE in cell if it already exists
 function updateDateWithStyle(cellValue, dateFormatted) {
-    const datePattern = /\s\d{2}\/\d{2}\/\d{2}$/;
     const newText = cellValue.replace(datePattern, '\n' + dateFormatted);
     return createRichTextValue(newText, dateFormatted);
 }

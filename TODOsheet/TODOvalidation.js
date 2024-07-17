@@ -1,5 +1,4 @@
 function checkAndSetColumn(column, limit, priority) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const dataRange = sheet.getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;

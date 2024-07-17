@@ -23,8 +23,6 @@ function exampleTextTODO(column, exampleText) {
 
 
 function applyFormatToAllTODO() {
-    // Get the active sheet and determine the total number of rows
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const totalRows = sheet.getMaxRows();
 
     // Get the range for all the columns A to H up to the last row
@@ -59,9 +57,6 @@ function setColumnBackground(sheet, col, color, startRow = 2) {
     range.setBackground(color);
 }
 function customCeilBGColorTODO() {
-    let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const totalRows = sheet.getMaxRows();
-
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
     setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
