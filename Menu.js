@@ -18,3 +18,8 @@ function onOpen() {
     customCeilBGColorTODO();
     applyFormatToAllTODO();
 }
+
+function logHelloWorld() {
+    ui.alert('Hello World from Custom Menu!');
+    console.log('Hello World from Custom Menu!');
+}
