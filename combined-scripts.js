@@ -5,23 +5,23 @@
 function onOpen() {
     let ui = SpreadsheetApp.getUi();
     // Add a custom menu
+    let todoSubMenu = ui.createMenu('TODO sheet')
+        .addItem('Apply Format to All', 'applyFormatToAllTODO')
+        .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
+        .addItem('Create Pie Chart', 'createPieChartTODO');
+
+    // Add the custom menu and the TODO sub-menu
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
-        .addItem('TODOsheet: Apply Format to All', 'applyFormatToAllTODO')
-        .addItem('TODOsheet: Set Ceil Background Colors', 'customCeilBGColorTODO')
-        .addItem('TODOsheet: Create Pie Chart', 'createPieChartTODO')
+        .addSeparator()
+        .addSubMenu(todoSubMenu)
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
     createPieChartTODO();
     customCeilBGColorTODO();
     applyFormatToAllTODO();
-}
-
-function logHelloWorld() {
-    const ui = SpreadsheetApp.getUi();
-    ui.alert("Hello, World from Github to GoogleSheets!!!!!!!!!");
 }
 // Contents of ./shared/formatting.js
 
