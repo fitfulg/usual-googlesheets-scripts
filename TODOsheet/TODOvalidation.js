@@ -1,5 +1,5 @@
 function checkAndSetColumn(column, limit, priority) {
-    const dataRange = sheet.getDataRange();
+    const dataRange = dataRange;
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());

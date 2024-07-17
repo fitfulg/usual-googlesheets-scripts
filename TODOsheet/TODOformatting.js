@@ -1,5 +1,4 @@
 function exampleTextTODO(column, exampleText) {
-    const dataRange = sheet.getDataRange();
     let values;
 
     if (column === "B") {

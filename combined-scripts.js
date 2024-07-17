@@ -5,7 +5,7 @@
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
-
+const dataRange = sheet.getDataRange();
 // Contents of ./Menu.js
 
 function onOpen() {
@@ -54,7 +54,7 @@ function applyFormatToSelected() {
 }
 
 function applyFormatToAll() {
-    let range = sheet.getDataRange();
+    let range = dataRange;
     Format(range);
     applyBorders(range);
 }
@@ -104,7 +104,6 @@ function resetTextStyle(range) {
 // Contents of ./TODOsheet/TODOformatting.js
 
 function exampleTextTODO(column, exampleText) {
-    const dataRange = sheet.getDataRange();
     let values;
 
     if (column === "B") {
@@ -189,7 +188,6 @@ function setCellContentAndStyleTODO() {
 // Contents of ./TODOsheet/TODOpiechart.js
 
 function createPieChartTODO() {
-    const dataRange = sheet.getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
     const valuesE = sheet.getRange("E2:E" + dataRange.getLastRow()).getValues().flat();
@@ -273,7 +271,7 @@ function onEdit(e) {
 // Contents of ./TODOsheet/TODOvalidation.js
 
 function checkAndSetColumn(column, limit, priority) {
-    const dataRange = sheet.getDataRange();
+    const dataRange = dataRange;
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());

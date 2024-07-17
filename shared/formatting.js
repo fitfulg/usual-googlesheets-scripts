@@ -18,7 +18,7 @@ function applyFormatToSelected() {
 }
 
 function applyFormatToAll() {
-    let range = sheet.getDataRange();
+    let range = dataRange;
     Format(range);
     applyBorders(range);
 }
