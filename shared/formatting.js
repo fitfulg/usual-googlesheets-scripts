@@ -39,7 +39,7 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
 
 // Append DATE to cell
 function appendDateWithStyle(cellValue, dateFormatted, column) {
-    const newText = cellValue + '\n' + dateFormatted;
+    const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue + '\n' + dateFormatted;
     return createRichTextValue(newText, dateFormatted, column);
 }
 

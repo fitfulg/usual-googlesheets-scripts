@@ -79,7 +79,7 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
 
 // Append DATE to cell
 function appendDateWithStyle(cellValue, dateFormatted, column) {
-    const newText = cellValue + '\n' + dateFormatted;
+    const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue + '\n' + dateFormatted;
     return createRichTextValue(newText, dateFormatted, column);
 }
 
@@ -337,7 +337,7 @@ function onEdit(e) {
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
 
         // Append or update the formatted date at the end of the cell content
-        const dateFormatted = `\n${formattedDate}`;
+        const dateFormatted = `${formattedDate}`;
 
         const richTextValue = datePattern.test(cellValue)
             ? updateDateWithStyle(cellValue, dateFormatted, columnLetter)
