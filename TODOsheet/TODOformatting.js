@@ -45,9 +45,9 @@ function applyFormatToAllTODO() {
     setCellContentAndStyleTODO();
 
     // Check the number of occupied cells in columns C, D, and E
-    checkAndSetColumn("C", 10, "HIGH PRIORITY");
-    checkAndSetColumn("D", 20, "MEDIUM PRIORITY");
-    checkAndSetColumn("E", 20, "LOW PRIORITY");
+    checkAndSetColumn("C", 9, "HIGH PRIORITY");
+    checkAndSetColumn("D", 19, "MEDIUM PRIORITY");
+    checkAndSetColumn("E", 19, "LOW PRIORITY");
 
     // Add example text to specific columns if empty
     for (const column in exampleTexts) {
