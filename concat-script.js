@@ -40,7 +40,7 @@ function logHelloWorld() {
 
 // globals.js: sheet, getDataRange
 
-// Higher-order function to apply formatting to a range only if it is valid
+// Higher-order fn to apply formatting to a range only if it is valid
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
 const Format = withValidRange((range) => {
@@ -113,7 +113,7 @@ function resetTextStyle(range) {
 
 // Contents of ./TODOsheet/TODOformatting.js
 
-// globals.js: sheet, getDataRange
+// globals.js: sheet, getDataRange, datePattern
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
@@ -200,7 +200,7 @@ function setCellContentAndStyleTODO() {
     }
 }
 
-// Function to update date colors based on time passed
+// update date colors based on time passed
 function updateDateColorsTODO() {
     const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
     const dataRange = getDataRange();
@@ -211,7 +211,7 @@ function updateDateColorsTODO() {
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
-            if (datePattern.test(cellValue)) {
+            if (datePattern.test(cellValue)) {// test() is a
                 const dateText = cellValue.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
                 const today = new Date();
@@ -262,9 +262,9 @@ const exampleTexts = {
 
 const dateColorConfig = {
     C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
-    D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 3 months, 6 months
-    E: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 6 months, 1 year
-    F: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 6 months, 1 year
+    D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
+    E: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
+    F: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
     G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9', defaultColor: '#A9A9A9' }, // Always default
     H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
@@ -304,7 +304,7 @@ function createPieChartTODO() {
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
 
-// Add the onEdit function to track changes in specified columns and add the date
+// Track changes in specified columns and add the date
 function onEdit(e) {
     const range = e.range;
     const column = range.getColumn();
@@ -319,8 +319,6 @@ function onEdit(e) {
 
         const date = new Date();
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
-
-        // Append or update the formatted date at the end of the cell content
         const dateFormatted = ` ${formattedDate}`;
 
         const richTextValue = datePattern.test(cellValue)
@@ -343,12 +341,12 @@ function checkAndSetColumn(column, limit, priority) {
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());
 
     if (occupied > limit) {
-        // Set border color to red with thicker border
+        // red with thicker border
         range.setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
         sheet.getRange(column + "1").setValue("⚠️CELL LIMIT REACHED⚠️");
         SpreadsheetApp.getUi().alert("⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority);
     } else {
-        // Set border color to black with thicker border
+        // black with thicker border
         range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
         sheet.getRange(column + "1").setValue(priority);
     }

@@ -1,7 +1,7 @@
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
 
-// Add the onEdit function to track changes in specified columns and add the date
+// Track changes in specified columns and add the date
 function onEdit(e) {
     const range = e.range;
     const column = range.getColumn();
@@ -16,8 +16,6 @@ function onEdit(e) {
 
         const date = new Date();
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
-
-        // Append or update the formatted date at the end of the cell content
         const dateFormatted = ` ${formattedDate}`;
 
         const richTextValue = datePattern.test(cellValue)

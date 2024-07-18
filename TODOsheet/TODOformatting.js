@@ -1,4 +1,4 @@
-// globals.js: sheet, getDataRange
+// globals.js: sheet, getDataRange, datePattern
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
@@ -85,7 +85,7 @@ function setCellContentAndStyleTODO() {
     }
 }
 
-// Function to update date colors based on time passed
+// update date colors based on time passed
 function updateDateColorsTODO() {
     const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
     const dataRange = getDataRange();
@@ -96,7 +96,7 @@ function updateDateColorsTODO() {
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
-            if (datePattern.test(cellValue)) {
+            if (datePattern.test(cellValue)) {// test() is a
                 const dateText = cellValue.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
                 const today = new Date();

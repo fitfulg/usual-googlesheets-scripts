@@ -1,6 +1,6 @@
 // globals.js: sheet, getDataRange
 
-// Higher-order function to apply formatting to a range only if it is valid
+// Higher-order fn to apply formatting to a range only if it is valid
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
 const Format = withValidRange((range) => {

@@ -7,12 +7,12 @@ function checkAndSetColumn(column, limit, priority) {
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());
 
     if (occupied > limit) {
-        // Set border color to red with thicker border
+        // red with thicker border
         range.setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
         sheet.getRange(column + "1").setValue("⚠️CELL LIMIT REACHED⚠️");
         SpreadsheetApp.getUi().alert("⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority);
     } else {
-        // Set border color to black with thicker border
+        // black with thicker border
         range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
         sheet.getRange(column + "1").setValue(priority);
     }
