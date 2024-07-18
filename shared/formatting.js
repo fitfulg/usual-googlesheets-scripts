@@ -38,31 +38,22 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
 }
 
 // Append DATE to cell
-function appendDateWithStyle(cellValue, dateFormatted, column) {
-    const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue + '\n' + dateFormatted;
-    return createRichTextValue(newText, dateFormatted, column);
+function appendDateWithStyle(cellValue, dateFormatted, column, config) {
+    const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue.trim() + '\n' + dateFormatted;
+    return createRichTextValue(newText, dateFormatted, column, config);
 }
 
 // Update DATE in cell if it already exists
-function updateDateWithStyle(cellValue, dateFormatted, column) {
-    const newText = cellValue.replace(datePattern, '\n' + dateFormatted);
-    return createRichTextValue(newText, dateFormatted, column);
+function updateDateWithStyle(cellValue, dateFormatted, column, config) {
+    const newText = cellValue.replace(datePattern, '\n' + dateFormatted).trim();
+    return createRichTextValue(newText, dateFormatted, column, config);
 }
 
 // Create rich text value with italic date
-function createRichTextValue(text, dateFormatted, column) {
-    let color;
-    switch (column) {
-        case 'G':
-            color = '#A9A9A9'; // Always gray
-            break;
-        case 'H':
-            color = '#FF0000'; // Always red
-            break;
-        default:
-            color = '#A9A9A9'; // Default color (dark gray)
-            break;
-    }
+function createRichTextValue(text, dateFormatted, column, config) {
+    const columnConfig = config[column];
+    const color = columnConfig.defaultColor || '#A9A9A9'; // Default color (dark gray)
+
     return SpreadsheetApp.newRichTextValue()
         .setText(text)
         .setTextStyle(text.length - dateFormatted.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())

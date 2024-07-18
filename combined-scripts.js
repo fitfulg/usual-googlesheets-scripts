@@ -78,31 +78,22 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
 }
 
 // Append DATE to cell
-function appendDateWithStyle(cellValue, dateFormatted, column) {
-    const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue + '\n' + dateFormatted;
-    return createRichTextValue(newText, dateFormatted, column);
+function appendDateWithStyle(cellValue, dateFormatted, column, config) {
+    const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue.trim() + '\n' + dateFormatted;
+    return createRichTextValue(newText, dateFormatted, column, config);
 }
 
 // Update DATE in cell if it already exists
-function updateDateWithStyle(cellValue, dateFormatted, column) {
-    const newText = cellValue.replace(datePattern, '\n' + dateFormatted);
-    return createRichTextValue(newText, dateFormatted, column);
+function updateDateWithStyle(cellValue, dateFormatted, column, config) {
+    const newText = cellValue.replace(datePattern, '\n' + dateFormatted).trim();
+    return createRichTextValue(newText, dateFormatted, column, config);
 }
 
 // Create rich text value with italic date
-function createRichTextValue(text, dateFormatted, column) {
-    let color;
-    switch (column) {
-        case 'G':
-            color = '#A9A9A9'; // Always gray
-            break;
-        case 'H':
-            color = '#FF0000'; // Always red
-            break;
-        default:
-            color = '#A9A9A9'; // Default color (dark gray)
-            break;
-    }
+function createRichTextValue(text, dateFormatted, column, config) {
+    const columnConfig = config[column];
+    const color = columnConfig.defaultColor || '#A9A9A9'; // Default color (dark gray)
+
     return SpreadsheetApp.newRichTextValue()
         .setText(text)
         .setTextStyle(text.length - dateFormatted.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())
@@ -215,7 +206,7 @@ function updateDateColorsTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
 
-    columns.forEach((column) => {
+    for (const column of columns) {
         const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
@@ -226,18 +217,11 @@ function updateDateColorsTODO() {
                 const today = new Date();
                 const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
 
-                let color;
-                if (column === 'G') {
-                    color = '#A9A9A9'; // Always gray
-                } else if (column === 'H') {
-                    color = '#FF0000'; // Always red
-                } else {
-                    color = '#A9A9A9'; // Default color (dark gray)
-                    if (diffDays >= config.danger) {
-                        color = config.dangerColor;
-                    } else if (diffDays >= config.warning) {
-                        color = config.warningColor;
-                    }
+                let color = config.defaultColor || '#A9A9A9'; // Default color (dark gray)
+                if (diffDays >= config.danger) {
+                    color = config.dangerColor;
+                } else if (diffDays >= config.warning) {
+                    color = config.warningColor;
                 }
 
                 const richTextValue = SpreadsheetApp.newRichTextValue()
@@ -248,7 +232,7 @@ function updateDateColorsTODO() {
                 cell.setRichTextValue(richTextValue);
             }
         }
-    });
+    }
 }
 // Contents of ./TODOsheet/TODOlibrary.js
 
@@ -277,12 +261,12 @@ const exampleTexts = {
 };
 
 const dateColorConfig = {
-    C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 1 week, 1 month
-    D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 3 months, 6 months
-    E: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 6 months, 1 year
-    F: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000' }, // 6 months, 1 year
-    G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9' }, // Always default
-    H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000' } // Always red
+    C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
+    D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 3 months, 6 months
+    E: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 6 months, 1 year
+    F: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 6 months, 1 year
+    G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9', defaultColor: '#A9A9A9' }, // Always default
+    H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
 // Contents of ./TODOsheet/TODOpiechart.js
 
@@ -337,11 +321,11 @@ function onEdit(e) {
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
 
         // Append or update the formatted date at the end of the cell content
-        const dateFormatted = `${formattedDate}`;
+        const dateFormatted = ` ${formattedDate}`;
 
         const richTextValue = datePattern.test(cellValue)
-            ? updateDateWithStyle(cellValue, dateFormatted, columnLetter)
-            : appendDateWithStyle(cellValue, dateFormatted, columnLetter);
+            ? updateDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig)
+            : appendDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig);
 
         // Set the value with the date and apply the rich text formatting
         range.setRichTextValue(richTextValue);

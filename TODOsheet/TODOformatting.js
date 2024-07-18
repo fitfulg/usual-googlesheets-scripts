@@ -91,7 +91,7 @@ function updateDateColorsTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
 
-    columns.forEach((column) => {
+    for (const column of columns) {
         const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
@@ -102,18 +102,11 @@ function updateDateColorsTODO() {
                 const today = new Date();
                 const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
 
-                let color;
-                if (column === 'G') {
-                    color = '#A9A9A9'; // Always gray
-                } else if (column === 'H') {
-                    color = '#FF0000'; // Always red
-                } else {
-                    color = '#A9A9A9'; // Default color (dark gray)
-                    if (diffDays >= config.danger) {
-                        color = config.dangerColor;
-                    } else if (diffDays >= config.warning) {
-                        color = config.warningColor;
-                    }
+                let color = config.defaultColor || '#A9A9A9'; // Default color (dark gray)
+                if (diffDays >= config.danger) {
+                    color = config.dangerColor;
+                } else if (diffDays >= config.warning) {
+                    color = config.warningColor;
                 }
 
                 const richTextValue = SpreadsheetApp.newRichTextValue()
@@ -124,5 +117,5 @@ function updateDateColorsTODO() {
                 cell.setRichTextValue(richTextValue);
             }
         }
-    });
+    }
 }

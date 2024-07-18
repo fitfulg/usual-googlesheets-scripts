@@ -18,11 +18,11 @@ function onEdit(e) {
         const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
 
         // Append or update the formatted date at the end of the cell content
-        const dateFormatted = `${formattedDate}`;
+        const dateFormatted = ` ${formattedDate}`;
 
         const richTextValue = datePattern.test(cellValue)
-            ? updateDateWithStyle(cellValue, dateFormatted, columnLetter)
-            : appendDateWithStyle(cellValue, dateFormatted, columnLetter);
+            ? updateDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig)
+            : appendDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig);
 
         // Set the value with the date and apply the rich text formatting
         range.setRichTextValue(richTextValue);
