@@ -1,6 +1,6 @@
 #!/bin/bash
 
-output_file="combined-scripts.js"
+output_file="concat-script.js"
 echo "// Auto-generated file with all JS scripts" > $output_file
 
 find . -name "*.js" -not -name "$output_file" | while read file; do
