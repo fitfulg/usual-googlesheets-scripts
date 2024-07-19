@@ -23,6 +23,6 @@ function onOpen() {
 }
 
 function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!!!_!!!!---!!!!');
+    ui.alert('Hello World from Custom Menu!!!__________!!!!---!!!!');
     console.log('Hello World from Custom Menu!');
 }
