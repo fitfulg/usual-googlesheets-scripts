@@ -120,68 +120,12 @@ function updateDateColorsTODO() {
     }
 }
 
-function showDatesTODO() {
-    const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
-    const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();
-
-    for (const column of columns) {
-        for (let row = 2; row <= lastRow; row++) {
-            const cell = sheet.getRange(`${column}${row}`);
-            const cellValue = cell.getValue();
-
-            if (datePattern.test(cellValue)) {
-                const richTextValue = SpreadsheetApp.newRichTextValue()
-                    .setText(cellValue)
-                    .setTextStyle(cellValue.length - cellValue.match(datePattern)[0].length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
-                    .build();
-
-                cell.setRichTextValue(richTextValue);
-            }
-        }
-    }
-}
-
-function hideDatesTODO() {
-    const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
-    const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();
-
-    for (const column of columns) {
-        for (let row = 2; row <= lastRow; row++) {
-            const cell = sheet.getRange(`${column}${row}`);
-            const cellValue = cell.getValue();
-
-            if (datePattern.test(cellValue)) {
-                const richTextValue = SpreadsheetApp.newRichTextValue()
-                    .setText(cellValue)
-                    .setTextStyle(cellValue.length - cellValue.match(datePattern)[0].length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(false).setForegroundColor(cell.getFontColor()).build())
-                    .build();
-
-                cell.setRichTextValue(richTextValue);
-            }
-        }
-    }
-}
-
 function setupDropdownTODO() {
     // Setup dropdown in I1
     const buttonCell = sheet.getRange("I1");
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Piechart', 'Show Piechart', 'Hide Piechart'], true).build();
     buttonCell.setDataValidation(rule);
     buttonCell.setValue('Piechart');
-    buttonCell.setFontWeight('bold');
-    buttonCell.setFontSize(12);
-    buttonCell.setHorizontalAlignment("center");
-    buttonCell.setVerticalAlignment("middle");
-}
-
-function setupDateToggleDropdownTODO() {
-    // Setup dropdown in I2
-    const buttonCell = sheet.getRange("I2");
-    const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Date Toggle', 'Show Dates', 'Hide Dates'], true).build();
-    buttonCell.setDataValidation(rule);
-    buttonCell.setValue('Date Toggle');
     buttonCell.setFontWeight('bold');
     buttonCell.setFontSize(12);
     buttonCell.setHorizontalAlignment("center");

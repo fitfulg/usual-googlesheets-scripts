@@ -21,7 +21,6 @@ function onOpen() {
     applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
-    setupDateToggleDropdownTODO();
 }
 
 function logHelloWorld() {
