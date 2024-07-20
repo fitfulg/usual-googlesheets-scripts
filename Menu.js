@@ -3,13 +3,13 @@
 
 function onOpen() {
     // custom menu
-    let todoSubMenu = ui.createMenu('TODO sheet')
+    let todoSubMenu = SpreadsheetApp.getUi().createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
         .addItem('Create Pie Chart', 'createPieChartTODO')
         .addItem('Delete Pie Charts', 'deleteAllChartsTODO');
 
-    ui.createMenu('Custom Formats')
+    SpreadsheetApp.getUi().createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
         .addSeparator()
@@ -25,6 +25,6 @@ function onOpen() {
 }
 
 function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!!!');
+    SpreadsheetApp.getUi().alert('Hello World from Custom Menu!!!');
     console.log('Hello World from Custom Menu!');
 }
