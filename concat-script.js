@@ -249,6 +249,35 @@ function setupDropdownTODO() {
     buttonCell.setHorizontalAlignment("center");
     buttonCell.setVerticalAlignment("middle");
 }
+
+function shiftCellsUpTODO(column, startRow, endRow) {
+    Logger.log(`shiftCellsUpTODO called for column: ${column}, from row ${startRow} to ${endRow}`);
+    const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
+    const values = range.getValues();
+    const richTextValues = range.getRichTextValues();
+
+    const newValues = [];
+    const newRichTextValues = [];
+
+    // Filter out empty values
+    for (let i = 0; i < values.length; i++) {
+        Logger.log(`Value at row ${i + startRow}: ${values[i][0]}`);
+        if (values[i][0].trim() !== '') {
+            newValues.push([values[i][0]]);
+            newRichTextValues.push([richTextValues[i][0]]);
+        }
+    }
+    // Add empty values to match the original range size
+    while (newValues.length < values.length) {
+        newValues.push(['']);
+        newRichTextValues.push([SpreadsheetApp.newRichTextValue().setText('').build()]);
+    }
+    Logger.log('Setting new values and rich text values');
+    range.setValues(newValues);
+    range.setRichTextValues(newRichTextValues);
+    Logger.log('shiftCellsUpTODO completed');
+}
+
 // Contents of ./TODOsheet/TODOlibrary.js
 
 const cellStyles = {
@@ -362,41 +391,84 @@ function togglePieChartTODO(action) {
 
 // Track changes in specified columns and add the date
 function onEdit(e) {
-    const range = e.range;
-    const column = range.getColumn();
-    const row = range.getRow();
-    const columnLetter = String.fromCharCode(64 + column);
-
-    // Check column for the toggle piechart action
-    if (column === 9 && row === 1) {
-        const action = range.getValue().toString().trim();
-        Logger.log(`Action selected: ${action}`);
-        if (action === 'Show Piechart' || action === 'Hide Piechart') {
-            togglePieChartTODO(action);
-        } else {
-            Logger.log('Invalid action selected');
+    try {
+        if (!e || !e.range) {
+            Logger.log('Edit event is undefined or does not have range property');
+            return;
         }
-        sheet.getRange("I1").setValue("Piechart");
-        return;
-    }
 
-    // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
-    if (column >= 3 && column <= 8 && row >= 2) {
-        const cellValue = range.getValue();
+        const range = e.range;
+        const column = range.getColumn();
+        const row = range.getRow();
+        const columnLetter = String.fromCharCode(64 + column);
+        const totalRows = sheet.getMaxRows();
 
-        if (cellValue.trim() === "") return resetTextStyle(range);
+        Logger.log(`onEdit triggered: column ${column}, row ${row}`);
 
-        const date = new Date();
-        const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
-        const dateFormatted = ` ${formattedDate}`;
+        // Check column for the toggle piechart action
+        if (column === 9 && row === 1) {
+            const action = range.getValue().toString().trim();
+            Logger.log(`Action selected: ${action}`);
+            if (action === 'Show Piechart' || action === 'Hide Piechart') {
+                togglePieChartTODO(action);
+            } else {
+                Logger.log('Invalid action selected');
+            }
+            sheet.getRange("I1").setValue("Piechart");
+            return;
+        }
 
-        const richTextValue = datePattern.test(cellValue)
-            ? updateDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig)
-            : appendDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig);
+        // Store original value before edit
+        const originalValue = e.oldValue || '';
+        const newValue = range.getValue().toString();
 
-        range.setRichTextValue(richTextValue);
+        Logger.log(`Original value: ${originalValue}, New value: ${newValue}`);
+
+        // Shift cells up if the edited cell is in columns A, C, D, E, F, G, H and is now empty
+        if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
+            Logger.log(`Shifting cells up for column ${column}`);
+            shiftCellsUpTODO(column, 2, totalRows);
+        }
+
+        // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
+        if (column >= 3 && column <= 8 && row >= 2) {
+            const cellValue = newValue;
+            Logger.log(`Cell value after edit: ${cellValue}`);
+
+            // Skip if value has not changed
+            if (originalValue === newValue) {
+                Logger.log('No change in cell value, skipping update');
+                return;
+            }
+
+            // Get current rich text value to preserve formatting
+            const richTextValue = range.getRichTextValue();
+            const text = richTextValue ? richTextValue.getText() : cellValue;
+
+            if (text.trim() === "") return resetTextStyle(range);
+
+            const date = new Date();
+            const formattedDate = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
+            const dateFormatted = ` ${formattedDate}`;
+
+            const newRichTextValue = datePattern.test(text)
+                ? updateDateWithStyle(text, dateFormatted, columnLetter, dateColorConfig)
+                : appendDateWithStyle(text, dateFormatted, columnLetter, dateColorConfig);
+
+            Logger.log(`Setting rich text value for cell ${columnLetter}${row}`);
+            range.setRichTextValue(newRichTextValue);
+        }
+    } catch (error) {
+        Logger.log(`Error in onEdit: ${error.message}`);
     }
 }
+
+
+
+
+
+
+
 
 // Contents of ./TODOsheet/TODOvalidation.js
 

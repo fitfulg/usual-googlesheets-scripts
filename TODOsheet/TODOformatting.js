@@ -131,3 +131,31 @@ function setupDropdownTODO() {
     buttonCell.setHorizontalAlignment("center");
     buttonCell.setVerticalAlignment("middle");
 }
+
+function shiftCellsUpTODO(column, startRow, endRow) {
+    Logger.log(`shiftCellsUpTODO called for column: ${column}, from row ${startRow} to ${endRow}`);
+    const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
+    const values = range.getValues();
+    const richTextValues = range.getRichTextValues();
+
+    const newValues = [];
+    const newRichTextValues = [];
+
+    // Filter out empty values
+    for (let i = 0; i < values.length; i++) {
+        Logger.log(`Value at row ${i + startRow}: ${values[i][0]}`);
+        if (values[i][0].trim() !== '') {
+            newValues.push([values[i][0]]);
+            newRichTextValues.push([richTextValues[i][0]]);
+        }
+    }
+    // Add empty values to match the original range size
+    while (newValues.length < values.length) {
+        newValues.push(['']);
+        newRichTextValues.push([SpreadsheetApp.newRichTextValue().setText('').build()]);
+    }
+    Logger.log('Setting new values and rich text values');
+    range.setValues(newValues);
+    range.setRichTextValues(newRichTextValues);
+    Logger.log('shiftCellsUpTODO completed');
+}
