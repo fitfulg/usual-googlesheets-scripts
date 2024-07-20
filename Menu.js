@@ -1,12 +1,13 @@
 // globals.js: ui
-// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
 
 function onOpen() {
     // custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
-        .addItem('Create Pie Chart', 'createPieChartTODO');
+        .addItem('Create Pie Chart', 'createPieChartTODO')
+        .addItem('Delete Pie Charts', 'deleteAllChartsTODO');
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
@@ -16,10 +17,10 @@ function onOpen() {
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
-    createPieChartTODO();
     customCeilBGColorTODO();
     applyFormatToAllTODO();
     updateDateColorsTODO();
+    setupDropdownTODO();
 }
 
 function logHelloWorld() {

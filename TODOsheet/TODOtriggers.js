@@ -8,6 +8,19 @@ function onEdit(e) {
     const row = range.getRow();
     const columnLetter = String.fromCharCode(64 + column);
 
+    // Check column for the toggle piechart action
+    if (column === 9 && row === 1) {
+        const action = range.getValue().toString().trim();
+        Logger.log(`Action selected: ${action}`);
+        if (action === 'Show Piechart' || action === 'Hide Piechart') {
+            togglePieChartTODO(action);
+        } else {
+            Logger.log('Invalid action selected');
+        }
+        sheet.getRange("I1").setValue("Piechart");
+        return;
+    }
+
     // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
     if (column >= 3 && column <= 8 && row >= 2) {
         const cellValue = range.getValue();
@@ -22,7 +35,6 @@ function onEdit(e) {
             ? updateDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig)
             : appendDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig);
 
-        // Set the value with the date and apply the rich text formatting
         range.setRichTextValue(richTextValue);
     }
 }

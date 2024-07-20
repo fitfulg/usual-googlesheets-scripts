@@ -6,17 +6,20 @@ const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const getDataRange = () => sheet.getDataRange();
 const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
+let isPieChartVisible = false;
+
 // Contents of ./Menu.js
 
 // globals.js: ui
-// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
 
 function onOpen() {
     // custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
-        .addItem('Create Pie Chart', 'createPieChartTODO');
+        .addItem('Create Pie Chart', 'createPieChartTODO')
+        .addItem('Delete Pie Charts', 'deleteAllChartsTODO');
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
@@ -26,10 +29,10 @@ function onOpen() {
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
-    createPieChartTODO();
     customCeilBGColorTODO();
     applyFormatToAllTODO();
     updateDateColorsTODO();
+    setupDropdownTODO();
 }
 
 function logHelloWorld() {
@@ -234,6 +237,18 @@ function updateDateColorsTODO() {
         }
     }
 }
+
+function setupDropdownTODO() {
+    // Setup dropdown in I1
+    const buttonCell = sheet.getRange("I1");
+    const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Piechart', 'Show Piechart', 'Hide Piechart'], true).build();
+    buttonCell.setDataValidation(rule);
+    buttonCell.setValue('Piechart');
+    buttonCell.setFontWeight('bold');
+    buttonCell.setFontSize(12);
+    buttonCell.setHorizontalAlignment("center");
+    buttonCell.setVerticalAlignment("middle");
+}
 // Contents of ./TODOsheet/TODOlibrary.js
 
 const cellStyles = {
@@ -273,6 +288,7 @@ const dateColorConfig = {
 // globals.js: sheet, getDataRange
 
 function createPieChartTODO() {
+    Logger.log('Creating piechart');
     const dataRange = getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
@@ -294,10 +310,51 @@ function createPieChartTODO() {
         .setChartType(Charts.ChartType.PIE)
         .addRange(chartDataRange)
         .setPosition(1, 10, 0, 0) // Position the chart starting at column J
+        .setOption('title', 'Pie Chart')
         .build();
 
     sheet.insertChart(chart);
+    Logger.log('Piechart created');
+    isPieChartVisible = true;
 }
+
+function deleteAllChartsTODO() {
+    Logger.log('Deleting all charts');
+    const charts = sheet.getCharts();
+
+    charts.forEach(chart => {
+        sheet.removeChart(chart);
+    });
+
+    sheet.getRange("J1:K4").clearContent();
+    Logger.log(`Deleted ${charts.length} charts`);
+    isPieChartVisible = false;
+}
+
+// Contents of ./TODOsheet/TODOtoggleFn.js
+
+// TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
+
+function togglePieChartTODO(action) {
+    Logger.log(`togglePieChartTODO called with action: ${action}`);
+    if (action === 'Hide Piechart') {
+        Logger.log('Attempting to hide piechart');
+        deleteAllChartsTODO();
+        isPieChartVisible = false;
+        Logger.log('Piechart hidden');
+    } else if (action === 'Show Piechart') {
+        Logger.log('Attempting to show piechart');
+        createPieChartTODO();
+        isPieChartVisible = true;
+        Logger.log('Piechart shown');
+    } else {
+        Logger.log('Invalid action selected');
+    }
+}
+
+
+
+
 
 // Contents of ./TODOsheet/TODOtriggers.js
 
@@ -310,6 +367,19 @@ function onEdit(e) {
     const column = range.getColumn();
     const row = range.getRow();
     const columnLetter = String.fromCharCode(64 + column);
+
+    // Check column for the toggle piechart action
+    if (column === 9 && row === 1) {
+        const action = range.getValue().toString().trim();
+        Logger.log(`Action selected: ${action}`);
+        if (action === 'Show Piechart' || action === 'Hide Piechart') {
+            togglePieChartTODO(action);
+        } else {
+            Logger.log('Invalid action selected');
+        }
+        sheet.getRange("I1").setValue("Piechart");
+        return;
+    }
 
     // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
     if (column >= 3 && column <= 8 && row >= 2) {
@@ -325,7 +395,6 @@ function onEdit(e) {
             ? updateDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig)
             : appendDateWithStyle(cellValue, dateFormatted, columnLetter, dateColorConfig);
 
-        // Set the value with the date and apply the rich text formatting
         range.setRichTextValue(richTextValue);
     }
 }

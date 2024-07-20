@@ -119,3 +119,15 @@ function updateDateColorsTODO() {
         }
     }
 }
+
+function setupDropdownTODO() {
+    // Setup dropdown in I1
+    const buttonCell = sheet.getRange("I1");
+    const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Piechart', 'Show Piechart', 'Hide Piechart'], true).build();
+    buttonCell.setDataValidation(rule);
+    buttonCell.setValue('Piechart');
+    buttonCell.setFontWeight('bold');
+    buttonCell.setFontSize(12);
+    buttonCell.setHorizontalAlignment("center");
+    buttonCell.setVerticalAlignment("middle");
+}
