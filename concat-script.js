@@ -2,7 +2,7 @@
 
 // Contents of ./globals.js
 
-// const ui = SpreadsheetApp.getUi();
+const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const getDataRange = () => sheet.getDataRange();
 const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
@@ -16,13 +16,13 @@ let areDatesVisible = true;
 
 function onOpen() {
     // custom menu
-    let todoSubMenu = SpreadsheetApp.getUi().createMenu('TODO sheet')
+    let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
         .addItem('Create Pie Chart', 'createPieChartTODO')
         .addItem('Delete Pie Charts', 'deleteAllChartsTODO');
 
-    SpreadsheetApp.getUi().createMenu('Custom Formats')
+    ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
         .addSeparator()
@@ -38,7 +38,7 @@ function onOpen() {
 }
 
 function logHelloWorld() {
-    SpreadsheetApp.getUi().alert('Hello World from Custom Menu!!!');
+    ui.alert('Hello World from Custom Menu!!!');
     console.log('Hello World from Custom Menu!');
 }
 // Contents of ./shared/formatting.js
