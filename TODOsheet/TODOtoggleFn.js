@@ -17,6 +17,21 @@ function togglePieChartTODO(action) {
     }
 }
 
-
+function toggleDatesTODO(action) {
+    Logger.log(`toggleDatesTODO called with action: ${action}`);
+    if (action === 'Hide Dates' && areDatesVisible) {
+        Logger.log('Hiding dates');
+        hideDatesTODO();
+        areDatesVisible = false;
+        Logger.log('Dates hidden');
+    } else if (action === 'Show Dates' && !areDatesVisible) {
+        Logger.log('Showing dates');
+        showDatesTODO();
+        areDatesVisible = true;
+        Logger.log('Dates shown');
+    } else {
+        Logger.log('No action taken');
+    }
+}
 
 

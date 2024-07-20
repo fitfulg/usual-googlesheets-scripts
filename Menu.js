@@ -21,9 +21,10 @@ function onOpen() {
     applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
+    setupDateToggleDropdownTODO();
 }
 
 function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!!!__________!!!!---!!!!');
+    ui.alert('Hello World from Custom Menu!!!');
     console.log('Hello World from Custom Menu!');
 }

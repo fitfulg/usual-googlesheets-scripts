@@ -7,6 +7,7 @@ const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const getDataRange = () => sheet.getDataRange();
 const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 let isPieChartVisible = false;
+let areDatesVisible = true;
 
 // Contents of ./Menu.js
 
@@ -33,10 +34,11 @@ function onOpen() {
     applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
+    setupDateToggleDropdownTODO();
 }
 
 function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!!!__________!!!!---!!!!');
+    ui.alert('Hello World from Custom Menu!!!');
     console.log('Hello World from Custom Menu!');
 }
 // Contents of ./shared/formatting.js
@@ -238,12 +240,68 @@ function updateDateColorsTODO() {
     }
 }
 
+function showDatesTODO() {
+    const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
+    const dataRange = getDataRange();
+    const lastRow = dataRange.getLastRow();
+
+    for (const column of columns) {
+        for (let row = 2; row <= lastRow; row++) {
+            const cell = sheet.getRange(`${column}${row}`);
+            const cellValue = cell.getValue();
+
+            if (datePattern.test(cellValue)) {
+                const richTextValue = SpreadsheetApp.newRichTextValue()
+                    .setText(cellValue)
+                    .setTextStyle(cellValue.length - cellValue.match(datePattern)[0].length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build())
+                    .build();
+
+                cell.setRichTextValue(richTextValue);
+            }
+        }
+    }
+}
+
+function hideDatesTODO() {
+    const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
+    const dataRange = getDataRange();
+    const lastRow = dataRange.getLastRow();
+
+    for (const column of columns) {
+        for (let row = 2; row <= lastRow; row++) {
+            const cell = sheet.getRange(`${column}${row}`);
+            const cellValue = cell.getValue();
+
+            if (datePattern.test(cellValue)) {
+                const richTextValue = SpreadsheetApp.newRichTextValue()
+                    .setText(cellValue)
+                    .setTextStyle(cellValue.length - cellValue.match(datePattern)[0].length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(false).setForegroundColor(cell.getFontColor()).build())
+                    .build();
+
+                cell.setRichTextValue(richTextValue);
+            }
+        }
+    }
+}
+
 function setupDropdownTODO() {
     // Setup dropdown in I1
     const buttonCell = sheet.getRange("I1");
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Piechart', 'Show Piechart', 'Hide Piechart'], true).build();
     buttonCell.setDataValidation(rule);
     buttonCell.setValue('Piechart');
+    buttonCell.setFontWeight('bold');
+    buttonCell.setFontSize(12);
+    buttonCell.setHorizontalAlignment("center");
+    buttonCell.setVerticalAlignment("middle");
+}
+
+function setupDateToggleDropdownTODO() {
+    // Setup dropdown in I2
+    const buttonCell = sheet.getRange("I2");
+    const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Date Toggle', 'Show Dates', 'Hide Dates'], true).build();
+    buttonCell.setDataValidation(rule);
+    buttonCell.setValue('Date Toggle');
     buttonCell.setFontWeight('bold');
     buttonCell.setFontSize(12);
     buttonCell.setHorizontalAlignment("center");
@@ -352,7 +410,22 @@ function togglePieChartTODO(action) {
     }
 }
 
-
+function toggleDatesTODO(action) {
+    Logger.log(`toggleDatesTODO called with action: ${action}`);
+    if (action === 'Hide Dates' && areDatesVisible) {
+        Logger.log('Hiding dates');
+        hideDatesTODO();
+        areDatesVisible = false;
+        Logger.log('Dates hidden');
+    } else if (action === 'Show Dates' && !areDatesVisible) {
+        Logger.log('Showing dates');
+        showDatesTODO();
+        areDatesVisible = true;
+        Logger.log('Dates shown');
+    } else {
+        Logger.log('No action taken');
+    }
+}
 
 
 
@@ -378,6 +451,19 @@ function onEdit(e) {
             Logger.log('Invalid action selected');
         }
         sheet.getRange("I1").setValue("Piechart");
+        return;
+    }
+
+    // Check column for the toggle dates action
+    if (column === 9 && row === 2) {
+        const action = range.getValue().toString().trim();
+        Logger.log(`Action selected: ${action}`);
+        if (action === 'Show Dates' || action === 'Hide Dates') {
+            toggleDatesTODO(action);
+        } else {
+            Logger.log('Invalid action selected');
+        }
+        sheet.getRange("I2").setValue("Date Toggle");
         return;
     }
 
