@@ -2,6 +2,30 @@
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
+function updateCellCommentTODO() {
+    const cell = sheet.getRange("I2");
+    const version = "v1.1\n";
+    const changes = `
+        - There is an indicative limit of cells for each priority. In the end the objective of a TODO is none other than to complete the tasks and that they do not accumulate. Once this limit is activated, a warning is activated for the entire column.
+        This feature does not block cells, that is, you can continue occupying cells even if you have the warning.
+        - You can apply some custom formats that do not require to refresh the page from the "Custom Formats" menu.
+        - Writing or modifying a cell causes the current date to be added, which over time changes color from gray to orange and from orange to red.
+        - The date color change times are different for each column, with HIGH PRIORITY being the fastest to change and LOW PRIORITY being the slowest.
+        - The Piechart can be shown or hidden directly using its dropdown cell.
+        - Empty cells that are deleted are occupied by their immediately lower cell.
+        - Empty cells that remain empty are occupied by the cell immediately below them by opening or refreshing the page.
+    `.trim().replace(/\n\s+- /g, "\n- ");
+
+    const comment = `Versión: ${version}\nFEATURES:\n${changes}`;
+    cell.setValue("💡");
+    cell.setComment(comment);
+    cell.setBackground("#efefef");
+    cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
+    cell.setFontSize(24);
+    Format(cell);
+}
+
+
 function exampleTextTODO(column, exampleText) {
     const dataRange = getDataRange();
     let values;

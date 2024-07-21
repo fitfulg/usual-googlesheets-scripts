@@ -22,6 +22,7 @@ function onOpen() {
     updateDateColorsTODO();
     setupDropdownTODO();
     pushUpEmptyCellsTODO();
+    updateCellCommentTODO()
 }
 
 function logHelloWorld() {
