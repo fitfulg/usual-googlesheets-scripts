@@ -176,16 +176,18 @@ function updateCellCommentTODO() {
     cell.setBackground("#efefef");
     cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
 
+    // Crear RichTextValue con diferentes tamaños de fuente
     const richText = SpreadsheetApp.newRichTextValue()
         .setText(`${version}\n${emoji}`)
         .setTextStyle(0, version.length, SpreadsheetApp.newTextStyle().setFontSize(8).build())
-        .setTextStyle(version.length, version.length + 1, SpreadsheetApp.newTextStyle().setFontSize(20).build())
         .setTextStyle(version.length + 1, version.length + 2, SpreadsheetApp.newTextStyle().setFontSize(20).build())
+        .setTextStyle(version.length + 2, version.length + 3, SpreadsheetApp.newTextStyle().setFontSize(20).build())
         .build();
 
     cell.setRichTextValue(richText);
     Format(cell);
 }
+
 
 
 function exampleTextTODO(column, exampleText) {
