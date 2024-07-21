@@ -160,7 +160,7 @@ function updateCellCommentTODO() {
     const cell = sheet.getRange("I2");
     const version = "v1.1\n";
     const changes = `
-        - There is an indicative limit of cells for each priority. In the end the objective of a TODO is none other than to complete the tasks and that they do not accumulate. Once this limit is reached, a warning is activated for the entire column.\n
+        - There is an indicative limit of cells for each priority. In the end the objective of a TODO is none other than to complete the tasks and that they do not accumulate. Once this limit is reached, a warning is activated for the entire column.
         This feature does not block cells, that is, you can continue occupying cells even if you have the warning.\n
         - You can apply some custom formats that do not require to refresh the page from the "Custom Formats" menu.\n
         - Writing or modifying a cell causes the current date to be added, which over time changes color from gray to orange and from orange to red.\n
