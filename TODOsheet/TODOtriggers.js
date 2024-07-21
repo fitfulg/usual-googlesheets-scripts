@@ -1,5 +1,6 @@
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
+// shared/utils.js: extractUrls, arraysEqual
 
 // Track changes in specified columns and add the date
 function onEdit(e) {
@@ -47,15 +48,22 @@ function onEdit(e) {
             const cellValue = newValue;
             Logger.log(`Cell value after edit: ${cellValue}`);
 
-            // Skip if value has not changed
-            if (originalValue === newValue) {
-                Logger.log('No change in cell value, skipping update');
+            let richTextValue = range.getRichTextValue();
+            const text = richTextValue ? richTextValue.getText() : cellValue;
+
+            // Store old rich text value and URLs
+            const originalRichText = e.oldRichTextValue || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
+            const originalText = originalRichText.getText();
+
+            const originalUrls = extractUrls(originalRichText);
+            const newUrls = extractUrls(richTextValue);
+
+            Logger.log(`Original URLs: ${JSON.stringify(originalUrls)}, New URLs: ${JSON.stringify(newUrls)}`);
+
+            if (originalText === text && arraysEqual(originalUrls, newUrls)) {
+                Logger.log('No change in cell value or links, skipping update');
                 return;
             }
-
-            // Get current rich text value to preserve formatting
-            const richTextValue = range.getRichTextValue();
-            const text = richTextValue ? richTextValue.getText() : cellValue;
 
             if (text.trim() === "") return resetTextStyle(range);
 
@@ -69,11 +77,31 @@ function onEdit(e) {
 
             Logger.log(`Setting rich text value for cell ${columnLetter}${row}`);
             range.setRichTextValue(newRichTextValue);
+
+            // Preserve URLs after updating rich text value
+            const updatedRichTextValue = range.getRichTextValue();
+            const updatedText = updatedRichTextValue.getText();
+
+            const finalRichTextValue = SpreadsheetApp.newRichTextValue().setText(updatedText);
+            for (let i = 0; i < updatedText.length; i++) {
+                const url = richTextValue.getLinkUrl(i, i + 1);
+                if (url) {
+                    finalRichTextValue.setLinkUrl(i, i + 1, url);
+                }
+            }
+            range.setRichTextValue(finalRichTextValue.build());
         }
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
     }
 }
+
+
+
+
+
+
+
 
 
 

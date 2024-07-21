@@ -70,3 +70,14 @@ function resetTextStyle(range) {
 
     range.setRichTextValue(richTextValue);
 }
+
+function clearTextFormatting(range) {
+    const values = range.getValues();
+    const richTextValues = values.map(row => row.map(value =>
+        SpreadsheetApp.newRichTextValue()
+            .setText(value)
+            .setTextStyle(SpreadsheetApp.newTextStyle().build())
+            .build()
+    ));
+    range.setRichTextValues(richTextValues);
+}

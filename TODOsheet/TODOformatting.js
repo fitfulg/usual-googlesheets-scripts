@@ -157,5 +157,14 @@ function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log('Setting new values and rich text values');
     range.setValues(newValues);
     range.setRichTextValues(newRichTextValues);
+
+    // Clear text formatting for the new empty cells
+    const emptyRange = sheet.getRange(startRow + newValues.length, column, values.length - newValues.length, 1);
+    clearTextFormatting(emptyRange);
+
     Logger.log('shiftCellsUpTODO completed');
 }
+
+
+
+
