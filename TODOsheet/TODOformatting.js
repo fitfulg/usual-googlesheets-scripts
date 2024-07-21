@@ -17,13 +17,14 @@ function exampleTextTODO(column, exampleText) {
         values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     }
 
-    const isEmpty = values.every(value => !value.trim());
+    const isEmpty = values.every(value => !value.toString().trim());
 
     if (isEmpty) {
         const cell = sheet.getRange(column + "2");
         cell.setValue(exampleText);
     }
 }
+
 
 
 function applyFormatToAllTODO() {
@@ -96,7 +97,7 @@ function updateDateColorsTODO() {
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
-            if (datePattern.test(cellValue)) {// test() is a
+            if (datePattern.test(cellValue)) {
                 const dateText = cellValue.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
                 const today = new Date();
@@ -132,37 +133,61 @@ function setupDropdownTODO() {
     buttonCell.setVerticalAlignment("middle");
 }
 
+// Shift cells up if empty 
 function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log(`shiftCellsUpTODO called for column: ${column}, from row ${startRow} to ${endRow}`);
     const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
     const values = range.getValues();
     const richTextValues = range.getRichTextValues();
-
     const newValues = [];
     const newRichTextValues = [];
 
-    // Filter out empty values
     for (let i = 0; i < values.length; i++) {
         Logger.log(`Value at row ${i + startRow}: ${values[i][0]}`);
-        if (values[i][0].trim() !== '') {
+        if (values[i][0].toString().trim() !== '') {
             newValues.push([values[i][0]]);
             newRichTextValues.push([richTextValues[i][0]]);
         }
     }
-    // Add empty values to match the original range size
+
     while (newValues.length < values.length) {
         newValues.push(['']);
         newRichTextValues.push([SpreadsheetApp.newRichTextValue().setText('').build()]);
     }
-    Logger.log('Setting new values and rich text values');
-    range.setValues(newValues);
-    range.setRichTextValues(newRichTextValues);
 
-    // Clear text formatting for the new empty cells
-    const emptyRange = sheet.getRange(startRow + newValues.length, column, values.length - newValues.length, 1);
-    clearTextFormatting(emptyRange);
+    if (newValues.length > 0) {
+        Logger.log('Setting new values and rich text values');
+        range.setValues(newValues);
+        range.setRichTextValues(newRichTextValues);
+    }
+
+    if (values.length > newValues.length) {
+        const emptyRange = sheet.getRange(startRow + newValues.length, column, values.length - newValues.length, 1);
+        clearTextFormatting(emptyRange);
+    }
 
     Logger.log('shiftCellsUpTODO completed');
+}
+
+// Force push up empty cells in columns A, C, D, E, F, G, H
+function pushUpEmptyCellsTODO() {
+    const dataRange = getDataRange();
+    const totalRows = dataRange.getLastRow();
+    const columns = [1, 3, 4, 5, 6, 7, 8]; // A, C, D, E, F, G, H
+
+    columns.forEach(column => {
+        for (let row = 2; row <= totalRows; row++) {
+            const cell = sheet.getRange(row, column);
+            const cellValue = cell.getValue().toString().trim();
+            if (cellValue === '') {
+                Logger.log(`Empty cell found at ${cell.getA1Notation()}, shifting cells up`);
+                shiftCellsUpTODO(column, 2, totalRows);
+                break; // Reset the loop for the same column
+            }
+        }
+    });
+
+    Logger.log('pushUpEmptyCells completed');
 }
 
 
