@@ -158,7 +158,8 @@ function arraysEqual(arr1, arr2) {
 
 function updateCellCommentTODO() {
     const cell = sheet.getRange("I2");
-    const version = "v1.1\n";
+    const version = "v1.1";
+    const emoji = "💡";
     const changes = `
         - There is an indicative limit of cells for each priority. In the end the objective of a TODO is none other than to complete the tasks and that they do not accumulate. Once this limit is reached, a warning is activated for the entire column.
         This feature does not block cells, that is, you can continue occupying cells even if you have the warning.\n
@@ -171,11 +172,18 @@ function updateCellCommentTODO() {
     `;
 
     const comment = `Versión: ${version}\nFEATURES:\n${changes}`;
-    cell.setValue(`${version} 💡`);
     cell.setComment(comment);
     cell.setBackground("#efefef");
     cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
-    cell.setFontSize(20);
+
+    const richText = SpreadsheetApp.newRichTextValue()
+        .setText(`${version}\n${emoji}`)
+        .setTextStyle(0, version.length, SpreadsheetApp.newTextStyle().setFontSize(8).build())
+        .setTextStyle(version.length, version.length + 1, SpreadsheetApp.newTextStyle().setFontSize(20).build())
+        .setTextStyle(version.length + 1, version.length + 2, SpreadsheetApp.newTextStyle().setFontSize(20).build())
+        .build();
+
+    cell.setRichTextValue(richText);
     Format(cell);
 }
 
