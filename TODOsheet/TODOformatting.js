@@ -17,11 +17,11 @@ function updateCellCommentTODO() {
     `;
 
     const comment = `Versión: ${version}\nFEATURES:\n${changes}`;
-    cell.setValue(`$I$2: ${version} 💡`);
+    cell.setValue(`${version} 💡`);
     cell.setComment(comment);
     cell.setBackground("#efefef");
     cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
-    cell.setFontSize(24);
+    cell.setFontSize(20);
     Format(cell);
 }
 
