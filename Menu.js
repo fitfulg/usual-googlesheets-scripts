@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // globals.js: ui
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
 
@@ -26,6 +27,6 @@ function onOpen() {
 }
 
 function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!!!!');
-    console.log('Hello World from Custom Menu!');
+    ui.alert('Hello World from Custom Menu!');
+    Logger.log('Hello World from Custom Menu!');
 }
