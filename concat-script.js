@@ -14,7 +14,8 @@ let isPieChartVisible = false;
 
 module.exports = {
     testEnvironment: 'node',
-    testPathIgnorePatterns: ['/node_modules/', '/tests/'],
+    testPathIgnorePatterns: ['/node_modules/'],
+    testMatch: ["**/tests/**/*.test.js"],
     verbose: true,
 };
 
@@ -136,6 +137,19 @@ function clearTextFormatting(range) {
     range.setRichTextValues(richTextValues);
 }
 
+// for testing 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        // applyFormatToSelected,
+        // applyFormatToAll,
+        setCellStyle,
+        // appendDateWithStyle,
+        // updateDateWithStyle,
+        // createRichTextValue,
+        // resetTextStyle,
+        // clearTextFormatting
+    };
+}
 // Contents of ./shared/utils.js
 
 function extractUrls(richTextValue) {
