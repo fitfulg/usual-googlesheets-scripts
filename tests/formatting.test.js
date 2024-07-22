@@ -32,3 +32,29 @@ describe('setCellStyle', () => {
         expect(mockRange.setBackground).toHaveBeenCalledWith('#ffffff');
     });
 });
+
+describe('applyBorders', () => {
+    test('should apply solid borders to the range', () => {
+        const mockRange = {
+            setBorder: jest.fn().mockReturnThis(),
+        };
+
+        global.SpreadsheetApp = {
+            BorderStyle: {
+                SOLID: 'solid'
+            }
+        };
+
+        const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
+
+        const applyBordersWithStyle = withValidRange((range, borderStyle) =>
+            range.setBorder(true, true, true, true, true, true, "#000000", borderStyle)
+        );
+
+        global.applyBorders = (range) => applyBordersWithStyle(range, SpreadsheetApp.BorderStyle.SOLID);
+
+        applyBorders(mockRange);
+
+        expect(mockRange.setBorder).toHaveBeenCalledWith(true, true, true, true, true, true, "#000000", 'solid');
+    });
+});

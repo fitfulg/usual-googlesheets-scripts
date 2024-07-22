@@ -10,15 +10,6 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 // state management
 let isPieChartVisible = false;
 
-// Contents of ./jest.config.js
-
-module.exports = {
-    testEnvironment: 'node',
-    testPathIgnorePatterns: ['/node_modules/'],
-    testMatch: ["**/tests/**/*.test.js"],
-    verbose: true,
-};
-
 // Contents of ./Menu.js
 
 // globals.js: ui
@@ -140,14 +131,16 @@ function clearTextFormatting(range) {
 // for testing 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        // applyFormatToSelected,
-        // applyFormatToAll,
+        applyBorders,
+        applyBordersWithStyle,
+        applyFormatToSelected,
+        applyFormatToAll,
         setCellStyle,
-        // appendDateWithStyle,
-        // updateDateWithStyle,
-        // createRichTextValue,
-        // resetTextStyle,
-        // clearTextFormatting
+        appendDateWithStyle,
+        updateDateWithStyle,
+        createRichTextValue,
+        resetTextStyle,
+        clearTextFormatting
     };
 }
 // Contents of ./shared/utils.js

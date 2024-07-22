@@ -84,13 +84,15 @@ function clearTextFormatting(range) {
 // for testing 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        // applyFormatToSelected,
-        // applyFormatToAll,
+        applyBorders,
+        applyBordersWithStyle,
+        applyFormatToSelected,
+        applyFormatToAll,
         setCellStyle,
-        // appendDateWithStyle,
-        // updateDateWithStyle,
-        // createRichTextValue,
-        // resetTextStyle,
-        // clearTextFormatting
+        appendDateWithStyle,
+        updateDateWithStyle,
+        createRichTextValue,
+        resetTextStyle,
+        clearTextFormatting
     };
 }
