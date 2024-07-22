@@ -1,4 +1,12 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged || { echo 'lint-staged failed'; exit 1; }
+# Ejecuta lint-staged y captura el código de salida
+npx lint-staged
+exit_code=$?
+
+# Si lint-staged falla, imprime un mensaje y termina con un código de error
+if [ $exit_code -ne 0 ]; then
+  echo "lint-staged falló con el código de salida $exit_code"
+  exit $exit_code
+fi
