@@ -107,7 +107,6 @@ function createRichTextValue(text, dateFormatted, column, config) {
         .build();
 }
 
-
 // Reset the text style of a cell
 function resetTextStyle(range) {
     const richTextValue = SpreadsheetApp.newRichTextValue()
@@ -188,8 +187,6 @@ function updateCellCommentTODO() {
     Format(cell);
 }
 
-
-
 function exampleTextTODO(column, exampleText) {
     const dataRange = getDataRange();
     let values;
@@ -213,8 +210,6 @@ function exampleTextTODO(column, exampleText) {
     }
 }
 
-
-
 function applyFormatToAllTODO() {
     const totalRows = sheet.getMaxRows();
 
@@ -234,9 +229,9 @@ function applyFormatToAllTODO() {
     setCellContentAndStyleTODO();
 
     // Check the number of occupied cells in columns C, D, and E
-    checkAndSetColumn("C", 9, "HIGH PRIORITY");
-    checkAndSetColumn("D", 19, "MEDIUM PRIORITY");
-    checkAndSetColumn("E", 19, "LOW PRIORITY");
+    checkAndSetColumnTODO("C", 9, "HIGH PRIORITY");
+    checkAndSetColumnTODO("D", 19, "MEDIUM PRIORITY");
+    checkAndSetColumnTODO("E", 19, "LOW PRIORITY");
 
     // Add example text to specific columns if empty
     for (const column in exampleTexts) {
@@ -244,6 +239,25 @@ function applyFormatToAllTODO() {
         exampleTextTODO(column, text);
     }
 }
+
+function checkAndSetColumnTODO(column, limit, priority) {
+    const dataRange = getDataRange();
+    const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
+    const occupied = values.filter(String).length;
+    const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());
+
+    if (occupied > limit) {
+        // red with thicker border
+        range.setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+        sheet.getRange(column + "1").setValue("⚠️CELL LIMIT REACHED⚠️");
+        SpreadsheetApp.getUi().alert("⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority);
+    } else {
+        // black with thicker border
+        range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+        sheet.getRange(column + "1").setValue(priority);
+    }
+}
+
 function setColumnBackground(sheet, col, color, startRow = 2) {
     let totalRows = sheet.getMaxRows();
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
@@ -265,7 +279,6 @@ function customCeilBGColorTODO() {
     sheet.getRange('B3').setBackground('#b5a642'); // Dark yellow 3
     sheet.getRange('B8').setBackground('#b5a642'); // Dark yellow 3
 }
-
 
 function setCellContentAndStyleTODO() {
     for (const cell in cellStyles) {
@@ -377,10 +390,6 @@ function pushUpEmptyCellsTODO() {
 
     Logger.log('pushUpEmptyCells completed');
 }
-
-
-
-
 
 // Contents of ./TODOsheet/TODOlibrary.js
 
@@ -599,25 +608,3 @@ function onEdit(e) {
 
 
 
-
-// Contents of ./TODOsheet/TODOvalidation.js
-
-// globals.js: sheet, getDataRange
-
-function checkAndSetColumn(column, limit, priority) {
-    const dataRange = getDataRange();
-    const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
-    const occupied = values.filter(String).length;
-    const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());
-
-    if (occupied > limit) {
-        // red with thicker border
-        range.setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-        sheet.getRange(column + "1").setValue("⚠️CELL LIMIT REACHED⚠️");
-        SpreadsheetApp.getUi().alert("⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority);
-    } else {
-        // black with thicker border
-        range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-        sheet.getRange(column + "1").setValue(priority);
-    }
-}

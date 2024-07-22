@@ -60,7 +60,6 @@ function createRichTextValue(text, dateFormatted, column, config) {
         .build();
 }
 
-
 // Reset the text style of a cell
 function resetTextStyle(range) {
     const richTextValue = SpreadsheetApp.newRichTextValue()
