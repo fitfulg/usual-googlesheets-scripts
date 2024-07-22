@@ -237,3 +237,54 @@ function pushUpEmptyCellsTODO() {
 
     Logger.log('pushUpEmptyCells completed');
 }
+
+function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e) {
+    const cellValue = newValue;
+    Logger.log(`Cell value after edit: ${cellValue}`);
+
+    // Get rich text value of the edited cell, or use the plain cell value
+    const richTextValue = range.getRichTextValue();
+    const text = richTextValue ? richTextValue.getText() : cellValue;
+
+    // Retrieve original rich text value before edit, or create new rich text value if not available
+    const originalRichText = e.oldRichTextValue || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
+    const originalText = originalRichText.getText();
+
+    const originalUrls = extractUrls(originalRichText);
+    const newUrls = extractUrls(richTextValue);
+
+    Logger.log(`Original URLs: ${JSON.stringify(originalUrls)}, New URLs: ${JSON.stringify(newUrls)}`);
+
+    if (originalText === text && arraysEqual(originalUrls, newUrls)) {
+        Logger.log('No change in cell value or links, skipping update');
+        return;
+    }
+
+    if (text.trim() === "") return resetTextStyle(range);
+
+    const dateFormatted = ` ${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`;
+
+    // Append or update the date in the text based on whether the date pattern exists
+    const newRichTextValue = datePattern.test(text)
+        ? updateDateWithStyle(text, dateFormatted, columnLetter, dateColorConfig)
+        : appendDateWithStyle(text, dateFormatted, columnLetter, dateColorConfig);
+
+    Logger.log(`Setting rich text value for cell ${columnLetter}${row}`);
+    range.setRichTextValue(newRichTextValue);
+
+    preserveUrlsTODO(range, richTextValue, newRichTextValue);
+}
+
+function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
+    const updatedRichTextValue = range.getRichTextValue();
+    const updatedText = updatedRichTextValue.getText();
+    const finalRichTextValue = SpreadsheetApp.newRichTextValue().setText(updatedText);
+
+    for (let i = 0; i < updatedText.length; i++) {
+        const url = richTextValue.getLinkUrl(i, i + 1);
+        if (url) {
+            finalRichTextValue.setLinkUrl(i, i + 1, url);
+        }
+    }
+    range.setRichTextValue(finalRichTextValue.build());
+}

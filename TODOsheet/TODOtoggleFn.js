@@ -15,5 +15,15 @@ function togglePieChartTODO(action) {
     }
 }
 
+function handlePieChartToggleTODO(range) {
+    const action = range.getValue().toString().trim();
+    Logger.log(`Action selected: ${action}`);
+    if (action === 'Show Piechart' || action === 'Hide Piechart') {
+        togglePieChartTODO(action);
+    } else {
+        Logger.log('Invalid action selected');
+    }
+    sheet.getRange("I1").setValue("Piechart");
+}
 
 
