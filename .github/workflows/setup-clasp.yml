@@ -22,5 +22,8 @@ jobs:
             "scriptId": "'${{ secrets.CLASP_SCRIPT_ID }}'",
             "rootDir": "./"
           }' > .clasp.json
+      - name: Verify .claspignore
+        run: |
+          cat .claspignore
       - name: Push to Google Apps Script
         run: clasp push

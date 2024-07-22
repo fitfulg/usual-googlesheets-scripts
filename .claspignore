@@ -2,12 +2,18 @@
 concat-script.js
 
 # Ignorar dependencias de Node.js
-node_modules/
+node_modules/**
+node_modules/**/.*/**
+node_modules/**/.*
+
 
 # Ignorar archivos y directorios de configuración del entorno de desarrollo
 .husky/
 .vscode/
 .git/
+tests/**
+tests/**/.*/**
+tests/**/.*
 tests/
 jest.config.js
 package.json
