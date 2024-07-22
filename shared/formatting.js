@@ -80,3 +80,17 @@ function clearTextFormatting(range) {
     ));
     range.setRichTextValues(richTextValues);
 }
+
+// for testing 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        // applyFormatToSelected,
+        // applyFormatToAll,
+        setCellStyle,
+        // appendDateWithStyle,
+        // updateDateWithStyle,
+        // createRichTextValue,
+        // resetTextStyle,
+        // clearTextFormatting
+    };
+}

@@ -1,1 +1,9 @@
 concat-script.js
+node_modules/
+.husky/
+.vscode/
+.git/
+package.json
+package-lock.json
+jest.config.js
+tests/
