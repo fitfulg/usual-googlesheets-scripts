@@ -167,6 +167,7 @@ function arraysEqual(arr1, arr2) {
 }
 // Contents of ./TODOsheet/TODOformatting.js
 
+/* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange, datePattern
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
 // TODOsheet/TODOlibrary.js: dateColorConfig
@@ -458,6 +459,23 @@ function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
     range.setRichTextValue(finalRichTextValue.build());
 }
 
+// for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        updateCellCommentTODO,
+        exampleTextTODO,
+        applyFormatToAllTODO,
+        checkAndSetColumnTODO,
+        setColumnBackground,
+        customCeilBGColorTODO,
+        setCellContentAndStyleTODO,
+        updateDateColorsTODO,
+        setupDropdownTODO,
+        pushUpEmptyCellsTODO,
+        updateRichTextTODO,
+        preserveUrlsTODO
+    }
+}
 // Contents of ./TODOsheet/TODOlibrary.js
 
 const cellStyles = {
