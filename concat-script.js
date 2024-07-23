@@ -17,6 +17,19 @@ let isPieChartVisible = false;
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
 
 function onOpen() {
+    Logger.log('onOpen triggered');
+
+    const docProperties = PropertiesService.getDocumentProperties();
+    const lastHash = docProperties.getProperty('lastHash');
+    const currentHash = getSheetContentHash();
+
+    if (shouldRunUpdates(lastHash, currentHash)) {
+        runAllFunctionsTODO();
+        docProperties.setProperty('lastHash', currentHash);
+        Logger.log('Running all update functions');
+    } else {
+        Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
+    }
     // custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
@@ -31,14 +44,17 @@ function onOpen() {
         .addSubMenu(todoSubMenu)
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
+}
 
+function runAllFunctionsTODO() {
     customCeilBGColorTODO();
     applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
     pushUpEmptyCellsTODO();
-    updateCellCommentTODO()
+    updateCellCommentTODO();
     removeMultipleDatesTODO();
+    Logger.log('All functions called successfully!');
 }
 
 function logHelloWorld() {
@@ -47,6 +63,7 @@ function logHelloWorld() {
 }
 // Contents of ./shared/formatting.js
 
+/* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange
 
 // Higher-order fn to apply formatting to a range only if it is valid
@@ -147,6 +164,8 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 // Contents of ./shared/utils.js
 
+/* eslint-disable no-unused-vars */
+
 function extractUrls(richTextValue) {
     const urls = [];
     const text = richTextValue.getText();
@@ -165,6 +184,20 @@ function arraysEqual(arr1, arr2) {
         if (arr1[i] !== arr2[i]) return false;
     }
     return true;
+}
+
+function generateHash(content) {
+    return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, content));
+}
+// check if the hash of the content of the sheet has changed
+function shouldRunUpdates(lastHash, currentHash) {
+    return lastHash !== currentHash;
+}
+//  get the content of the sheet and generate a hash for it
+function getSheetContentHash() {
+    const range = getDataRange();
+    const values = range.getValues().flat().join(",");
+    return generateHash(values);
 }
 // Contents of ./TODOsheet/TODOformatting.js
 

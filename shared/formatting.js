@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange
 
 // Higher-order fn to apply formatting to a range only if it is valid
