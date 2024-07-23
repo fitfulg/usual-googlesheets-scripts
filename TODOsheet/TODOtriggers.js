@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
 // shared/utils.js: extractUrls, arraysEqual
@@ -39,6 +40,8 @@ function onEdit(e) {
         if (column >= 3 && column <= 8 && row >= 2) {
             updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e);
         }
+        Logger.log('Calling removeMultipleDatesTODO from onEdit');
+        removeMultipleDatesTODO();
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
     }

@@ -38,6 +38,7 @@ function onOpen() {
     setupDropdownTODO();
     pushUpEmptyCellsTODO();
     updateCellCommentTODO()
+    removeMultipleDatesTODO();
 }
 
 function logHelloWorld() {
@@ -459,6 +460,75 @@ function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
     range.setRichTextValue(finalRichTextValue.build());
 }
 
+function removeMultipleDatesTODO() {
+    const dataRange = getDataRange();
+    const lastRow = dataRange.getLastRow();
+    const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+    Logger.log('Init removeMultipleDatesTODO');
+
+    for (const column of columns) {
+        for (let row = 2; row <= lastRow; row++) {
+            const cell = sheet.getRange(`${column}${row}`);
+            const cellValue = cell.getValue();
+            const richTextValue = cell.getRichTextValue();
+            const text = richTextValue ? richTextValue.getText() : cellValue;
+
+            Logger.log(`Checking cell ${column}${row}: ${text}`);
+
+            const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
+            if (dateMatches && dateMatches.length > 1) {
+                Logger.log(`Found dates in ${column}${row}: ${dateMatches.join(', ')}`);
+
+                const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
+                Logger.log(`Today is: ${today}`);
+
+                // filter and keep only the last occurrence of today's date
+                const datesToKeep = [today];
+                for (let date of dateMatches) {
+                    if (date !== today) {
+                        datesToKeep.push(date);
+                    }
+                }
+
+                // create updated text with only the last occurrence of today's date
+                let updatedText = text;
+                for (let date of datesToKeep) {
+                    let lastOccurrence = updatedText.lastIndexOf(date);
+                    if (lastOccurrence !== -1) {
+                        updatedText = updatedText.substring(0, lastOccurrence) + updatedText.substring(lastOccurrence).replace(new RegExp(date, 'g'), '');
+                    }
+                }
+
+                updatedText = updatedText.replace(new RegExp(`\\b(${dateMatches.join('|')})\\b`, 'g'), '').trim() + `\n${today}`;
+                Logger.log(`Updated text for ${column}${row}: ${updatedText}`);
+
+                // build new rich text value with updated text
+                let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
+                let currentPos = 0;
+
+                for (let part of updatedText.split('\n')) {
+                    let startPos = currentPos;
+                    let endPos = startPos + part.length;
+                    if (datePattern.test(part)) {
+                        builder.setTextStyle(startPos, endPos, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
+                    } else {
+                        let style = richTextValue.getTextStyle(startPos, endPos);
+                        builder.setTextStyle(startPos, endPos, style);
+                    }
+                    currentPos += part.length + 1; // +1 for the newline character
+                }
+
+                const richTextResult = builder.build();
+                cell.setRichTextValue(richTextResult);
+                Logger.log(`Cell ${column}${row} updated with value: ${richTextResult.getText()}`);
+            }
+        }
+    }
+    Logger.log('End removeMultipleDatesTODO');
+}
+
+
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -473,10 +543,13 @@ if (typeof module !== 'undefined' && module.exports) {
         setupDropdownTODO,
         pushUpEmptyCellsTODO,
         updateRichTextTODO,
-        preserveUrlsTODO
+        preserveUrlsTODO,
+        removeMultipleDatesTODO
     }
 }
 // Contents of ./TODOsheet/TODOlibrary.js
+
+/* eslint-disable no-unused-vars */
 
 const cellStyles = {
     "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
@@ -511,6 +584,8 @@ const dateColorConfig = {
     H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
 // Contents of ./TODOsheet/TODOpiechart.js
+
+/* eslint-disable no-unused-vars */
 
 // globals.js: sheet, getDataRange
 
@@ -560,6 +635,7 @@ function deleteAllChartsTODO() {
 
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
+/* eslint-disable no-unused-vars */
 // TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
 
 function togglePieChartTODO(action) {
@@ -592,6 +668,7 @@ function handlePieChartToggleTODO(range) {
 
 // Contents of ./TODOsheet/TODOtriggers.js
 
+/* eslint-disable no-unused-vars */
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
 // shared/utils.js: extractUrls, arraysEqual
@@ -633,6 +710,8 @@ function onEdit(e) {
         if (column >= 3 && column <= 8 && row >= 2) {
             updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e);
         }
+        Logger.log('Calling removeMultipleDatesTODO from onEdit');
+        removeMultipleDatesTODO();
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
     }

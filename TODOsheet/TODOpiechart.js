@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 // globals.js: sheet, getDataRange
 
 function createPieChartTODO() {

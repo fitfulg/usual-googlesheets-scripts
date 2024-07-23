@@ -24,6 +24,7 @@ function onOpen() {
     setupDropdownTODO();
     pushUpEmptyCellsTODO();
     updateCellCommentTODO()
+    removeMultipleDatesTODO();
 }
 
 function logHelloWorld() {
