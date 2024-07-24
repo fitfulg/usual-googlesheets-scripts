@@ -2,7 +2,7 @@
 
 // Contents of ./globals.js
 
-/* eslint-disable no-unused-vars */
+ 
 
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -70,7 +70,7 @@ function logHelloWorld() {
 
 // Contents of ./shared/formatting.js
 
-/* eslint-disable no-unused-vars */
+ 
 // globals.js: sheet, getDataRange
 
 // Higher-order fn to apply formatting to a range only if it is valid
@@ -158,7 +158,7 @@ function clearTextFormatting(range) {
 
 // Contents of ./shared/utils.js
 
-/* eslint-disable no-unused-vars */
+ 
 
 function extractUrls(richTextValue) {
     const urls = [];
@@ -197,7 +197,6 @@ function getSheetContentHash() {
 
 // Contents of ./TODOsheet/TODOformatting.js
 
-/* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange, datePattern
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle, appendDateWithStyle, updateDateWithStyle, resetTextStyle, clearTextFormatting
 // shared/utils.js: extractUrls, arraysEqual
@@ -601,7 +600,7 @@ const dateColorConfig = {
 
 // Contents of ./TODOsheet/TODOpiechart.js
 
-/* eslint-disable no-unused-vars */
+ 
 // globals.js: sheet, getDataRange, isPieChartVisible
 
 function createPieChartTODO() {
@@ -651,7 +650,7 @@ function deleteAllChartsTODO() {
 
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
-/* eslint-disable no-unused-vars */
+ 
 // TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
 
 function togglePieChartTODO(action) {
