@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 // TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
 
 function togglePieChartTODO(action) {
@@ -27,4 +27,10 @@ function handlePieChartToggleTODO(range) {
     sheet.getRange("I1").setValue("Piechart");
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        togglePieChartTODO,
+        handlePieChartToggleTODO
+    }
+}
 

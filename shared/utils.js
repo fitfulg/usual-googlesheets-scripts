@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 
 function extractUrls(richTextValue) {
     const urls = [];
@@ -32,4 +32,14 @@ function getSheetContentHash() {
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
     return generateHash(values);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        extractUrls,
+        arraysEqual,
+        generateHash,
+        shouldRunUpdates,
+        getSheetContentHash
+    }
 }

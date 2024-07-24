@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 
 const cellStyles = {
     "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
@@ -32,3 +32,11 @@ const dateColorConfig = {
     G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9', defaultColor: '#A9A9A9' }, // Always default
     H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        cellStyles,
+        exampleTexts,
+        dateColorConfig
+    }
+}

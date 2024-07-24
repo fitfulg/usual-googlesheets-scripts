@@ -10,6 +10,15 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 // state management
 let isPieChartVisible = false;
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        ui,
+        sheet,
+        getDataRange,
+        datePattern,
+        isPieChartVisible
+    }
+}
 // Contents of ./Menu.js
 
 /* eslint-disable no-unused-vars */
@@ -60,6 +69,14 @@ function runAllFunctionsTODO() {
 function logHelloWorld() {
     ui.alert('Hello World from Custom Menu!!');
     Logger.log('Hello World from Custom Menu!');
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        onOpen,
+        runAllFunctionsTODO,
+        logHelloWorld
+    }
 }
 // Contents of ./shared/formatting.js
 
@@ -198,6 +215,16 @@ function getSheetContentHash() {
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
     return generateHash(values);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        extractUrls,
+        arraysEqual,
+        generateHash,
+        shouldRunUpdates,
+        getSheetContentHash
+    }
 }
 // Contents of ./TODOsheet/TODOformatting.js
 
@@ -616,6 +643,14 @@ const dateColorConfig = {
     G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9', defaultColor: '#A9A9A9' }, // Always default
     H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        cellStyles,
+        exampleTexts,
+        dateColorConfig
+    }
+}
 // Contents of ./TODOsheet/TODOpiechart.js
 
 /* eslint-disable no-unused-vars */
@@ -666,6 +701,12 @@ function deleteAllChartsTODO() {
     isPieChartVisible = false;
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        createPieChartTODO,
+        deleteAllChartsTODO
+    }
+}
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
 /* eslint-disable no-unused-vars */
@@ -697,6 +738,12 @@ function handlePieChartToggleTODO(range) {
     sheet.getRange("I1").setValue("Piechart");
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        togglePieChartTODO,
+        handlePieChartToggleTODO
+    }
+}
 
 
 // Contents of ./TODOsheet/TODOtriggers.js
@@ -747,6 +794,12 @@ function onEdit(e) {
         removeMultipleDatesTODO();
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
+    }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        onEdit
     }
 }
 

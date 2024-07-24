@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 
 // globals.js: sheet, getDataRange
 
@@ -44,4 +44,11 @@ function deleteAllChartsTODO() {
     sheet.getRange("J1:K4").clearContent();
     Logger.log(`Deleted ${charts.length} charts`);
     isPieChartVisible = false;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        createPieChartTODO,
+        deleteAllChartsTODO
+    }
 }

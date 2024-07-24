@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
 // shared/utils.js: extractUrls, arraysEqual
@@ -44,6 +44,12 @@ function onEdit(e) {
         removeMultipleDatesTODO();
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
+    }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        onEdit
     }
 }
 
