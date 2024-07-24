@@ -2,6 +2,8 @@
 
 // Contents of ./globals.js
 
+/* eslint-disable no-unused-vars */
+
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const getDataRange = () => sheet.getDataRange();
@@ -13,9 +15,11 @@ let isPieChartVisible = false;
 
 // Contents of ./Menu.js
 
- 
+
 // globals.js: ui
-// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
+// shared/utils.js: getSheetContentHash, shouldRunUpdates
+// shared/formatting: applyFormatToSelected, applyFormatToAll
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO
 
 function onOpen() {
     Logger.log('onOpen triggered');
@@ -154,7 +158,7 @@ function clearTextFormatting(range) {
 
 // Contents of ./shared/utils.js
 
- 
+/* eslint-disable no-unused-vars */
 
 function extractUrls(richTextValue) {
     const urls = [];
@@ -195,7 +199,8 @@ function getSheetContentHash() {
 
 /* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange, datePattern
-// shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
+// shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle, appendDateWithStyle, updateDateWithStyle, resetTextStyle, clearTextFormatting
+// shared/utils.js: extractUrls, arraysEqual
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
 function updateCellCommentTODO() {
@@ -596,9 +601,8 @@ const dateColorConfig = {
 
 // Contents of ./TODOsheet/TODOpiechart.js
 
- 
-
-// globals.js: sheet, getDataRange
+/* eslint-disable no-unused-vars */
+// globals.js: sheet, getDataRange, isPieChartVisible
 
 function createPieChartTODO() {
     Logger.log('Creating piechart');
@@ -647,7 +651,7 @@ function deleteAllChartsTODO() {
 
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
- 
+/* eslint-disable no-unused-vars */
 // TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
 
 function togglePieChartTODO(action) {
@@ -680,10 +684,10 @@ function handlePieChartToggleTODO(range) {
 
 // Contents of ./TODOsheet/TODOtriggers.js
 
- 
-// globals.js: sheet, datePattern, getDataRange
-// shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
-// shared/utils.js: extractUrls, arraysEqual
+
+// globals.js: sheet
+// TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
+// TODOsheet/TODOformatting.js: shiftCellsUpTODO, updateRichTextTODO, removeMultipleDatesTODO
 
 // Track changes in specified columns and add the date
 function onEdit(e) {
@@ -703,7 +707,7 @@ function onEdit(e) {
 
         // Check if the edited cell is for toggling the pie chart (cell I1)
         if (column === 9 && row === 1) {
-            handlePieChartToggle(range);
+            handlePieChartToggleTODO(range);
             return;
         }
 

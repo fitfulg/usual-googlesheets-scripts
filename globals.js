@@ -1,3 +1,5 @@
+ 
+
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const getDataRange = () => sheet.getDataRange();

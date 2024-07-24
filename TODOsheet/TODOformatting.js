@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange, datePattern
-// shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle
+// shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle, appendDateWithStyle, updateDateWithStyle, resetTextStyle, clearTextFormatting
+// shared/utils.js: extractUrls, arraysEqual
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
 function updateCellCommentTODO() {
@@ -374,6 +375,7 @@ if (typeof module !== 'undefined' && module.exports) {
         pushUpEmptyCellsTODO,
         updateRichTextTODO,
         preserveUrlsTODO,
-        removeMultipleDatesTODO
+        removeMultipleDatesTODO,
+        shiftCellsUpTODO
     }
 }

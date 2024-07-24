@@ -1,6 +1,5 @@
  
-
-// globals.js: sheet, getDataRange
+// globals.js: sheet, getDataRange, isPieChartVisible
 
 function createPieChartTODO() {
     Logger.log('Creating piechart');

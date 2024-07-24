@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 // globals.js: sheet, getDataRange
 
 // Higher-order fn to apply formatting to a range only if it is valid
@@ -89,6 +89,7 @@ if (typeof module !== 'undefined' && module.exports) {
         applyBordersWithStyle,
         applyFormatToSelected,
         applyFormatToAll,
+        applyThickBorders,
         setCellStyle,
         appendDateWithStyle,
         updateDateWithStyle,

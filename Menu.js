@@ -1,6 +1,8 @@
- 
+
 // globals.js: ui
-// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
+// shared/utils.js: getSheetContentHash, shouldRunUpdates
+// shared/formatting: applyFormatToSelected, applyFormatToAll
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO
 
 function onOpen() {
     Logger.log('onOpen triggered');

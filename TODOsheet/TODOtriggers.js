@@ -1,7 +1,7 @@
- 
-// globals.js: sheet, datePattern, getDataRange
-// shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
-// shared/utils.js: extractUrls, arraysEqual
+
+// globals.js: sheet
+// TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
+// TODOsheet/TODOformatting.js: shiftCellsUpTODO, updateRichTextTODO, removeMultipleDatesTODO
 
 // Track changes in specified columns and add the date
 function onEdit(e) {
@@ -21,7 +21,7 @@ function onEdit(e) {
 
         // Check if the edited cell is for toggling the pie chart (cell I1)
         if (column === 9 && row === 1) {
-            handlePieChartToggle(range);
+            handlePieChartToggleTODO(range);
             return;
         }
 
