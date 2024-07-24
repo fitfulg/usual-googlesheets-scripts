@@ -10,18 +10,10 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 // state management
 let isPieChartVisible = false;
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        ui,
-        sheet,
-        getDataRange,
-        datePattern,
-        isPieChartVisible
-    }
-}
+
 // Contents of ./Menu.js
 
-/* eslint-disable no-unused-vars */
+ 
 // globals.js: ui
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, updateDateColorsTODO, setupDropdownTODO
 
@@ -71,13 +63,7 @@ function logHelloWorld() {
     Logger.log('Hello World from Custom Menu!');
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        onOpen,
-        runAllFunctionsTODO,
-        logHelloWorld
-    }
-}
+
 // Contents of ./shared/formatting.js
 
 /* eslint-disable no-unused-vars */
@@ -165,23 +151,10 @@ function clearTextFormatting(range) {
 }
 
 // for testing 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        applyBorders,
-        applyBordersWithStyle,
-        applyFormatToSelected,
-        applyFormatToAll,
-        setCellStyle,
-        appendDateWithStyle,
-        updateDateWithStyle,
-        createRichTextValue,
-        resetTextStyle,
-        clearTextFormatting
-    };
-}
+
 // Contents of ./shared/utils.js
 
-/* eslint-disable no-unused-vars */
+ 
 
 function extractUrls(richTextValue) {
     const urls = [];
@@ -217,15 +190,7 @@ function getSheetContentHash() {
     return generateHash(values);
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        extractUrls,
-        arraysEqual,
-        generateHash,
-        shouldRunUpdates,
-        getSheetContentHash
-    }
-}
+
 // Contents of ./TODOsheet/TODOformatting.js
 
 /* eslint-disable no-unused-vars */
@@ -590,26 +555,10 @@ function removeMultipleDatesTODO() {
 
 
 // for testing
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        updateCellCommentTODO,
-        exampleTextTODO,
-        applyFormatToAllTODO,
-        checkAndSetColumnTODO,
-        setColumnBackground,
-        customCeilBGColorTODO,
-        setCellContentAndStyleTODO,
-        updateDateColorsTODO,
-        setupDropdownTODO,
-        pushUpEmptyCellsTODO,
-        updateRichTextTODO,
-        preserveUrlsTODO,
-        removeMultipleDatesTODO
-    }
-}
+
 // Contents of ./TODOsheet/TODOlibrary.js
 
-/* eslint-disable no-unused-vars */
+ 
 
 const cellStyles = {
     "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
@@ -644,16 +593,10 @@ const dateColorConfig = {
     H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        cellStyles,
-        exampleTexts,
-        dateColorConfig
-    }
-}
+
 // Contents of ./TODOsheet/TODOpiechart.js
 
-/* eslint-disable no-unused-vars */
+ 
 
 // globals.js: sheet, getDataRange
 
@@ -701,15 +644,10 @@ function deleteAllChartsTODO() {
     isPieChartVisible = false;
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        createPieChartTODO,
-        deleteAllChartsTODO
-    }
-}
+
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
-/* eslint-disable no-unused-vars */
+ 
 // TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
 
 function togglePieChartTODO(action) {
@@ -738,17 +676,11 @@ function handlePieChartToggleTODO(range) {
     sheet.getRange("I1").setValue("Piechart");
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        togglePieChartTODO,
-        handlePieChartToggleTODO
-    }
-}
 
 
 // Contents of ./TODOsheet/TODOtriggers.js
 
-/* eslint-disable no-unused-vars */
+ 
 // globals.js: sheet, datePattern, getDataRange
 // shared/formatting.js: resetTextStyle, appendDateWithStyle, updateDateWithStyle
 // shared/utils.js: extractUrls, arraysEqual
@@ -797,11 +729,6 @@ function onEdit(e) {
     }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        onEdit
-    }
-}
 
 
 
