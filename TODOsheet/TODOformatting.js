@@ -4,6 +4,11 @@
 // shared/utils.js: extractUrls, arraysEqual
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
+/**
+ * Updates the comment for a specific cell with version and feature details.
+ * 
+ * @customfunction
+ */
 function updateCellCommentTODO() {
     const cell = sheet.getRange("I2");
     const version = "v1.1";
@@ -36,6 +41,13 @@ function updateCellCommentTODO() {
     Format(cell);
 }
 
+/**
+ * Sets example text for a specific column if the cells are empty.
+ * 
+ * @customfunction
+ * @param {string} column - The column to check for empty cells.
+ * @param {string} exampleText - The example text to set if cells are empty.
+ */
 function exampleTextTODO(column, exampleText) {
     const dataRange = getDataRange();
     let values;
@@ -59,6 +71,11 @@ function exampleTextTODO(column, exampleText) {
     }
 }
 
+/**
+ * Applies formatting to the entire sheet and sets example text.
+ * 
+ * @customfunction
+ */
 function applyFormatToAllTODO() {
     const totalRows = sheet.getMaxRows();
 
@@ -89,6 +106,14 @@ function applyFormatToAllTODO() {
     }
 }
 
+/**
+ * Checks and sets the column based on the limit of occupied cells.
+ * 
+ * @customfunction
+ * @param {string} column - The column to check.
+ * @param {number} limit - The limit of occupied cells.
+ * @param {string} priority - The priority level.
+ */
 function checkAndSetColumnTODO(column, limit, priority) {
     const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
@@ -107,11 +132,26 @@ function checkAndSetColumnTODO(column, limit, priority) {
     }
 }
 
+/**
+ * Sets the background color of a specific column.
+ * 
+ * @customfunction
+ * @param {Sheet} sheet - The sheet object.
+ * @param {number} col - The column number.
+ * @param {string} color - The background color to set.
+ * @param {number} [startRow=2] - The starting row number.
+ */
 function setColumnBackground(sheet, col, color, startRow = 2) {
     let totalRows = sheet.getMaxRows();
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
 }
+
+/**
+ * Customizes the background colors of specific columns and cells.
+ * 
+ * @customfunction
+ */
 function customCeilBGColorTODO() {
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
@@ -129,6 +169,11 @@ function customCeilBGColorTODO() {
     sheet.getRange('B8').setBackground('#b5a642'); // Dark yellow 3
 }
 
+/**
+ * Sets content and style for specific cells based on predefined configurations.
+ * 
+ * @customfunction
+ */
 function setCellContentAndStyleTODO() {
     for (const cell in cellStyles) {
         const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
@@ -136,7 +181,11 @@ function setCellContentAndStyleTODO() {
     }
 }
 
-// update date colors based on time passed
+/**
+ * Updates the colors of dates in specific columns based on the time passed.
+ *
+ * @customfunction
+ */
 function updateDateColorsTODO() {
     const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
     const dataRange = getDataRange();
@@ -171,6 +220,11 @@ function updateDateColorsTODO() {
     }
 }
 
+/**
+ * Sets up a dropdown menu in cell I1 with options to show or hide the pie chart.
+ *
+ * @customfunction
+ */
 function setupDropdownTODO() {
     // Setup dropdown in I1
     const buttonCell = sheet.getRange("I1");
@@ -183,7 +237,14 @@ function setupDropdownTODO() {
     buttonCell.setVerticalAlignment("middle");
 }
 
-// Shift cells up if empty 
+/**
+ * Shifts cells up in a column if they are empty, filling with the values below.
+ *
+ * @customfunction
+ * @param {string} column - The column to shift cells up.
+ * @param {number} startRow - The starting row number.
+ * @param {number} endRow - The ending row number.
+ */
 function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log(`shiftCellsUpTODO called for column: ${column}, from row ${startRow} to ${endRow}`);
     const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
@@ -219,7 +280,11 @@ function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log('shiftCellsUpTODO completed');
 }
 
-// Force push up empty cells in columns A, C, D, E, F, G, H
+/**
+ * Forces empty cells to shift up in specified columns.
+ *
+ * @customfunction
+ */
 function pushUpEmptyCellsTODO() {
     const dataRange = getDataRange();
     const totalRows = dataRange.getLastRow();
@@ -240,6 +305,17 @@ function pushUpEmptyCellsTODO() {
     Logger.log('pushUpEmptyCells completed');
 }
 
+/**
+ * Updates rich text content of a cell based on original and new values.
+ *
+ * @customfunction
+ * @param {Range} range - The cell range to update.
+ * @param {string} originalValue - The original value of the cell.
+ * @param {string} newValue - The new value of the cell.
+ * @param {string} columnLetter - The column letter of the cell.
+ * @param {number} row - The row number of the cell.
+ * @param {Event} e - The edit event object.
+ */
 function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e) {
     const cellValue = newValue;
     Logger.log(`Cell value after edit: ${cellValue}`);
@@ -277,6 +353,14 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     preserveUrlsTODO(range, richTextValue, newRichTextValue);
 }
 
+/**
+ * Preserves URLs in a cell's rich text content after updates.
+ *
+ * @customfunction
+ * @param {Range} range - The cell range to update.
+ * @param {RichTextValue} richTextValue - The original rich text value.
+ * @param {RichTextValue} newRichTextValue - The new rich text value.
+ */
 function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
     const updatedRichTextValue = range.getRichTextValue();
     const updatedText = updatedRichTextValue.getText();
@@ -291,6 +375,11 @@ function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
     range.setRichTextValue(finalRichTextValue.build());
 }
 
+/**
+ * Removes multiple dates from cells, keeping only the last occurrence of today's date.
+ * 
+ * @customfunction
+ */
 function removeMultipleDatesTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();

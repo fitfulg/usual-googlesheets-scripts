@@ -1,6 +1,11 @@
  
+
 // globals.js: sheet, getDataRange, isPieChartVisible
 
+/**
+ * Creates a pie chart in the sheet, displaying the occupied cells in columns C, D, and E.
+ * @customfunction
+ */
 function createPieChartTODO() {
     Logger.log('Creating piechart');
     const dataRange = getDataRange();
@@ -32,6 +37,10 @@ function createPieChartTODO() {
     isPieChartVisible = true;
 }
 
+/**
+ * Deletes all charts in the sheet and clears the content in the range J1:K4.
+ * @customfunction
+ */
 function deleteAllChartsTODO() {
     Logger.log('Deleting all charts');
     const charts = sheet.getCharts();
@@ -49,5 +58,5 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         createPieChartTODO,
         deleteAllChartsTODO
-    }
+    };
 }

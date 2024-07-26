@@ -2,7 +2,6 @@
 
 // Contents of ./globals.js
 
- 
 
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -21,6 +20,12 @@ let isPieChartVisible = false;
 // shared/formatting: applyFormatToSelected, applyFormatToAll
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO
 
+/**
+ * Initializes the UI menu in the spreadsheet.
+ * Sets up custom menus and triggers functions when menu items are clicked.
+ *
+ * @customfunction
+ */
 function onOpen() {
     Logger.log('onOpen triggered');
 
@@ -51,6 +56,12 @@ function onOpen() {
         .addToUi();
 }
 
+/**
+ * Runs all functions needed to update the TODO sheet.
+ * Calls multiple formatting and update functions.
+ *
+ * @customfunction
+ */
 function runAllFunctionsTODO() {
     customCeilBGColorTODO();
     applyFormatToAllTODO();
@@ -62,6 +73,11 @@ function runAllFunctionsTODO() {
     Logger.log('All functions called successfully!');
 }
 
+/**
+ * Displays a "Hello World" message in an alert.
+ *
+ * @customfunction
+ */
 function logHelloWorld() {
     ui.alert('Hello World from Custom Menu!!');
     Logger.log('Hello World from Custom Menu!');
@@ -70,34 +86,81 @@ function logHelloWorld() {
 
 // Contents of ./shared/formatting.js
 
- 
 // globals.js: sheet, getDataRange
 
-// Higher-order fn to apply formatting to a range only if it is valid
+/**
+ * Higher-order function to apply formatting to a range only if it is valid.
+ *
+ * @param {Function} fn - The formatting function to apply.
+ * @return {Function} A function that applies formatting if the range is valid.
+ */
 const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
 
+/**
+ * Applies wrap strategy and alignment to a range.
+ *
+ * @param {Range} range - The range to format.
+ */
 const Format = withValidRange((range) => {
     range.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
     range.setHorizontalAlignment("center");
     range.setVerticalAlignment("middle");
 });
 
+/**
+ * Applies border style to a range.
+ *
+ * @param {Range} range - The range to format.
+ * @param {BorderStyle} borderStyle - The border style to apply.
+ */
 const applyBordersWithStyle = withValidRange((range, borderStyle) => range.setBorder(true, true, true, true, true, true, "#000000", borderStyle));
+
+/**
+ * Applies solid borders to a range.
+ *
+ * @param {Range} range - The range to apply borders to.
+ */
 const applyBorders = range => applyBordersWithStyle(range, SpreadsheetApp.BorderStyle.SOLID);
+
+/**
+ * Applies thick borders to a range.
+ *
+ * @param {Range} range - The range to apply thick borders to.
+ */
 const applyThickBorders = range => applyBordersWithStyle(range, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 
+/**
+ * Applies formatting to the selected range.
+ *
+ * @customfunction
+ */
 function applyFormatToSelected() {
     let range = sheet.getActiveRange();
     Format(range);
     applyBorders(range);
 }
 
+/**
+ * Applies formatting to all data in the sheet.
+ *
+ * @customfunction
+ */
 function applyFormatToAll() {
     let range = getDataRange();
     Format(range);
     applyBorders(range);
 }
 
+/**
+ * Sets the content and style of a specific cell.
+ *
+ * @param {string} cell - The cell to set.
+ * @param {string} value - The value to set.
+ * @param {string} fontWeight - The font weight to set.
+ * @param {string} fontColor - The font color to set.
+ * @param {string} backgroundColor - The background color to set.
+ * @param {string} alignment - The alignment to set.
+ */
 function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment) {
     let range = sheet.getRange(cell);
     range.setValue(value)
@@ -110,19 +173,43 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
     }
 }
 
-// Append DATE to cell
+/**
+ * Appends a formatted date to a cell value.
+ *
+ * @param {string} cellValue - The current cell value.
+ * @param {string} dateFormatted - The formatted date to append.
+ * @param {string} column - The column of the cell.
+ * @param {Object} config - The configuration for formatting.
+ * @return {RichTextValue} The new rich text value.
+ */
 function appendDateWithStyle(cellValue, dateFormatted, column, config) {
     const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue.trim() + '\n' + dateFormatted;
     return createRichTextValue(newText, dateFormatted, column, config);
 }
 
-// Update DATE in cell if it already exists
+/**
+ * Updates a formatted date in a cell value.
+ *
+ * @param {string} cellValue - The current cell value.
+ * @param {string} dateFormatted - The formatted date to update.
+ * @param {string} column - The column of the cell.
+ * @param {Object} config - The configuration for formatting.
+ * @return {RichTextValue} The new rich text value.
+ */
 function updateDateWithStyle(cellValue, dateFormatted, column, config) {
     const newText = cellValue.replace(datePattern, '\n' + dateFormatted).trim();
     return createRichTextValue(newText, dateFormatted, column, config);
 }
 
-// Create rich text value with italic date
+/**
+ * Creates a rich text value with an italic date.
+ *
+ * @param {string} text - The text to format.
+ * @param {string} dateFormatted - The formatted date.
+ * @param {string} column - The column of the cell.
+ * @param {Object} config - The configuration for formatting.
+ * @return {RichTextValue} The new rich text value.
+ */
 function createRichTextValue(text, dateFormatted, column, config) {
     const columnConfig = config[column];
     const color = columnConfig.defaultColor || '#A9A9A9'; // Default color (dark gray)
@@ -133,7 +220,11 @@ function createRichTextValue(text, dateFormatted, column, config) {
         .build();
 }
 
-// Reset the text style of a cell
+/**
+ * Resets the text style of a cell.
+ *
+ * @param {Range} range - The range to reset.
+ */
 function resetTextStyle(range) {
     const richTextValue = SpreadsheetApp.newRichTextValue()
         .setText(range.getValue())
@@ -143,6 +234,11 @@ function resetTextStyle(range) {
     range.setRichTextValue(richTextValue);
 }
 
+/**
+ * Clears the text formatting of a range.
+ *
+ * @param {Range} range - The range to clear.
+ */
 function clearTextFormatting(range) {
     const values = range.getValues();
     const richTextValues = values.map(row => row.map(value =>
@@ -158,8 +254,13 @@ function clearTextFormatting(range) {
 
 // Contents of ./shared/utils.js
 
- 
 
+/**
+ * Extracts URLs from a rich text value.
+ *
+ * @param {RichTextValue} richTextValue - The rich text value to extract URLs from.
+ * @return {string[]} The extracted URLs.
+ */
 function extractUrls(richTextValue) {
     const urls = [];
     const text = richTextValue.getText();
@@ -172,6 +273,13 @@ function extractUrls(richTextValue) {
     return urls;
 }
 
+/**
+ * Checks if two arrays are equal.
+ *
+ * @param {Array} arr1 - The first array.
+ * @param {Array} arr2 - The second array.
+ * @return {boolean} True if the arrays are equal, false otherwise.
+ */
 function arraysEqual(arr1, arr2) {
     if (arr1.length !== arr2.length) return false;
     for (let i = 0; i < arr1.length; i++) {
@@ -180,14 +288,32 @@ function arraysEqual(arr1, arr2) {
     return true;
 }
 
+/**
+ * Generates a SHA-256 hash for the given content.
+ *
+ * @param {string} content - The content to hash.
+ * @return {string} The generated hash in base64 encoding.
+ */
 function generateHash(content) {
     return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, content));
 }
-// check if the hash of the content of the sheet has changed
+
+/**
+ * Checks if the hash of the content of the sheet has changed.
+ *
+ * @param {string} lastHash - The previous hash value.
+ * @param {string} currentHash - The current hash value.
+ * @return {boolean} True if the hash has changed, false otherwise.
+ */
 function shouldRunUpdates(lastHash, currentHash) {
     return lastHash !== currentHash;
 }
-//  get the content of the sheet and generate a hash for it
+
+/**
+ * Gets the content of the sheet and generates a hash for it.
+ *
+ * @return {string} The generated hash of the sheet content.
+ */
 function getSheetContentHash() {
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
@@ -202,6 +328,11 @@ function getSheetContentHash() {
 // shared/utils.js: extractUrls, arraysEqual
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
+/**
+ * Updates the comment for a specific cell with version and feature details.
+ * 
+ * @customfunction
+ */
 function updateCellCommentTODO() {
     const cell = sheet.getRange("I2");
     const version = "v1.1";
@@ -234,6 +365,13 @@ function updateCellCommentTODO() {
     Format(cell);
 }
 
+/**
+ * Sets example text for a specific column if the cells are empty.
+ * 
+ * @customfunction
+ * @param {string} column - The column to check for empty cells.
+ * @param {string} exampleText - The example text to set if cells are empty.
+ */
 function exampleTextTODO(column, exampleText) {
     const dataRange = getDataRange();
     let values;
@@ -257,6 +395,11 @@ function exampleTextTODO(column, exampleText) {
     }
 }
 
+/**
+ * Applies formatting to the entire sheet and sets example text.
+ * 
+ * @customfunction
+ */
 function applyFormatToAllTODO() {
     const totalRows = sheet.getMaxRows();
 
@@ -287,6 +430,14 @@ function applyFormatToAllTODO() {
     }
 }
 
+/**
+ * Checks and sets the column based on the limit of occupied cells.
+ * 
+ * @customfunction
+ * @param {string} column - The column to check.
+ * @param {number} limit - The limit of occupied cells.
+ * @param {string} priority - The priority level.
+ */
 function checkAndSetColumnTODO(column, limit, priority) {
     const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
@@ -305,11 +456,26 @@ function checkAndSetColumnTODO(column, limit, priority) {
     }
 }
 
+/**
+ * Sets the background color of a specific column.
+ * 
+ * @customfunction
+ * @param {Sheet} sheet - The sheet object.
+ * @param {number} col - The column number.
+ * @param {string} color - The background color to set.
+ * @param {number} [startRow=2] - The starting row number.
+ */
 function setColumnBackground(sheet, col, color, startRow = 2) {
     let totalRows = sheet.getMaxRows();
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
 }
+
+/**
+ * Customizes the background colors of specific columns and cells.
+ * 
+ * @customfunction
+ */
 function customCeilBGColorTODO() {
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
@@ -327,6 +493,11 @@ function customCeilBGColorTODO() {
     sheet.getRange('B8').setBackground('#b5a642'); // Dark yellow 3
 }
 
+/**
+ * Sets content and style for specific cells based on predefined configurations.
+ * 
+ * @customfunction
+ */
 function setCellContentAndStyleTODO() {
     for (const cell in cellStyles) {
         const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
@@ -334,7 +505,11 @@ function setCellContentAndStyleTODO() {
     }
 }
 
-// update date colors based on time passed
+/**
+ * Updates the colors of dates in specific columns based on the time passed.
+ *
+ * @customfunction
+ */
 function updateDateColorsTODO() {
     const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
     const dataRange = getDataRange();
@@ -369,6 +544,11 @@ function updateDateColorsTODO() {
     }
 }
 
+/**
+ * Sets up a dropdown menu in cell I1 with options to show or hide the pie chart.
+ *
+ * @customfunction
+ */
 function setupDropdownTODO() {
     // Setup dropdown in I1
     const buttonCell = sheet.getRange("I1");
@@ -381,7 +561,14 @@ function setupDropdownTODO() {
     buttonCell.setVerticalAlignment("middle");
 }
 
-// Shift cells up if empty 
+/**
+ * Shifts cells up in a column if they are empty, filling with the values below.
+ *
+ * @customfunction
+ * @param {string} column - The column to shift cells up.
+ * @param {number} startRow - The starting row number.
+ * @param {number} endRow - The ending row number.
+ */
 function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log(`shiftCellsUpTODO called for column: ${column}, from row ${startRow} to ${endRow}`);
     const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
@@ -417,7 +604,11 @@ function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log('shiftCellsUpTODO completed');
 }
 
-// Force push up empty cells in columns A, C, D, E, F, G, H
+/**
+ * Forces empty cells to shift up in specified columns.
+ *
+ * @customfunction
+ */
 function pushUpEmptyCellsTODO() {
     const dataRange = getDataRange();
     const totalRows = dataRange.getLastRow();
@@ -438,6 +629,17 @@ function pushUpEmptyCellsTODO() {
     Logger.log('pushUpEmptyCells completed');
 }
 
+/**
+ * Updates rich text content of a cell based on original and new values.
+ *
+ * @customfunction
+ * @param {Range} range - The cell range to update.
+ * @param {string} originalValue - The original value of the cell.
+ * @param {string} newValue - The new value of the cell.
+ * @param {string} columnLetter - The column letter of the cell.
+ * @param {number} row - The row number of the cell.
+ * @param {Event} e - The edit event object.
+ */
 function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e) {
     const cellValue = newValue;
     Logger.log(`Cell value after edit: ${cellValue}`);
@@ -475,6 +677,14 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     preserveUrlsTODO(range, richTextValue, newRichTextValue);
 }
 
+/**
+ * Preserves URLs in a cell's rich text content after updates.
+ *
+ * @customfunction
+ * @param {Range} range - The cell range to update.
+ * @param {RichTextValue} richTextValue - The original rich text value.
+ * @param {RichTextValue} newRichTextValue - The new rich text value.
+ */
 function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
     const updatedRichTextValue = range.getRichTextValue();
     const updatedText = updatedRichTextValue.getText();
@@ -489,6 +699,11 @@ function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
     range.setRichTextValue(finalRichTextValue.build());
 }
 
+/**
+ * Removes multiple dates from cells, keeping only the last occurrence of today's date.
+ * 
+ * @customfunction
+ */
 function removeMultipleDatesTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
@@ -562,7 +777,6 @@ function removeMultipleDatesTODO() {
 
 // Contents of ./TODOsheet/TODOlibrary.js
 
- 
 
 const cellStyles = {
     "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
@@ -600,9 +814,13 @@ const dateColorConfig = {
 
 // Contents of ./TODOsheet/TODOpiechart.js
 
- 
+
 // globals.js: sheet, getDataRange, isPieChartVisible
 
+/**
+ * Creates a pie chart in the sheet, displaying the occupied cells in columns C, D, and E.
+ * @customfunction
+ */
 function createPieChartTODO() {
     Logger.log('Creating piechart');
     const dataRange = getDataRange();
@@ -634,6 +852,10 @@ function createPieChartTODO() {
     isPieChartVisible = true;
 }
 
+/**
+ * Deletes all charts in the sheet and clears the content in the range J1:K4.
+ * @customfunction
+ */
 function deleteAllChartsTODO() {
     Logger.log('Deleting all charts');
     const charts = sheet.getCharts();
@@ -650,35 +872,60 @@ function deleteAllChartsTODO() {
 
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
- 
-// TODOsheet/TODOtoggleFn.js: createPieChartTODO, deleteAllChartsTODO
 
-function togglePieChartTODO(action) {
-    Logger.log(`togglePieChartTODO called with action: ${action}`);
-    if (action === 'Hide Piechart') {
-        deleteAllChartsTODO();
-        isPieChartVisible = false;
-        Logger.log('Piechart hidden');
-    } else if (action === 'Show Piechart') {
-        createPieChartTODO();
-        isPieChartVisible = true;
-        Logger.log('Piechart shown');
-    } else {
-        Logger.log('Invalid action selected');
-    }
+// globals.js: sheet, getDataRange, isPieChartVisible
+
+/**
+ * Creates a pie chart in the sheet, displaying the occupied cells in columns C, D, and E.
+ * @customfunction
+ */
+function createPieChartTODO() {
+    Logger.log('Creating piechart');
+    const dataRange = getDataRange();
+    const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
+    const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
+    const valuesE = sheet.getRange("E2:E" + dataRange.getLastRow()).getValues().flat();
+
+    const occupiedC = valuesC.filter(String).length;
+    const occupiedD = valuesD.filter(String).length;
+    const occupiedE = valuesE.filter(String).length;
+
+    const chartDataRange = sheet.getRange("J1:K4");
+    chartDataRange.setValues([
+        ["Column", "Occupied Cells"],
+        ["HIGH", occupiedC],
+        ["MEDIUM", occupiedD],
+        ["LOW", occupiedE]
+    ]);
+
+    const chart = sheet.newChart()
+        .setChartType(Charts.ChartType.PIE)
+        .addRange(chartDataRange)
+        .setPosition(1, 10, 0, 0) // Position the chart starting at column J
+        .setOption('title', 'Pie Chart')
+        .build();
+
+    sheet.insertChart(chart);
+    Logger.log('Piechart created');
+    isPieChartVisible = true;
 }
 
-function handlePieChartToggleTODO(range) {
-    const action = range.getValue().toString().trim();
-    Logger.log(`Action selected: ${action}`);
-    if (action === 'Show Piechart' || action === 'Hide Piechart') {
-        togglePieChartTODO(action);
-    } else {
-        Logger.log('Invalid action selected');
-    }
-    sheet.getRange("I1").setValue("Piechart");
-}
+/**
+ * Deletes all charts in the sheet and clears the content in the range J1:K4.
+ * @customfunction
+ */
+function deleteAllChartsTODO() {
+    Logger.log('Deleting all charts');
+    const charts = sheet.getCharts();
 
+    charts.forEach(chart => {
+        sheet.removeChart(chart);
+    });
+
+    sheet.getRange("J1:K4").clearContent();
+    Logger.log(`Deleted ${charts.length} charts`);
+    isPieChartVisible = false;
+}
 
 
 // Contents of ./TODOsheet/TODOtriggers.js
@@ -688,7 +935,11 @@ function handlePieChartToggleTODO(range) {
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
 // TODOsheet/TODOformatting.js: shiftCellsUpTODO, updateRichTextTODO, removeMultipleDatesTODO
 
-// Track changes in specified columns and add the date
+/**
+ * Track changes in specified columns and add the date.
+ * @param {GoogleAppsScript.Events.SheetsOnEdit} e - The event object for the edit trigger.
+ * @customfunction
+ */
 function onEdit(e) {
     try {
         if (!e || !e.range) {
@@ -731,18 +982,4 @@ function onEdit(e) {
         Logger.log(`Error in onEdit: ${error.message}`);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

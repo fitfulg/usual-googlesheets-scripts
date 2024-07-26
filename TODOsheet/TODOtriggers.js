@@ -1,9 +1,14 @@
+ 
 
 // globals.js: sheet
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
 // TODOsheet/TODOformatting.js: shiftCellsUpTODO, updateRichTextTODO, removeMultipleDatesTODO
 
-// Track changes in specified columns and add the date
+/**
+ * Track changes in specified columns and add the date.
+ * @param {GoogleAppsScript.Events.SheetsOnEdit} e - The event object for the edit trigger.
+ * @customfunction
+ */
 function onEdit(e) {
     try {
         if (!e || !e.range) {
@@ -52,17 +57,3 @@ if (typeof module !== 'undefined' && module.exports) {
         onEdit
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,9 +1,16 @@
+ 
 
 // globals.js: ui
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO
 
+/**
+ * Initializes the UI menu in the spreadsheet.
+ * Sets up custom menus and triggers functions when menu items are clicked.
+ *
+ * @customfunction
+ */
 function onOpen() {
     Logger.log('onOpen triggered');
 
@@ -34,6 +41,12 @@ function onOpen() {
         .addToUi();
 }
 
+/**
+ * Runs all functions needed to update the TODO sheet.
+ * Calls multiple formatting and update functions.
+ *
+ * @customfunction
+ */
 function runAllFunctionsTODO() {
     customCeilBGColorTODO();
     applyFormatToAllTODO();
@@ -45,6 +58,11 @@ function runAllFunctionsTODO() {
     Logger.log('All functions called successfully!');
 }
 
+/**
+ * Displays a "Hello World" message in an alert.
+ *
+ * @customfunction
+ */
 function logHelloWorld() {
     ui.alert('Hello World from Custom Menu!!');
     Logger.log('Hello World from Custom Menu!');
