@@ -2,8 +2,13 @@ name: Setup clasp
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      rollback:
+        description: 'Rollback to previous commit'
+        required: false
+        type: boolean
 
 jobs:
   setup-clasp:
@@ -30,3 +35,32 @@ jobs:
           cat .claspignore
       - name: Push to Google Apps Script
         run: clasp push
+
+  rollback:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install CLASP
+        run: npm install -g @google/clasp
+
+      - name: Authenticate with CLASP
+        run: |
+          echo '${{ secrets.CLASP_TOKEN }}' > ~/.clasprc.json
+
+      - name: Rollback to previous commit
+        run: |
+          git checkout HEAD^1
+          clasp push -f
+
+      - name: Notify rollback completion
+        run: |
+          echo "Rollback completed successfully!"
