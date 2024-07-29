@@ -65,7 +65,7 @@ function runAllFunctionsTODO() {
  */
 function logHelloWorld() {
     ui.alert('Hello World from Custom Menu!');
-    Logger.log('Hello World from Custom Menu!!');
+    Logger.log('Hello World from Custom Menu!!!');
 }
 
 if (typeof module !== 'undefined' && module.exports) {
