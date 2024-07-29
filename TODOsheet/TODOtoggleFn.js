@@ -1,62 +1,47 @@
- 
 
-// globals.js: sheet, getDataRange, isPieChartVisible
+
+// globals.js: sheet, isPieChartVisible
+// TODOsheet/TODOpiechart.js: createPieChartTODO, deleteAllChartsTODO
 
 /**
- * Creates a pie chart in the sheet, displaying the occupied cells in columns C, D, and E.
- * @customfunction
+ * Toggles the visibility of the piechart
+ * @param {string} action - The action to be performed
+ * @returns {void}
  */
-function createPieChartTODO() {
-    Logger.log('Creating piechart');
-    const dataRange = getDataRange();
-    const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
-    const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
-    const valuesE = sheet.getRange("E2:E" + dataRange.getLastRow()).getValues().flat();
-
-    const occupiedC = valuesC.filter(String).length;
-    const occupiedD = valuesD.filter(String).length;
-    const occupiedE = valuesE.filter(String).length;
-
-    const chartDataRange = sheet.getRange("J1:K4");
-    chartDataRange.setValues([
-        ["Column", "Occupied Cells"],
-        ["HIGH", occupiedC],
-        ["MEDIUM", occupiedD],
-        ["LOW", occupiedE]
-    ]);
-
-    const chart = sheet.newChart()
-        .setChartType(Charts.ChartType.PIE)
-        .addRange(chartDataRange)
-        .setPosition(1, 10, 0, 0) // Position the chart starting at column J
-        .setOption('title', 'Pie Chart')
-        .build();
-
-    sheet.insertChart(chart);
-    Logger.log('Piechart created');
-    isPieChartVisible = true;
+function togglePieChartTODO(action) {
+    Logger.log(`togglePieChartTODO called with action: ${action}`);
+    if (action === 'Hide Piechart') {
+        deleteAllChartsTODO();
+        isPieChartVisible = false;
+        Logger.log('Piechart hidden');
+    } else if (action === 'Show Piechart') {
+        createPieChartTODO();
+        isPieChartVisible = true;
+        Logger.log('Piechart shown');
+    } else {
+        Logger.log('Invalid action selected');
+    }
 }
 
 /**
- * Deletes all charts in the sheet and clears the content in the range J1:K4.
- * @customfunction
+ * Handles the Piechart toggle action
+ * @param {Range} range - The range containing the action
+ * @returns {void}
  */
-function deleteAllChartsTODO() {
-    Logger.log('Deleting all charts');
-    const charts = sheet.getCharts();
-
-    charts.forEach(chart => {
-        sheet.removeChart(chart);
-    });
-
-    sheet.getRange("J1:K4").clearContent();
-    Logger.log(`Deleted ${charts.length} charts`);
-    isPieChartVisible = false;
+function handlePieChartToggleTODO(range) {
+    const action = range.getValue().toString().trim();
+    Logger.log(`Action selected: ${action}`);
+    if (action === 'Show Piechart' || action === 'Hide Piechart') {
+        togglePieChartTODO(action);
+    } else {
+        Logger.log('Invalid action selected');
+    }
+    sheet.getRange("I1").setValue("Piechart");
 }
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        createPieChartTODO,
-        deleteAllChartsTODO
-    };
+        togglePieChartTODO,
+        handlePieChartToggleTODO
+    }
 }
