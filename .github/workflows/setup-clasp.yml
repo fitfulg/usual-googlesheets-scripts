@@ -48,22 +48,35 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
+  
       - name: Install CLASP
         run: npm install -g @google/clasp
-
+  
       - name: Authenticate with CLASP
         run: |
           echo '${{ secrets.CLASP_TOKEN }}' > ~/.clasprc.json
-
+  
+      - name: Create rollback branch with commit message
+        run: |
+          # Get the previous commit hash
+          PREV_COMMIT=$(git rev-parse HEAD^)
+          
+          # Get the commit message of the previous commit
+          COMMIT_MSG=$(git log --format=%B -n 1 $PREV_COMMIT | sed -e 's/[^A-Za-z0-9._-]/_/g' | cut -c1-50)
+          
+          # Create a branch name with date and commit message
+          BRANCH_NAME="rollback-$(date +%Y%m%d-%H%M%S)-${COMMIT_MSG}"
+          
+          # Create and push the new branch
+          git checkout -b $BRANCH_NAME $PREV_COMMIT
+          git push origin $BRANCH_NAME
+          
+          echo "Created and pushed branch: $BRANCH_NAME"
+  
       - name: Rollback to previous commit
         run: |
           echo "Current directory: $(pwd)"
           echo "Git status:"
-          git status
-          echo "Checking out previous commit..."
-          git checkout HEAD^1
-          echo "Git status after checkout:"
           git status
           echo "Creating .clasp.json..."
           echo '{
@@ -75,13 +88,13 @@ jobs:
           echo "Pushing to CLASP..."
           clasp push -f
         continue-on-error: true
-
+  
       - name: List files
         run: ls -la
-
+  
       - name: Check CLASP version
         run: clasp -v
-
+  
       - name: Notify rollback completion
         run: |
           echo "Rollback process completed. Check logs for details."
