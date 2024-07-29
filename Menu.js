@@ -1,4 +1,4 @@
- 
+
 
 // globals.js: ui
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
@@ -64,7 +64,7 @@ function runAllFunctionsTODO() {
  * @customfunction
  */
 function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!!');
+    ui.alert('Hello World from Custom Menu!');
     Logger.log('Hello World from Custom Menu!');
 }
 
