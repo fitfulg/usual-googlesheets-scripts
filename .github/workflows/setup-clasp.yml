@@ -65,17 +65,23 @@ jobs:
           git checkout HEAD^1
           echo "Git status after checkout:"
           git status
-          echo "Pushing to CLASP..."
-          clasp push -f
-        continue-on-error: true
-
-      - name: Create .clasp.json for rollback
-        run: |
+          echo "Creating .clasp.json..."
           echo '{
             "scriptId": "${{ secrets.CLASP_SCRIPT_ID }}",
             "rootDir": "./"
           }' > .clasp.json
+          echo "Contents of .clasp.json:"
+          cat .clasp.json
+          echo "Pushing to CLASP..."
+          clasp push -f
+        continue-on-error: true
+
+      - name: List files
+        run: ls -la
+
+      - name: Check CLASP version
+        run: clasp -v
 
       - name: Notify rollback completion
         run: |
-          echo "Rollback completed successfully!"
+          echo "Rollback process completed. Check logs for details."
