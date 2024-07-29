@@ -14,9 +14,9 @@ jobs:
   setup-clasp:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: Install clasp
@@ -40,12 +40,12 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -58,8 +58,23 @@ jobs:
 
       - name: Rollback to previous commit
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Git status:"
+          git status
+          echo "Checking out previous commit..."
           git checkout HEAD^1
+          echo "Git status after checkout:"
+          git status
+          echo "Pushing to CLASP..."
           clasp push -f
+        continue-on-error: true
+
+      - name: Create .clasp.json for rollback
+        run: |
+          echo '{
+            "scriptId": "${{ secrets.CLASP_SCRIPT_ID }}",
+            "rootDir": "./"
+          }' > .clasp.json
 
       - name: Notify rollback completion
         run: |
