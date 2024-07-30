@@ -24,11 +24,12 @@ jobs:
       - name: Run tests
         run: npm test
         id: run_tests
-        continue-on-error: true
+    outputs:
+      test_result: ${{ steps.run_tests.outcome }}
 
   setup-clasp:
     needs: test
-    if: success()
+    if: needs.test.outputs.test_result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +56,7 @@ jobs:
 
   rollback:
     needs: test
-    if: failure() || (github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true')
+    if: needs.test.outputs.test_result == 'failure' || (github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -139,14 +140,14 @@ jobs:
     steps:
       - name: Notify results
         run: |
-          if [[ "${{ needs.test.result }}" == "failure" ]]; then
+          if [[ "${{ needs.test.outputs.test_result }}" == "failure" ]]; then
             echo "Tests failed."
             if [[ "${{ needs.rollback.result }}" == "success" && -n "${{ needs.rollback.outputs.ROLLBACK_BRANCH }}" ]]; then
               echo "Rollback branch '${{ needs.rollback.outputs.ROLLBACK_BRANCH }}' created. Please review and merge if necessary."
             else
               echo "Rollback unsuccessful or didn't run. Check logs for details."
             fi
-          elif [[ "${{ needs.setup-clasp.result }}" == "success" ]]; then
+          elif [[ "${{ needs.test.outputs.test_result }}" == "success" && "${{ needs.setup-clasp.result }}" == "success" ]]; then
             echo "Tests passed. Changes pushed to Apps Script."
           elif [[ "${{ needs.rollback.result }}" == "success" ]]; then
             echo "${{ github.event.inputs.rollback == 'true' && 'Manual' || 'Automatic' }} rollback completed."
