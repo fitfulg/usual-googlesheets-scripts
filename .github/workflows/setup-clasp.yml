@@ -61,12 +61,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
+  
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -76,63 +76,45 @@ jobs:
         run: npm install -g @google/clasp
   
       - name: Authenticate with CLASP
-        run: |
-          echo '${{ secrets.CLASP_TOKEN }}' > ~/.clasprc.json
+        run: echo '${{ secrets.CLASP_TOKEN }}' > ~/.clasprc.json
   
-      - name: Create rollback branch with changes
+      - name: Create rollback branch and PR
+        id: create_rollback
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Create a new branch from the current state
           BRANCH_NAME="rollback-$(date +%Y%m%d-%H%M%S)"
           git checkout -b $BRANCH_NAME
           
-          # Get the message of the previous commit
           PREV_COMMIT_MSG=$(git log --format=%B -n 1 HEAD^)
           
-          # Get the changes needed to revert to the previous state
           git diff HEAD^..HEAD | git apply -R
           
-          # Commit these changes with a message referencing the previous commit
           git add .
           git commit -m "Revert to: $PREV_COMMIT_MSG"
           
-          # Push the new branch with the rollback changes
-          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" $BRANCH_NAME
+          git push -u origin $BRANCH_NAME
           
-          echo "Created and pushed branch: $BRANCH_NAME with rollback changes"
-
-      - name: Save branch name
-        run: echo "ROLLBACK_BRANCH=$BRANCH_NAME" >> $GITHUB_OUTPUT
-        id: save_branch
+          PR_URL=$(gh pr create --base main --head $BRANCH_NAME --title "Rollback: $PREV_COMMIT_MSG" --body "This is an automated rollback due to test failures or manual request.")
+          echo "ROLLBACK_PR=$PR_URL" >> $GITHUB_OUTPUT
+          echo "ROLLBACK_BRANCH=$BRANCH_NAME" >> $GITHUB_OUTPUT
   
-      - name: Create .clasp.json
+      - name: Push to CLASP
         run: |
           echo '{
             "scriptId": "${{ secrets.CLASP_SCRIPT_ID }}",
             "rootDir": "./"
           }' > .clasp.json
-
-      - name: Push to CLASP
-        run: |
           echo "Pushing to CLASP..."
           clasp push -f
         continue-on-error: true
-
-      - name: Check CLASP version
-        run: clasp -v
-
-      - name: Notify rollback completion
-        run: |
-          echo "Rollback process completed. A new branch '$BRANCH_NAME' has been created with the rollback changes."
-          echo "Changes have been pushed to Google Apps Script via CLASP."
-          echo "You can now manually merge this branch into main if desired."
-
+  
     outputs:
-      ROLLBACK_BRANCH: ${{ steps.save_branch.outputs.ROLLBACK_BRANCH }}
+      ROLLBACK_PR: ${{ steps.create_rollback.outputs.ROLLBACK_PR }}
+      ROLLBACK_BRANCH: ${{ steps.create_rollback.outputs.ROLLBACK_BRANCH }}
 
   notify:
     needs: [test, setup-clasp, rollback]
