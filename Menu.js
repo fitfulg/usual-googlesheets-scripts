@@ -65,7 +65,7 @@ function runAllFunctionsTODO() {
  */
 function logHelloWorld() {
     ui.alert('Hello World from Custom Menu!');
-    Logger.log('Rollback test 2!');
+    Logger.log('Hello world!');
 }
 
 if (typeof module !== 'undefined' && module.exports) {
