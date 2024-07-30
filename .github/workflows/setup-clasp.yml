@@ -11,7 +11,24 @@ on:
         type: boolean
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+        id: run_tests
+        continue-on-error: true
+
   setup-clasp:
+    needs: test
+    if: success()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +54,8 @@ jobs:
         run: clasp push
 
   rollback:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true'
+    needs: test
+    if: failure() || (github.event_name == 'workflow_dispatch' && github.event.inputs.rollback == 'true')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -84,6 +102,10 @@ jobs:
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" $BRANCH_NAME
           
           echo "Created and pushed branch: $BRANCH_NAME with rollback changes"
+
+      - name: Save branch name
+        run: echo "ROLLBACK_BRANCH=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        id: save_branch
   
       - name: Create .clasp.json
         run: |
@@ -106,3 +128,33 @@ jobs:
           echo "Rollback process completed. A new branch '$BRANCH_NAME' has been created with the rollback changes."
           echo "Changes have been pushed to Google Apps Script via CLASP."
           echo "You can now manually merge this branch into main if desired."
+
+    outputs:
+      ROLLBACK_BRANCH: ${{ steps.save_branch.outputs.ROLLBACK_BRANCH }}
+
+  notify:
+    needs: [test, setup-clasp, rollback]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify results
+        run: |
+          if [[ "${{ needs.test.result }}" == "failure" ]]; then
+            echo "Tests failed."
+            if [[ "${{ needs.rollback.result }}" == "success" && -n "${{ needs.rollback.outputs.ROLLBACK_BRANCH }}" ]]; then
+              echo "Rollback branch '${{ needs.rollback.outputs.ROLLBACK_BRANCH }}' created. Please review and merge if necessary."
+            else
+              echo "Rollback unsuccessful or didn't run. Check logs for details."
+            fi
+          elif [[ "${{ needs.setup-clasp.result }}" == "success" ]]; then
+            echo "Tests passed. Changes pushed to Apps Script."
+          elif [[ "${{ needs.rollback.result }}" == "success" ]]; then
+            echo "${{ github.event.inputs.rollback == 'true' && 'Manual' || 'Automatic' }} rollback completed."
+            if [[ -n "${{ needs.rollback.outputs.ROLLBACK_BRANCH }}" ]]; then
+              echo "Branch '${{ needs.rollback.outputs.ROLLBACK_BRANCH }}' created with rollback changes. Review and act accordingly."
+            else
+              echo "Rollback completed, but branch name unavailable. Check logs for details."
+            fi
+          else
+            echo "Workflow completed with unexpected results. Check logs for details."
+          fi
