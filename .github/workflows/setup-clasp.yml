@@ -59,50 +59,50 @@ jobs:
         run: |
           echo '${{ secrets.CLASP_TOKEN }}' > ~/.clasprc.json
   
-      - name: Create rollback branch with commit message
+      - name: Create rollback branch with changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Get the previous commit hash
-          PREV_COMMIT=$(git rev-parse HEAD^)
+          # Create a new branch from the current state
+          BRANCH_NAME="rollback-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $BRANCH_NAME
           
-          # Get the commit message of the previous commit
-          COMMIT_MSG=$(git log --format=%B -n 1 $PREV_COMMIT | sed -e 's/[^A-Za-z0-9._-]/_/g' | cut -c1-50)
+          # Get the message of the previous commit
+          PREV_COMMIT_MSG=$(git log --format=%B -n 1 HEAD^)
           
-          # Create a branch name with date and commit message
-          BRANCH_NAME="rollback-$(date +%Y%m%d-%H%M%S)-${COMMIT_MSG}"
+          # Get the changes needed to revert to the previous state
+          git diff HEAD^..HEAD | git apply -R
           
-          # Create and push the new branch
-          git checkout -b $BRANCH_NAME $PREV_COMMIT
+          # Commit these changes with a message referencing the previous commit
+          git add .
+          git commit -m "Revert to: $PREV_COMMIT_MSG"
+          
+          # Push the new branch with the rollback changes
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" $BRANCH_NAME
           
-          echo "Created and pushed branch: $BRANCH_NAME"
+          echo "Created and pushed branch: $BRANCH_NAME with rollback changes"
   
-      - name: Rollback to previous commit
+      - name: Create .clasp.json
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Git status:"
-          git status
-          echo "Creating .clasp.json..."
           echo '{
             "scriptId": "${{ secrets.CLASP_SCRIPT_ID }}",
             "rootDir": "./"
           }' > .clasp.json
-          echo "Contents of .clasp.json:"
-          cat .clasp.json
+
+      - name: Push to CLASP
+        run: |
           echo "Pushing to CLASP..."
           clasp push -f
         continue-on-error: true
-  
-      - name: List files
-        run: ls -la
-  
+
       - name: Check CLASP version
         run: clasp -v
-  
+
       - name: Notify rollback completion
         run: |
-          echo "Rollback process completed. Check logs for details."
+          echo "Rollback process completed. A new branch '$BRANCH_NAME' has been created with the rollback changes."
+          echo "Changes have been pushed to Google Apps Script via CLASP."
+          echo "You can now manually merge this branch into main if desired."
