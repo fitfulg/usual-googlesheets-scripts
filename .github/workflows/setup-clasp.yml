@@ -61,7 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,7 +77,7 @@ jobs:
       - name: Authenticate with CLASP
         run: echo '${{ secrets.CLASP_TOKEN }}' > ~/.clasprc.json
   
-      - name: Create rollback commit
+      - name: Create and push rollback branch
         id: create_rollback
         run: |
           git config --global user.name 'github-actions[bot]'
@@ -94,16 +93,11 @@ jobs:
           git add .
           git commit -m "Revert to: $PREV_COMMIT_MSG"
           
+          git push -u origin $BRANCH_NAME
+          
           echo "ROLLBACK_BRANCH=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "PREV_COMMIT_MSG=$PREV_COMMIT_MSG" >> $GITHUB_OUTPUT
-  
-      - name: Create Pull Request
-        id: create_pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_URL=$(gh pr create --base main --head ${{ steps.create_rollback.outputs.ROLLBACK_BRANCH }} --title "Rollback: ${{ steps.create_rollback.outputs.PREV_COMMIT_MSG }}" --body "This is an automated rollback due to test failures or manual request.")
-          echo "ROLLBACK_PR=$PR_URL" >> $GITHUB_OUTPUT
+          echo "PR_LINK=https://github.com/${{ github.repository }}/compare/main...$BRANCH_NAME" >> $GITHUB_OUTPUT
   
       - name: Push to CLASP
         run: |
@@ -116,8 +110,8 @@ jobs:
         continue-on-error: true
   
     outputs:
-      ROLLBACK_PR: ${{ steps.create_pr.outputs.ROLLBACK_PR }}
       ROLLBACK_BRANCH: ${{ steps.create_rollback.outputs.ROLLBACK_BRANCH }}
+      PR_LINK: ${{ steps.create_rollback.outputs.PR_LINK }}
 
   notify:
     needs: [test, setup-clasp, rollback]
