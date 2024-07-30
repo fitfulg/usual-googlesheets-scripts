@@ -57,15 +57,7 @@ function runAllFunctionsTODO() {
     Logger.log('All functions called successfully!');
 }
 
-/**
- * Displays a "Hello World" message in an alert.
- *
- * @customfunction
- */
-function logHelloWorld() {
-    ui.alert('Hello World from Custom Menu!');
-    Logger.log('Hello world!');
-}
+
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
