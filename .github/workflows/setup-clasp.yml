@@ -24,6 +24,7 @@ jobs:
       - name: Run tests
         run: npm test
         id: run_tests
+        continue-on-error: true
     outputs:
       test_result: ${{ steps.run_tests.outcome }}
 
