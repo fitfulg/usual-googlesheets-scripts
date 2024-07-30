@@ -16,7 +16,6 @@ let isPieChartVisible = false;
 // Contents of ./Menu.js
 
 
-
 // globals.js: ui
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll

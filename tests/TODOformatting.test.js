@@ -1,4 +1,4 @@
-const { exampleTextTODO } = require('../TODOsheet/TODOformatting');
+const { exampleTextTODO, updateCellCommentTODO, applyFormatToAllTODO } = require('../TODOsheet/TODOformatting');
 
 describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
     let mockRange, mockSheet, mockDataRange;
@@ -42,6 +42,20 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         };
 
         global.getDataRange = jest.fn().mockReturnValue(mockDataRange);
+    });
+
+    describe('Function Existence', () => {
+        test('updateCellCommentTODO function exists', () => {
+            expect(typeof updateCellCommentTODO).toBe('function');
+        });
+
+        test('exampleTextTODO function exists', () => {
+            expect(typeof exampleTextTODO).toBe('function');
+        });
+
+        test('applyFormatToAllTODO function exists', () => {
+            expect(typeof applyFormatToAllTODO).toBe('function');
+        });
     });
 
     describe('exampleTextTODO', () => {
