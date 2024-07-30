@@ -1,6 +1,51 @@
-// tests/formatting.test.js
+const { setCellStyle, applyBorders } = require('../shared/formatting');
+const formatting = require('../shared/formatting');
 
-const { setCellStyle } = require('../shared/formatting');
+describe('Formatting Functions', () => {
+    test('applyBorders function exists', () => {
+        expect(typeof formatting.applyBorders).toBe('function');
+    });
+
+    test('applyBordersWithStyle function exists', () => {
+        expect(typeof formatting.applyBordersWithStyle).toBe('function');
+    });
+
+    test('applyFormatToSelected function exists', () => {
+        expect(typeof formatting.applyFormatToSelected).toBe('function');
+    });
+
+    test('applyFormatToAll function exists', () => {
+        expect(typeof formatting.applyFormatToAll).toBe('function');
+    });
+
+    test('applyThickBorders function exists', () => {
+        expect(typeof formatting.applyThickBorders).toBe('function');
+    });
+
+    test('setCellStyle function exists', () => {
+        expect(typeof formatting.setCellStyle).toBe('function');
+    });
+
+    test('appendDateWithStyle function exists', () => {
+        expect(typeof formatting.appendDateWithStyle).toBe('function');
+    });
+
+    test('updateDateWithStyle function exists', () => {
+        expect(typeof formatting.updateDateWithStyle).toBe('function');
+    });
+
+    test('createRichTextValue function exists', () => {
+        expect(typeof formatting.createRichTextValue).toBe('function');
+    });
+
+    test('resetTextStyle function exists', () => {
+        expect(typeof formatting.resetTextStyle).toBe('function');
+    });
+
+    test('clearTextFormatting function exists', () => {
+        expect(typeof formatting.clearTextFormatting).toBe('function');
+    });
+});
 
 describe('setCellStyle', () => {
     // Mock methods for the range object
