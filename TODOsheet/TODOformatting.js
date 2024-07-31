@@ -317,40 +317,60 @@ function pushUpEmptyCellsTODO() {
  * @param {Event} e - The edit event object.
  */
 function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e) {
-    const cellValue = newValue;
-    Logger.log(`Cell value after edit: ${cellValue}`);
+    Logger.log(`Updating cell ${columnLetter}${row}. Original value: "${originalValue}", New value: "${newValue}"`);
 
-    // Get rich text value of the edited cell, or use the plain cell value
-    const richTextValue = range.getRichTextValue();
-    const text = richTextValue ? richTextValue.getText() : cellValue;
+    let updatedText = newValue.toString().trim();
+    const dateFormatted = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
 
-    // Retrieve original rich text value before edit, or create new rich text value if not available
-    const originalRichText = e.oldRichTextValue || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
-    const originalText = originalRichText.getText();
+    // Get the original rich text value to preserve links
+    const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
 
-    const originalUrls = extractUrls(originalRichText);
-    const newUrls = extractUrls(richTextValue);
+    if (columnLetter !== 'H') {
+        const daysLeftPattern = /\((\d+)\) days left/;
+        const daysLeftMatch = updatedText.match(daysLeftPattern);
 
-    Logger.log(`Original URLs: ${JSON.stringify(originalUrls)}, New URLs: ${JSON.stringify(newUrls)}`);
-
-    if (originalText === text && arraysEqual(originalUrls, newUrls)) {
-        Logger.log('No change in cell value or links, skipping update');
-        return;
+        if (daysLeftMatch) {
+            // Si encontramos el patrón "days left", lo convertimos a una fecha
+            const daysLeft = parseInt(daysLeftMatch[1]);
+            const date = new Date();
+            date.setDate(date.getDate() + daysLeft);
+            const futureDateFormatted = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
+            updatedText = updatedText.replace(daysLeftPattern, '').trim() + '\n' + futureDateFormatted;
+        } else if (!datePattern.test(updatedText)) {
+            updatedText = updatedText + '\n' + dateFormatted;
+        } else {
+            updatedText = updatedText.replace(datePattern, '\n' + dateFormatted);
+        }
     }
 
-    if (text.trim() === "") return resetTextStyle(range);
+    Logger.log(`Updated text: "${updatedText}"`);
 
-    const dateFormatted = ` ${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`;
+    const newRichTextValue = SpreadsheetApp.newRichTextValue()
+        .setText(updatedText)
+        .setTextStyle(0, updatedText.length, SpreadsheetApp.newTextStyle().build());
 
-    // Append or update the date in the text based on whether the date pattern exists
-    const newRichTextValue = datePattern.test(text)
-        ? updateDateWithStyle(text, dateFormatted, columnLetter, dateColorConfig)
-        : appendDateWithStyle(text, dateFormatted, columnLetter, dateColorConfig);
+    // Apply style to the date or "days left"
+    const lastLineIndex = updatedText.lastIndexOf('\n');
+    if (lastLineIndex !== -1) {
+        const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
+        newRichTextValue.setTextStyle(
+            lastLineIndex + 1,
+            updatedText.length,
+            SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
+        );
+    }
 
-    Logger.log(`Setting rich text value for cell ${columnLetter}${row}`);
-    range.setRichTextValue(newRichTextValue);
+    // Preserve links from the original rich text value, but not for the last line
+    const originalText = originalRichTextValue.getText();
+    for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {
+        const url = originalRichTextValue.getLinkUrl(i, i + 1);
+        if (url) {
+            newRichTextValue.setLinkUrl(i, i + 1, url);
+        }
+    }
 
-    preserveUrlsTODO(range, richTextValue, newRichTextValue);
+    range.setRichTextValue(newRichTextValue.build());
+    Logger.log(`Set new rich text value for cell ${columnLetter}${row}`);
 }
 
 /**
@@ -383,7 +403,7 @@ function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
 function removeMultipleDatesTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
-    const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
     Logger.log('Init removeMultipleDatesTODO');
 
@@ -448,6 +468,76 @@ function removeMultipleDatesTODO() {
     Logger.log('End removeMultipleDatesTODO');
 }
 
+/**
+ * Updates the cell with the number of days left, preserving any existing links.
+ * 
+ * @param {Range} range - The cell range to update.
+ * @param {number} daysLeft - The number of days left to display.
+ */
+function updateDaysLeftCell(range, daysLeft) {
+    let originalText = range.getValue().toString().split('\n')[0];
+    let daysLeftText = `(${daysLeft}) days left`;
+    let newText = originalText + '\n' + daysLeftText;
+
+    // Get the original rich text value to preserve links
+    const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalText).build();
+
+    // Create new rich text value with updated text and styling
+    let newRichTextValue = SpreadsheetApp.newRichTextValue()
+        .setText(newText)
+        .setTextStyle(0, originalText.length, SpreadsheetApp.newTextStyle().build())
+        .setTextStyle(originalText.length + 1, newText.length,
+            SpreadsheetApp.newTextStyle().setForegroundColor('#FF0000').setItalic(true).build());
+
+    // Preserve links from the original rich text value
+    const originalTextLength = originalRichTextValue.getText().length;
+    for (let i = 0; i < Math.min(newText.length, originalTextLength); i++) {
+        const url = originalRichTextValue.getLinkUrl(i, i + 1);
+        if (url) {
+            newRichTextValue.setLinkUrl(i, i + 1, url);
+        }
+    }
+
+    // Set the new rich text value to the cell
+    range.setRichTextValue(newRichTextValue.build());
+    Logger.log(`Updated days left for cell ${range.getA1Notation()}: ${newText}`);
+}
+
+/**
+ * Handles the editing of a cell based on its column.
+ * 
+ * @param {Range} range - The cell range that was edited.
+ * @param {string} originalValue - The original value of the cell before editing.
+ * @param {string} newValue - The new value of the cell after editing.
+ * @param {string} columnLetter - The letter of the column that was edited.
+ * @param {number} row - The row number of the edited cell.
+ * @param {Event} e - The edit event object.
+ */
+function handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e) {
+    if (columnLetter === 'H') {
+        let daysLeft = parseDaysLeftTODO(newValue);
+        updateDaysLeftCell(range, daysLeft);
+    } else {
+        updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e);
+        removeMultipleDatesTODO();
+    }
+}
+
+/**
+ * Parses the number of days left from a given value.
+ * 
+ * @param {string} value - The value to parse for days left.
+ * @returns {number} The number of days left, or 60 if not parseable.
+ */
+function parseDaysLeftTODO(value) {
+    const daysLeftMatch = value.match(/\((\d+)\) days left/);
+    if (daysLeftMatch) {
+        return parseInt(daysLeftMatch[1]);
+    } else if (/^\d+$/.test(value.trim())) {
+        return parseInt(value.trim());
+    }
+    return 60; // Default value
+}
 
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
@@ -465,6 +555,7 @@ if (typeof module !== 'undefined' && module.exports) {
         updateRichTextTODO,
         preserveUrlsTODO,
         removeMultipleDatesTODO,
-        shiftCellsUpTODO
+        shiftCellsUpTODO,
+        handleColumnEditTODO
     }
 }

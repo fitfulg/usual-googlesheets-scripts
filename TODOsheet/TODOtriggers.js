@@ -1,8 +1,8 @@
- 
+
 
 // globals.js: sheet
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
-// TODOsheet/TODOformatting.js: shiftCellsUpTODO, updateRichTextTODO, removeMultipleDatesTODO
+// TODOsheet/TODOformatting.js: shiftCellsUpTODO, handleColumnEditTODO
 
 /**
  * Track changes in specified columns and add the date.
@@ -33,22 +33,22 @@ function onEdit(e) {
         const originalValue = e.oldValue || '';
         const newValue = range.getValue().toString();
 
-        Logger.log(`Original value: ${originalValue}, New value: ${newValue}`);
+        Logger.log(`Original value: "${originalValue}", New value: "${newValue}"`);
 
-        // Shift cells up if the edited cell is in columns A, C, D, E, F, G, H and is now empty
+        // Shift cells up if the edited cell is now empty
         if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
             Logger.log(`Shifting cells up for column ${column}`);
             shiftCellsUpTODO(column, 2, totalRows);
+            return;
         }
 
-        // Check if the edit is in columns C, D, E, F, G, H and from row 2 onwards
-        if (column >= 3 && column <= 8 && row >= 2) {
-            updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e);
+        // Handle edits in different columns
+        if (row >= 2 && column >= 3 && column <= 8) {
+            handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
         }
-        Logger.log('Calling removeMultipleDatesTODO from onEdit');
-        removeMultipleDatesTODO();
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
+        Logger.log(`Error stack: ${error.stack}`);
     }
 }
 

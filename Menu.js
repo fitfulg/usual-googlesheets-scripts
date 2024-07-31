@@ -2,7 +2,7 @@
 // globals.js: ui
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
-// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO
+// TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO, updateDaysLeftTODO
 
 /**
  * Initializes the UI menu in the spreadsheet.
@@ -54,6 +54,7 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
+    updateDaysLeftTODO();
     Logger.log('All functions called successfully!');
 }
 
