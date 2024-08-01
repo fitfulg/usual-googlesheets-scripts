@@ -41,12 +41,17 @@ function onOpen() {
     } else {
         Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
     }
-    // custom menu
+
+    const ui = SpreadsheetApp.getUi();
+
+    // Custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
         .addItem('Create Pie Chart', 'createPieChartTODO')
-        .addItem('Delete Pie Charts', 'deleteAllChartsTODO');
+        .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
+        .addItem('Save Snapshot', 'saveSnapshot')  // Añadimos opción para guardar snapshot
+        .addItem('Restore Snapshot', 'restoreSnapshot');  // Añadimos opción para restaurar snapshot
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
@@ -71,7 +76,7 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
-    updateDaysLeftTODO();
+    //updateDaysLeftTODO();
     Logger.log('All functions called successfully!');
 }
 
@@ -81,6 +86,7 @@ function runAllFunctionsTODO() {
  * @customfunction
  */
 function logHelloWorld() {
+    const ui = SpreadsheetApp.getUi();
     ui.alert('Hello World from Custom Menu!');
     Logger.log('Hello world!!');
 }
@@ -257,7 +263,7 @@ function clearTextFormatting(range) {
 
 // Contents of ./shared/utils.js
 
- 
+
 
 /**
  * Extracts URLs from a rich text value.
@@ -322,6 +328,94 @@ function getSheetContentHash() {
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
     return generateHash(values);
+}
+
+function saveSnapshot() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getDataRange();
+    const richTextValues = range.getRichTextValues();
+    const snapshot = {};
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellValue = richTextValues[row][col];
+            if (cellValue) {
+                const cellKey = `R${row + 1}C${col + 1}`;
+                snapshot[cellKey] = {
+                    text: cellValue.getText(),
+                    links: []
+                };
+
+                for (let i = 0; i < cellValue.getText().length; i++) {
+                    const url = cellValue.getLinkUrl(i, i + 1);
+                    if (url) {
+                        snapshot[cellKey].links.push({ start: i, end: i + 1, url });
+                    }
+                }
+            }
+        }
+    }
+
+    // Save snapshot to script properties
+    const properties = PropertiesService.getScriptProperties();
+    properties.setProperty('sheetSnapshot', JSON.stringify(snapshot));
+    Logger.log("Snapshot saved.");
+}
+
+function restoreSnapshot() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getDataRange();
+    const properties = PropertiesService.getScriptProperties();
+    const snapshotJson = properties.getProperty('sheetSnapshot');
+
+    if (!snapshotJson) {
+        Logger.log("No snapshot found.");
+        return;
+    }
+
+    const snapshot = JSON.parse(snapshotJson);
+    const richTextValues = range.getRichTextValues();
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellKey = `R${row + 1}C${col + 1}`;
+            if (snapshot[cellKey]) {
+                const cellData = snapshot[cellKey];
+                const builder = SpreadsheetApp.newRichTextValue()
+                    .setText(cellData.text);
+
+                // Restore links
+                for (const link of cellData.links) {
+                    builder.setLinkUrl(link.start, link.end, link.url);
+                }
+
+                // Reapply formatting for dates and "days left"
+                const text = cellData.text;
+                const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
+                const daysLeftPattern = /\((\d+)\) days left/;
+                const daysLeftMatch = text.match(daysLeftPattern);
+
+                if (dateMatches) {
+                    for (const date of dateMatches) {
+                        const start = text.lastIndexOf(date);
+                        const end = start + date.length;
+                        builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
+                    }
+                }
+
+                if (daysLeftMatch) {
+                    const start = text.lastIndexOf(daysLeftMatch[0]);
+                    const end = start + daysLeftMatch[0].length;
+                    builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
+                }
+
+                richTextValues[row][col] = builder.build();
+            }
+        }
+    }
+
+    range.setRichTextValues(richTextValues);
+    Logger.log("Snapshot restored.");
 }
 
 
@@ -569,43 +663,41 @@ function setupDropdownTODO() {
  * Shifts cells up in a column if they are empty, filling with the values below.
  *
  * @customfunction
- * @param {string} column - The column to shift cells up.
+ * @param {number} column - The column to shift cells up (1-indexed).
  * @param {number} startRow - The starting row number.
  * @param {number} endRow - The ending row number.
  */
 function shiftCellsUpTODO(column, startRow, endRow) {
     Logger.log(`shiftCellsUpTODO called for column: ${column}, from row ${startRow} to ${endRow}`);
+
     const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
     const values = range.getValues();
     const richTextValues = range.getRichTextValues();
-    const newValues = [];
-    const newRichTextValues = [];
 
-    for (let i = 0; i < values.length; i++) {
-        Logger.log(`Value at row ${i + startRow}: ${values[i][0]}`);
-        if (values[i][0].toString().trim() !== '') {
-            newValues.push([values[i][0]]);
-            newRichTextValues.push([richTextValues[i][0]]);
+    let hasChanges = false;
+
+    for (let i = 0; i < values.length - 1; i++) {
+        if (values[i][0] === '' && values[i + 1][0] !== '') {
+            Logger.log(`Empty cell found at row ${i + startRow}, shifting cells up`);
+
+            // Preserve the original rich text, including links
+            values[i][0] = values[i + 1][0];
+            richTextValues[i][0] = richTextValues[i + 1][0];
+
+            values[i + 1][0] = '';
+            richTextValues[i + 1][0] = SpreadsheetApp.newRichTextValue().setText('').build();
+
+            hasChanges = true;
+            Logger.log(`After shifting: Row ${i + startRow}, New Value: ${values[i][0]}, New RichText: ${richTextValues[i][0].getText()}`);
         }
     }
 
-    while (newValues.length < values.length) {
-        newValues.push(['']);
-        newRichTextValues.push([SpreadsheetApp.newRichTextValue().setText('').build()]);
+    if (hasChanges) {
+        Logger.log(`Setting values for range: ${startRow} to ${endRow}, column: ${column}`);
+        range.setValues(values);
+        range.setRichTextValues(richTextValues);
     }
-
-    if (newValues.length > 0) {
-        Logger.log('Setting new values and rich text values');
-        range.setValues(newValues);
-        range.setRichTextValues(newRichTextValues);
-    }
-
-    if (values.length > newValues.length) {
-        const emptyRange = sheet.getRange(startRow + newValues.length, column, values.length - newValues.length, 1);
-        clearTextFormatting(emptyRange);
-    }
-
-    Logger.log('shiftCellsUpTODO completed');
+    Logger.log(`shiftCellsUpTODO completed for column: ${column}`);
 }
 
 /**
@@ -614,22 +706,26 @@ function shiftCellsUpTODO(column, startRow, endRow) {
  * @customfunction
  */
 function pushUpEmptyCellsTODO() {
-    const dataRange = getDataRange();
-    const totalRows = dataRange.getLastRow();
-    const columns = [1, 3, 4, 5, 6, 7, 8]; // A, C, D, E, F, G, H
+    Logger.log('pushUpEmptyCellsTODO called');
+    const range = sheet.getDataRange();
+    const numRows = range.getNumRows();
+    const numCols = range.getNumColumns();
 
-    columns.forEach(column => {
-        for (let row = 2; row <= totalRows; row++) {
-            const cell = sheet.getRange(row, column);
-            const cellValue = cell.getValue().toString().trim();
-            if (cellValue === '') {
-                Logger.log(`Empty cell found at ${cell.getA1Notation()}, shifting cells up`);
-                shiftCellsUpTODO(column, 2, totalRows);
-                break; // Reset the loop for the same column
+    for (let col = 1; col <= numCols; col++) {
+        let startRow = null;
+        for (let row = 2; row <= numRows; row++) {
+            if (sheet.getRange(row, col).getValue() === '' && startRow === null) {
+                startRow = row;
+            } else if (sheet.getRange(row, col).getValue() !== '' && startRow !== null) {
+                shiftCellsUpTODO(col, startRow, row - 1);
+                startRow = null;
             }
         }
-    });
-
+        // Handle the case where the last rows are empty
+        if (startRow !== null) {
+            shiftCellsUpTODO(col, startRow, numRows);
+        }
+    }
     Logger.log('pushUpEmptyCells completed');
 }
 
@@ -658,7 +754,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
         const daysLeftMatch = updatedText.match(daysLeftPattern);
 
         if (daysLeftMatch) {
-            // Si encontramos el patrón "days left", lo convertimos a una fecha
+            // Convert "days left" pattern to a date
             const daysLeft = parseInt(daysLeftMatch[1]);
             const date = new Date();
             date.setDate(date.getDate() + daysLeft);
@@ -673,7 +769,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
 
     Logger.log(`Updated text: "${updatedText}"`);
 
-    const newRichTextValue = SpreadsheetApp.newRichTextValue()
+    const newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
         .setText(updatedText)
         .setTextStyle(0, updatedText.length, SpreadsheetApp.newTextStyle().build());
 
@@ -681,7 +777,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     const lastLineIndex = updatedText.lastIndexOf('\n');
     if (lastLineIndex !== -1) {
         const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
-        newRichTextValue.setTextStyle(
+        newRichTextValueBuilder.setTextStyle(
             lastLineIndex + 1,
             updatedText.length,
             SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
@@ -693,11 +789,11 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {
         const url = originalRichTextValue.getLinkUrl(i, i + 1);
         if (url) {
-            newRichTextValue.setLinkUrl(i, i + 1, url);
+            newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
         }
     }
 
-    range.setRichTextValue(newRichTextValue.build());
+    range.setRichTextValue(newRichTextValueBuilder.build());
     Logger.log(`Set new rich text value for cell ${columnLetter}${row}`);
 }
 

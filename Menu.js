@@ -24,12 +24,17 @@ function onOpen() {
     } else {
         Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
     }
-    // custom menu
+
+    const ui = SpreadsheetApp.getUi();
+
+    // Custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('Apply Format to All', 'applyFormatToAllTODO')
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
         .addItem('Create Pie Chart', 'createPieChartTODO')
-        .addItem('Delete Pie Charts', 'deleteAllChartsTODO');
+        .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
+        .addItem('Save Snapshot', 'saveSnapshot')  // Añadimos opción para guardar snapshot
+        .addItem('Restore Snapshot', 'restoreSnapshot');  // Añadimos opción para restaurar snapshot
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
@@ -54,7 +59,7 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
-    updateDaysLeftTODO();
+    //updateDaysLeftTODO();
     Logger.log('All functions called successfully!');
 }
 
@@ -64,6 +69,7 @@ function runAllFunctionsTODO() {
  * @customfunction
  */
 function logHelloWorld() {
+    const ui = SpreadsheetApp.getUi();
     ui.alert('Hello World from Custom Menu!');
     Logger.log('Hello world!!');
 }
