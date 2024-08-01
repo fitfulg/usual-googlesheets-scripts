@@ -15,7 +15,6 @@ let isPieChartVisible = false;
 
 // Contents of ./Menu.js
 
-
 // globals.js: ui
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
@@ -30,12 +29,16 @@ let isPieChartVisible = false;
 function onOpen() {
     Logger.log('onOpen triggered');
 
+    // bad practice but only way (by the moment) to not lose links from shifted up cells after reloading the page  
+    saveSnapshot();
+
     const docProperties = PropertiesService.getDocumentProperties();
     const lastHash = docProperties.getProperty('lastHash');
     const currentHash = getSheetContentHash();
 
     if (shouldRunUpdates(lastHash, currentHash)) {
         runAllFunctionsTODO();
+        restoreSnapshotTODO();
         docProperties.setProperty('lastHash', currentHash);
         Logger.log('Running all update functions');
     } else {
@@ -76,7 +79,6 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
-    //updateDaysLeftTODO();
     Logger.log('All functions called successfully!');
 }
 
@@ -330,6 +332,12 @@ function getSheetContentHash() {
     return generateHash(values);
 }
 
+/**
+ * Saves a snapshot of the current state of the active sheet.
+ * The snapshot includes the text content and links of each cell.
+ * 
+ * @return {void}
+ */
 function saveSnapshot() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
@@ -362,61 +370,7 @@ function saveSnapshot() {
     Logger.log("Snapshot saved.");
 }
 
-function restoreSnapshot() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = sheet.getDataRange();
-    const properties = PropertiesService.getScriptProperties();
-    const snapshotJson = properties.getProperty('sheetSnapshot');
 
-    if (!snapshotJson) {
-        Logger.log("No snapshot found.");
-        return;
-    }
-
-    const snapshot = JSON.parse(snapshotJson);
-    const richTextValues = range.getRichTextValues();
-
-    for (let row = 0; row < richTextValues.length; row++) {
-        for (let col = 0; col < richTextValues[row].length; col++) {
-            const cellKey = `R${row + 1}C${col + 1}`;
-            if (snapshot[cellKey]) {
-                const cellData = snapshot[cellKey];
-                const builder = SpreadsheetApp.newRichTextValue()
-                    .setText(cellData.text);
-
-                // Restore links
-                for (const link of cellData.links) {
-                    builder.setLinkUrl(link.start, link.end, link.url);
-                }
-
-                // Reapply formatting for dates and "days left"
-                const text = cellData.text;
-                const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
-                const daysLeftPattern = /\((\d+)\) days left/;
-                const daysLeftMatch = text.match(daysLeftPattern);
-
-                if (dateMatches) {
-                    for (const date of dateMatches) {
-                        const start = text.lastIndexOf(date);
-                        const end = start + date.length;
-                        builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-                    }
-                }
-
-                if (daysLeftMatch) {
-                    const start = text.lastIndexOf(daysLeftMatch[0]);
-                    const end = start + daysLeftMatch[0].length;
-                    builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
-                }
-
-                richTextValues[row][col] = builder.build();
-            }
-        }
-    }
-
-    range.setRichTextValues(richTextValues);
-    Logger.log("Snapshot restored.");
-}
 
 
 // Contents of ./TODOsheet/TODOformatting.js
@@ -963,11 +917,71 @@ function parseDaysLeftTODO(value) {
     return 60; // Default value
 }
 
+/**
+ * Restores the sheet to a previously saved snapshot state.
+ * This includes restoring text content, links, and formatting for dates and "days left" text.
+ * 
+ * @return {void}
+ */
+function restoreSnapshotTODO() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getDataRange();
+    const properties = PropertiesService.getScriptProperties();
+    const snapshotJson = properties.getProperty('sheetSnapshot');
+
+    if (!snapshotJson) {
+        Logger.log("No snapshot found.");
+        return;
+    }
+
+    const snapshot = JSON.parse(snapshotJson);
+    const richTextValues = range.getRichTextValues();
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellKey = `R${row + 1}C${col + 1}`;
+            if (snapshot[cellKey]) {
+                const cellData = snapshot[cellKey];
+                const builder = SpreadsheetApp.newRichTextValue()
+                    .setText(cellData.text);
+
+                // Restore links
+                for (const link of cellData.links) {
+                    builder.setLinkUrl(link.start, link.end, link.url);
+                }
+
+                // Reapply formatting for dates and "days left"
+                const text = cellData.text;
+                const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
+                const daysLeftPattern = /\((\d+)\) days left/;
+                const daysLeftMatch = text.match(daysLeftPattern);
+
+                if (dateMatches) {
+                    for (const date of dateMatches) {
+                        const start = text.lastIndexOf(date);
+                        const end = start + date.length;
+                        builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
+                    }
+                }
+
+                if (daysLeftMatch) {
+                    const start = text.lastIndexOf(daysLeftMatch[0]);
+                    const end = start + daysLeftMatch[0].length;
+                    builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
+                }
+
+                richTextValues[row][col] = builder.build();
+            }
+        }
+    }
+
+    range.setRichTextValues(richTextValues);
+    Logger.log("Snapshot restored.");
+}
+
 // for testing
 
 // Contents of ./TODOsheet/TODOlibrary.js
-
- 
 
 const cellStyles = {
     "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
@@ -1004,8 +1018,6 @@ const dateColorConfig = {
 
 
 // Contents of ./TODOsheet/TODOpiechart.js
-
- 
 
 // globals.js: sheet, getDataRange, isPieChartVisible
 
@@ -1064,8 +1076,6 @@ function deleteAllChartsTODO() {
 
 // Contents of ./TODOsheet/TODOtoggleFn.js
 
-
-
 // globals.js: sheet, isPieChartVisible
 // TODOsheet/TODOpiechart.js: createPieChartTODO, deleteAllChartsTODO
 
@@ -1107,8 +1117,6 @@ function handlePieChartToggleTODO(range) {
 
 
 // Contents of ./TODOsheet/TODOtriggers.js
-
-
 
 // globals.js: sheet
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO

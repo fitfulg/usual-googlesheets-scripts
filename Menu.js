@@ -1,4 +1,3 @@
-
 // globals.js: ui
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
@@ -13,12 +12,16 @@
 function onOpen() {
     Logger.log('onOpen triggered');
 
+    // bad practice but only way (by the moment) to not lose links from shifted up cells after reloading the page  
+    saveSnapshot();
+
     const docProperties = PropertiesService.getDocumentProperties();
     const lastHash = docProperties.getProperty('lastHash');
     const currentHash = getSheetContentHash();
 
     if (shouldRunUpdates(lastHash, currentHash)) {
         runAllFunctionsTODO();
+        restoreSnapshotTODO();
         docProperties.setProperty('lastHash', currentHash);
         Logger.log('Running all update functions');
     } else {
@@ -59,7 +62,6 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
-    //updateDaysLeftTODO();
     Logger.log('All functions called successfully!');
 }
 

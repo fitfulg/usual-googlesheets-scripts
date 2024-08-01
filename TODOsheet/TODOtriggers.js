@@ -1,5 +1,3 @@
-
-
 // globals.js: sheet
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
 // TODOsheet/TODOformatting.js: shiftCellsUpTODO, handleColumnEditTODO

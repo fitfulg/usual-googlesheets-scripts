@@ -1,5 +1,3 @@
-
-
 // globals.js: sheet, isPieChartVisible
 // TODOsheet/TODOpiechart.js: createPieChartTODO, deleteAllChartsTODO
 

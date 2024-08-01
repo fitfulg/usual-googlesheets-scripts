@@ -541,6 +541,68 @@ function parseDaysLeftTODO(value) {
     return 60; // Default value
 }
 
+/**
+ * Restores the sheet to a previously saved snapshot state.
+ * This includes restoring text content, links, and formatting for dates and "days left" text.
+ * 
+ * @return {void}
+ */
+function restoreSnapshotTODO() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getDataRange();
+    const properties = PropertiesService.getScriptProperties();
+    const snapshotJson = properties.getProperty('sheetSnapshot');
+
+    if (!snapshotJson) {
+        Logger.log("No snapshot found.");
+        return;
+    }
+
+    const snapshot = JSON.parse(snapshotJson);
+    const richTextValues = range.getRichTextValues();
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellKey = `R${row + 1}C${col + 1}`;
+            if (snapshot[cellKey]) {
+                const cellData = snapshot[cellKey];
+                const builder = SpreadsheetApp.newRichTextValue()
+                    .setText(cellData.text);
+
+                // Restore links
+                for (const link of cellData.links) {
+                    builder.setLinkUrl(link.start, link.end, link.url);
+                }
+
+                // Reapply formatting for dates and "days left"
+                const text = cellData.text;
+                const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
+                const daysLeftPattern = /\((\d+)\) days left/;
+                const daysLeftMatch = text.match(daysLeftPattern);
+
+                if (dateMatches) {
+                    for (const date of dateMatches) {
+                        const start = text.lastIndexOf(date);
+                        const end = start + date.length;
+                        builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
+                    }
+                }
+
+                if (daysLeftMatch) {
+                    const start = text.lastIndexOf(daysLeftMatch[0]);
+                    const end = start + daysLeftMatch[0].length;
+                    builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
+                }
+
+                richTextValues[row][col] = builder.build();
+            }
+        }
+    }
+
+    range.setRichTextValues(richTextValues);
+    Logger.log("Snapshot restored.");
+}
+
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -558,6 +620,7 @@ if (typeof module !== 'undefined' && module.exports) {
         preserveUrlsTODO,
         removeMultipleDatesTODO,
         shiftCellsUpTODO,
-        handleColumnEditTODO
+        handleColumnEditTODO,
+        restoreSnapshotTODO
     }
 }

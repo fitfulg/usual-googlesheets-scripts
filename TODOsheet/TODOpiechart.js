@@ -1,5 +1,3 @@
- 
-
 // globals.js: sheet, getDataRange, isPieChartVisible
 
 /**
