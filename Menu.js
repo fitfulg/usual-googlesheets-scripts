@@ -37,8 +37,8 @@ function onOpen() {
         .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
         .addItem('Create Pie Chart', 'createPieChartTODO')
         .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
-        .addItem('Save Snapshot', 'saveSnapshot')  // Añadimos opción para guardar snapshot
-        .addItem('Restore Snapshot', 'restoreSnapshot');  // Añadimos opción para restaurar snapshot
+        .addItem('Save Snapshot', 'saveSnapshot')
+        .addItem('Restore Snapshot', 'restoreSnapshot');
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')

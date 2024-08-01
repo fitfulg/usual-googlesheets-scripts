@@ -29,7 +29,7 @@ function updateCellCommentTODO() {
     cell.setBackground("#efefef");
     cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
 
-    // Crear RichTextValue con diferentes tamaños de fuente
+    // Create RichTextValue with different font sizes
     const richText = SpreadsheetApp.newRichTextValue()
         .setText(`${version}\n${emoji}`)
         .setTextStyle(0, version.length, SpreadsheetApp.newTextStyle().setFontSize(8).build())
@@ -506,7 +506,7 @@ function updateDaysLeftCell(range, daysLeft) {
     range.setRichTextValue(newRichTextValue.build());
 
     // Set a custom property to store the initial date
-    range.setNote(now.toISOString());
+    PropertiesService.getDocumentProperties().setProperty(range.getA1Notation(), now.toISOString());
 
     Logger.log(`Updated days left for cell ${range.getA1Notation()}: ${newText}`);
 }
@@ -609,6 +609,13 @@ function restoreSnapshotTODO() {
     Logger.log("Snapshot restored.");
 }
 
+/**
+ * Updates the days left counter for each cell in column H.
+ * If the counter reaches zero, the cell is cleared.
+ * 
+ * @customfunction
+ * @return {void}
+ */
 function updateDaysLeftCounterTODO() {
     Logger.log('Updating days left counter');
     const range = sheet.getRange('H2:H' + sheet.getLastRow());
@@ -616,30 +623,32 @@ function updateDaysLeftCounterTODO() {
     const richTextValues = range.getRichTextValues();
     const now = new Date();
     let cellsCleared = 0;
+    const properties = PropertiesService.getDocumentProperties();
 
     for (let i = 0; i < values.length; i++) {
         const cellValue = values[i][0].toString();
         const match = cellValue.match(/\((\d+)\) days left/);
         if (match) {
             const originalDays = parseInt(match[1]);
-            const cellNote = range.getCell(i + 1, 1).getNote();
-            if (!cellNote) {
-                Logger.log(`No start date found for cell H${i + 2}. Clearing cell.`);
+            const cellNotation = `H${i + 2}`;
+            const startDateString = properties.getProperty(cellNotation);
+            if (!startDateString) {
+                Logger.log(`No start date found for cell ${cellNotation}. Clearing cell.`);
                 values[i][0] = '';
                 richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
                 cellsCleared++;
                 continue;
             }
-            const cellDate = new Date(cellNote);
+            const cellDate = new Date(startDateString);
             const timeDiff = now.getTime() - cellDate.getTime();
             const daysLeft = Math.max(0, originalDays - Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
 
             if (daysLeft <= 0 || isNaN(daysLeft)) {
                 // Clear the cell when the counter reaches zero or is NaN
-                Logger.log(`Clearing cell H${i + 2}. Days left: ${daysLeft}`);
+                Logger.log(`Clearing cell ${cellNotation}. Days left: ${daysLeft}`);
                 values[i][0] = '';
                 richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
-                range.getCell(i + 1, 1).clearNote(); // Clear the note with the start date
+                properties.deleteProperty(cellNotation); // Remove the start date property
                 cellsCleared++;
             } else {
                 const newText = cellValue.replace(/\(\d+\) days left/, `(${daysLeft}) days left`);
