@@ -39,6 +39,7 @@ function onOpen() {
     if (shouldRunUpdates(lastHash, currentHash)) {
         runAllFunctionsTODO();
         restoreSnapshotTODO();
+        updateDaysLeftCounterTODO();
         docProperties.setProperty('lastHash', currentHash);
         Logger.log('Running all update functions');
     } else {
@@ -79,6 +80,7 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
+    updateDaysLeftCounterTODO();
     Logger.log('All functions called successfully!');
 }
 
@@ -857,6 +859,8 @@ function updateDaysLeftCell(range, daysLeft) {
     let daysLeftText = `(${daysLeft}) days left`;
     let newText = originalText + '\n' + daysLeftText;
 
+    const now = new Date();
+
     // Get the original rich text value to preserve links
     const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalText).build();
 
@@ -878,6 +882,10 @@ function updateDaysLeftCell(range, daysLeft) {
 
     // Set the new rich text value to the cell
     range.setRichTextValue(newRichTextValue.build());
+
+    // Set a custom property to store the initial date
+    range.setNote(now.toISOString());
+
     Logger.log(`Updated days left for cell ${range.getA1Notation()}: ${newText}`);
 }
 
@@ -914,7 +922,7 @@ function parseDaysLeftTODO(value) {
     } else if (/^\d+$/.test(value.trim())) {
         return parseInt(value.trim());
     }
-    return 60; // Default value
+    return 60; // Default value: 60 days
 }
 
 /**
@@ -977,6 +985,63 @@ function restoreSnapshotTODO() {
 
     range.setRichTextValues(richTextValues);
     Logger.log("Snapshot restored.");
+}
+
+function updateDaysLeftCounterTODO() {
+    Logger.log('Updating days left counter');
+    const range = sheet.getRange('H2:H' + sheet.getLastRow());
+    const values = range.getValues();
+    const richTextValues = range.getRichTextValues();
+    const now = new Date();
+    let cellsCleared = 0;
+
+    for (let i = 0; i < values.length; i++) {
+        const cellValue = values[i][0].toString();
+        const match = cellValue.match(/\((\d+)\) days left/);
+        if (match) {
+            const originalDays = parseInt(match[1]);
+            const cellNote = range.getCell(i + 1, 1).getNote();
+            if (!cellNote) {
+                Logger.log(`No start date found for cell H${i + 2}. Clearing cell.`);
+                values[i][0] = '';
+                richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
+                cellsCleared++;
+                continue;
+            }
+            const cellDate = new Date(cellNote);
+            const timeDiff = now.getTime() - cellDate.getTime();
+            const daysLeft = Math.max(0, originalDays - Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
+
+            if (daysLeft <= 0 || isNaN(daysLeft)) {
+                // Clear the cell when the counter reaches zero or is NaN
+                Logger.log(`Clearing cell H${i + 2}. Days left: ${daysLeft}`);
+                values[i][0] = '';
+                richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
+                range.getCell(i + 1, 1).clearNote(); // Clear the note with the start date
+                cellsCleared++;
+            } else {
+                const newText = cellValue.replace(/\(\d+\) days left/, `(${daysLeft}) days left`);
+                const richTextValue = SpreadsheetApp.newRichTextValue()
+                    .setText(newText)
+                    .setTextStyle(0, newText.length, richTextValues[i][0].getTextStyle())
+                    .setTextStyle(newText.lastIndexOf('('), newText.length,
+                        SpreadsheetApp.newTextStyle().setForegroundColor('#FF0000').setItalic(true).build())
+                    .build();
+
+                values[i][0] = newText;
+                richTextValues[i][0] = richTextValue;
+            }
+        }
+    }
+
+    range.setValues(values);
+    range.setRichTextValues(richTextValues);
+    Logger.log(`Days left counter updated. ${cellsCleared} cells cleared.`);
+
+    if (cellsCleared > 0) {
+        // If any cells were cleared, call pushUpEmptyCellsTODO to reorganize the column
+        pushUpEmptyCellsTODO();
+    }
 }
 
 // for testing

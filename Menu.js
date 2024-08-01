@@ -22,6 +22,7 @@ function onOpen() {
     if (shouldRunUpdates(lastHash, currentHash)) {
         runAllFunctionsTODO();
         restoreSnapshotTODO();
+        updateDaysLeftCounterTODO();
         docProperties.setProperty('lastHash', currentHash);
         Logger.log('Running all update functions');
     } else {
@@ -62,6 +63,7 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateCellCommentTODO();
     removeMultipleDatesTODO();
+    updateDaysLeftCounterTODO();
     Logger.log('All functions called successfully!');
 }
 
