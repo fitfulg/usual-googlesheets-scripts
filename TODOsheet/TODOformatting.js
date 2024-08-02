@@ -158,7 +158,7 @@ function customCeilBGColorTODO() {
     setColumnBackground(sheet, 7, '#d3d3d3', 2); // Column G: Light gray 3
 
     // Apply white background to columns B, C, D, E, H, I starting from row 2
-    let whiteColumns = [2, 3, 4, 5, 8, 9]; // Columns B, C, D, E, H, I
+    let whiteColumns = [2, 3, 4, 5, 8, 9]; // Makes cell I2 momentarily white(column 8) while loading rest of the sheet. Useful for testing. Then turns dark gray(updateCellCommentTODO)
     for (let col of whiteColumns) {
         setColumnBackground(sheet, col, '#ffffff', 2);
     }
@@ -186,7 +186,7 @@ function setCellContentAndStyleTODO() {
  * @customfunction
  */
 function updateDateColorsTODO() {
-    const columns = ['C', 'D', 'E', 'F', 'G', 'H'];
+    const columns = ['C', 'D', 'E', 'F', 'G'];
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
 
