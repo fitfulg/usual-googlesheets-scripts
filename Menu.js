@@ -33,12 +33,17 @@ function onOpen() {
 
     // Custom menu
     let todoSubMenu = ui.createMenu('TODO sheet')
-        .addItem('Apply Format to All', 'applyFormatToAllTODO')
-        .addItem('Set Ceil Background Colors', 'customCeilBGColorTODO')
+        .addItem('RESTORE DEFAULT TODO TEMPLATE', 'applyFormatToAllTODO')
+        .addItem('RESTORE Ceil Background Colors', 'customCeilBGColorTODO')
+        .addSeparator()
+        .addItem('Save Snapshot', 'saveSnapshot')
+        .addItem('Restore Snapshot', 'restoreSnapshot')
+        .addSeparator()
         .addItem('Create Pie Chart', 'createPieChartTODO')
         .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
-        .addItem('Save Snapshot', 'saveSnapshot')
-        .addItem('Restore Snapshot', 'restoreSnapshot');
+        .addSeparator()
+        .addItem('Version and feature details', 'updateCellCommentTODO')
+
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')

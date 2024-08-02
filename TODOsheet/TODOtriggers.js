@@ -1,6 +1,6 @@
 // globals.js: sheet
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
-// TODOsheet/TODOformatting.js: shiftCellsUpTODO, handleColumnEditTODO
+// TODOsheet/TODOformatting.js: shiftCellsUpTODO, handleColumnEditTODO, addCheckboxToCellTODO
 
 /**
  * Track changes in specified columns and add the date.
@@ -43,6 +43,10 @@ function onEdit(e) {
         // Handle edits in different columns
         if (row >= 2 && column >= 3 && column <= 8) {
             handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
+            // Add checkbox only if it was not already present
+            if (!newValue.includes('☑️')) {
+                addCheckboxToCellTODO(range);
+            }
         }
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
