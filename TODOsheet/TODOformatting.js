@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // globals.js: sheet, getDataRange, datePattern
 // shared/formatting.js: Format, applyBorders, applyThickBorders, setCellStyle, appendDateWithStyle, updateDateWithStyle, resetTextStyle, clearTextFormatting
-// shared/utils.js: extractUrls, arraysEqual
+// shared/utils.js: extractUrls, arraysEqual, restoreSnapshot
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
 /**
@@ -21,7 +21,6 @@ function updateCellCommentTODO() {
         - The date color change times are different for each column, with HIGH PRIORITY being the fastest to change and LOW PRIORITY being the slowest.\n
         - The Piechart can be shown or hidden directly using its dropdown cell.\n
         - Empty cells that are deleted are occupied by their immediately lower cell.\n
-        - Empty cells that remain empty are occupied by the cell immediately below them by opening or refreshing the page.\n
     `;
 
     const comment = `Versión: ${version}\nFEATURES:\n${changes}`;
@@ -548,65 +547,31 @@ function parseDaysLeftTODO(value) {
 }
 
 /**
- * Restores the sheet to a previously saved snapshot state.
- * This includes restoring text content, links, and formatting for dates and "days left" text.
- * 
+ * Restores the sheet snapshot and applies custom formatting for dates and "days left".
+ *
  * @return {void}
  */
 function restoreSnapshotTODO() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = sheet.getDataRange();
-    const properties = PropertiesService.getScriptProperties();
-    const snapshotJson = properties.getProperty('sheetSnapshot');
+    restoreSnapshot((builder, text) => {
+        // Reapply formatting for dates and "days left"
+        const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
+        const daysLeftPattern = /\((\d+)\) days left/;
+        const daysLeftMatch = text.match(daysLeftPattern);
 
-    if (!snapshotJson) {
-        Logger.log("No snapshot found.");
-        return;
-    }
-
-    const snapshot = JSON.parse(snapshotJson);
-    const richTextValues = range.getRichTextValues();
-
-    for (let row = 0; row < richTextValues.length; row++) {
-        for (let col = 0; col < richTextValues[row].length; col++) {
-            const cellKey = `R${row + 1}C${col + 1}`;
-            if (snapshot[cellKey]) {
-                const cellData = snapshot[cellKey];
-                const builder = SpreadsheetApp.newRichTextValue()
-                    .setText(cellData.text);
-
-                // Restore links
-                for (const link of cellData.links) {
-                    builder.setLinkUrl(link.start, link.end, link.url);
-                }
-
-                // Reapply formatting for dates and "days left"
-                const text = cellData.text;
-                const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
-                const daysLeftPattern = /\((\d+)\) days left/;
-                const daysLeftMatch = text.match(daysLeftPattern);
-
-                if (dateMatches) {
-                    for (const date of dateMatches) {
-                        const start = text.lastIndexOf(date);
-                        const end = start + date.length;
-                        builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-                    }
-                }
-
-                if (daysLeftMatch) {
-                    const start = text.lastIndexOf(daysLeftMatch[0]);
-                    const end = start + daysLeftMatch[0].length;
-                    builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
-                }
-
-                richTextValues[row][col] = builder.build();
+        if (dateMatches) {
+            for (const date of dateMatches) {
+                const start = text.lastIndexOf(date);
+                const end = start + date.length;
+                builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
             }
         }
-    }
 
-    range.setRichTextValues(richTextValues);
-    Logger.log("Snapshot restored.");
+        if (daysLeftMatch) {
+            const start = text.lastIndexOf(daysLeftMatch[0]);
+            const end = start + daysLeftMatch[0].length;
+            builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
+        }
+    });
 }
 
 /**

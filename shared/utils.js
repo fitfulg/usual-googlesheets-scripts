@@ -103,6 +103,53 @@ function saveSnapshot() {
     Logger.log("Snapshot saved.");
 }
 
+/**
+ * Restores the sheet to a previously saved snapshot state.
+ * This includes restoring text content, links, and optional custom formatting.
+ *
+ * @param {function} formatCallback - Optional callback function to apply custom formatting.
+ * @return {void}
+ */
+function restoreSnapshot(formatCallback) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const range = sheet.getDataRange();
+    const properties = PropertiesService.getScriptProperties();
+    const snapshotJson = properties.getProperty('sheetSnapshot');
+
+    if (!snapshotJson) {
+        Logger.log("No snapshot found.");
+        return;
+    }
+
+    const snapshot = JSON.parse(snapshotJson);
+    const richTextValues = range.getRichTextValues();
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellKey = `R${row + 1}C${col + 1}`;
+            if (snapshot[cellKey]) {
+                const cellData = snapshot[cellKey];
+                const builder = SpreadsheetApp.newRichTextValue()
+                    .setText(cellData.text);
+
+                // Restore links
+                for (const link of cellData.links) {
+                    builder.setLinkUrl(link.start, link.end, link.url);
+                }
+
+                // Apply custom formatting if a callback is provided
+                if (formatCallback) {
+                    formatCallback(builder, cellData.text);
+                }
+
+                richTextValues[row][col] = builder.build();
+            }
+        }
+    }
+
+    range.setRichTextValues(richTextValues);
+    Logger.log("Snapshot restored.");
+}
 
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -112,6 +159,7 @@ if (typeof module !== 'undefined' && module.exports) {
         generateHash,
         shouldRunUpdates,
         getSheetContentHash,
-        saveSnapshot
+        saveSnapshot,
+        restoreSnapshot
     };
 }
