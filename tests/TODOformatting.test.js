@@ -9,7 +9,6 @@ const { updateCellCommentTODO,
     setupDropdownTODO,
     pushUpEmptyCellsTODO,
     updateRichTextTODO,
-    preserveUrlsTODO,
     removeMultipleDatesTODO,
     shiftCellsUpTODO } = require('../TODOsheet/TODOformatting');
 
@@ -90,9 +89,6 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         });
         test('updateRichTextTODO function exists', () => {
             expect(typeof updateRichTextTODO).toBe('function');
-        });
-        test('preserveUrlsTODO function exists', () => {
-            expect(typeof preserveUrlsTODO).toBe('function');
         });
         test('removeMultipleDatesTODO function exists', () => {
             expect(typeof removeMultipleDatesTODO).toBe('function');

@@ -800,28 +800,6 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
 }
 
 /**
- * Preserves URLs in a cell's rich text content after updates.
- *
- * @customfunction
- * @param {Range} range - The cell range to update.
- * @param {RichTextValue} richTextValue - The original rich text value.
- * @param {RichTextValue} newRichTextValue - The new rich text value.
- */
-function preserveUrlsTODO(range, richTextValue, newRichTextValue) {
-    const updatedRichTextValue = range.getRichTextValue();
-    const updatedText = updatedRichTextValue.getText();
-    const finalRichTextValue = SpreadsheetApp.newRichTextValue().setText(updatedText);
-
-    for (let i = 0; i < updatedText.length; i++) {
-        const url = richTextValue.getLinkUrl(i, i + 1);
-        if (url) {
-            finalRichTextValue.setLinkUrl(i, i + 1, url);
-        }
-    }
-    range.setRichTextValue(finalRichTextValue.build());
-}
-
-/**
  * Removes multiple dates from cells, keeping only the last occurrence of today's date.
  * 
  * @customfunction
@@ -873,6 +851,7 @@ function removeMultipleDatesTODO() {
                 let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
                 let currentPos = 0;
 
+                // apply styles to the updated text
                 for (let part of updatedText.split('\n')) {
                     let startPos = currentPos;
                     let endPos = startPos + part.length;
