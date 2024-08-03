@@ -619,39 +619,6 @@ function updateDaysLeftCounterTODO() {
     }
 }
 
-/**
- * Adds a checkbox to a cell while preserving existing rich text styles and links.
- * @param {Range} range - The range of the cell to which the checkbox is added.
- */
-function addCheckboxToCellTODO(range) {
-    const cellValue = range.getValue().toString();
-    const richTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(cellValue).build();
-
-    // Check if checkbox is already present at the beginning
-    if (cellValue.startsWith('☑️')) {
-        Logger.log(`Checkbox already present at the start of cell ${range.getA1Notation()}`);
-        return;
-    }
-
-    const newRichTextValueBuilder = SpreadsheetApp.newRichTextValue().setText('☑️' + cellValue);
-
-    // Apply style to the checkbox
-    newRichTextValueBuilder.setTextStyle(0, 2, SpreadsheetApp.newTextStyle().setBold(true).build());
-
-    // Preserve existing text styles and links starting from the next character
-    for (let i = 0; i < cellValue.length; i++) {
-        const textStyle = richTextValue.getTextStyle(i, i + 1);
-        const url = richTextValue.getLinkUrl(i, i + 1);
-        newRichTextValueBuilder.setTextStyle(i + 2, i + 3, textStyle);
-        if (url) {
-            newRichTextValueBuilder.setLinkUrl(i + 2, i + 3, url);
-        }
-    }
-
-    range.setRichTextValue(newRichTextValueBuilder.build());
-    Logger.log(`Checkbox added to the start of cell ${range.getA1Notation()}`);
-}
-
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -670,7 +637,6 @@ if (typeof module !== 'undefined' && module.exports) {
         shiftCellsUpTODO,
         handleColumnEditTODO,
         restoreSnapshotTODO,
-        updateDaysLeftCounterTODO,
-        addCheckboxToCellTODO
+        updateDaysLeftCounterTODO
     }
 }

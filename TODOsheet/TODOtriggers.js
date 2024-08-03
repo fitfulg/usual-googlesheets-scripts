@@ -43,8 +43,9 @@ function onEdit(e) {
         // Handle edits in different columns
         if (row >= 2 && column >= 3 && column <= 8) {
             handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
-            // Add checkbox only if it was not already present
-            if (!newValue.includes('☑️')) {
+            // Only add a checkbox if the newValue is non-empty and doesn't already contain a checkbox
+            if (newValue && !newValue.includes('☑️')) {
+                Logger.log(`Adding default checkbox to cell ${columnLetter}${row}`);
                 addCheckboxToCellTODO(range);
             }
         }

@@ -2,6 +2,7 @@
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO, updateDaysLeftTODO
+// TODOsheet/TODOcheckbox.js: addCheckboxToCellTODO, addCheckboxesToSelectedCellsTODO, markCheckboxSelectedCellsTODO, markAllCheckboxesSelectedCellsTODO, removeCheckboxesFromSelectedCellsTODO
 
 /**
  * Initializes the UI menu in the spreadsheet.
@@ -35,6 +36,12 @@ function onOpen() {
     let todoSubMenu = ui.createMenu('TODO sheet')
         .addItem('RESTORE DEFAULT TODO TEMPLATE', 'applyFormatToAllTODO')
         .addItem('RESTORE Ceil Background Colors', 'customCeilBGColorTODO')
+        .addSeparator()
+        .addItem('Add Checkboxes to Selected Cells', 'addCheckboxesTODO')
+        .addItem('Mark Checkbox in Selected Cells', 'markCheckboxTODO')
+        .addItem('Mark All Checkboxes in Selected Cells', 'markAllCheckboxesTODO')
+        .addItem('Restore Checkboxes', 'restoreCheckboxesTODO')
+        .addItem('Remove All Checkboxes in Selected Cells', 'removeCheckboxesTODO')
         .addSeparator()
         .addItem('Save Snapshot', 'saveSnapshot')
         .addItem('Restore Snapshot', 'restoreSnapshot')
