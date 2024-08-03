@@ -436,6 +436,7 @@ function restoreSnapshot(formatCallback) {
 
 // Contents of ./TODOsheet/TODOcheckbox.js
 
+ 
 
 // globals.js: sheet
 
@@ -729,19 +730,25 @@ function removeCheckboxesTODO() {
  */
 function updateCellCommentTODO() {
     const cell = sheet.getRange("I2");
-    const version = "v1.1";
+    const version = "v1.2";
     const emoji = "💡";
-    const changes = `
+    const changes = `\n
+        - A checkbox is added by default from the 3rd to the 8th column when a cell is written or modified.\n
+        - You can add, mark, restore and delete checkboxes in cells by selecting them and using the "Custom Formats" menu.\n
+        - The "days left" counter is updated daily in the 8th column. When the counter reaches zero, the cell is cleared.\n
+        - A snapshot of the sheet can be saved and restored from the "Custom Formats" menu.\n
+        - Snapshots are automatically saved and restored when the sheet is reloaded so that the last state is always preserved.\n
+
+        OLD FEATURES: \n
         - There is an indicative limit of cells for each priority. In the end the objective of a TODO is none other than to complete the tasks and that they do not accumulate. Once this limit is reached, a warning is activated for the entire column.
         This feature does not block cells, that is, you can continue occupying cells even if you have the warning.\n
         - You can apply some custom formats that do not require to refresh the page from the "Custom Formats" menu.\n
-        - Writing or modifying a cell causes the current date to be added, which over time changes color from gray to orange and from orange to red.\n
         - The date color change times are different for each column, with HIGH PRIORITY being the fastest to change and LOW PRIORITY being the slowest.\n
         - The Piechart can be shown or hidden directly using its dropdown cell.\n
         - Empty cells that are deleted are occupied by their immediately lower cell.\n
     `;
 
-    const comment = `Versión: ${version}\nFEATURES:\n${changes}`;
+    const comment = `Versión: ${version}\n NEW FEATURES:\n${changes}`;
     cell.setComment(comment);
     cell.setBackground("#efefef");
     cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
