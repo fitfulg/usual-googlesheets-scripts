@@ -86,7 +86,7 @@ function runAllFunctionsTODO() {
  */
 function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
-    ui.alert('Hello World from Custom Menu!');
+    ui.alert('Hello World!!');
     Logger.log('Hello world!!');
 }
 
