@@ -1335,9 +1335,9 @@ function updateDaysLeftCounterTODO() {
 const cellStyles = {
     "A1": {
         value: {
-            "English": "QUICK PATTERNS",
-            "Spanish": "PATRONES RÁPIDOS",
-            "Catalan": "PATRONS RÀPIDS"
+            "English": "BEHAVIOR PATTERNS",
+            "Spanish": "PATRONES DE CONDUCTA",
+            "Catalan": "PATRONS DE CONDUCTA"
         },
         fontWeight: "bold",
         fontColor: "#FFFFFF",
@@ -1401,9 +1401,9 @@ const cellStyles = {
     },
     "H1": {
         value: {
-            "English": "IN QUARANTINE BEFORE BEING CANCELED",
-            "Spanish": "EN CUARENTENA ANTES DE CANCELAR",
-            "Catalan": "EN QUARANTENA ABANS DE CANCEL·LAR"
+            "English": "IN QUARANTINE",
+            "Spanish": "EN CUARENTENA",
+            "Catalan": "EN QUARANTENA"
         },
         fontWeight: "bold",
         fontColor: "#FF0000",
@@ -1682,6 +1682,9 @@ function handlePieChartToggleTODO(range) {
 // Contents of ./TODOsheet/TODOtranslate.js
 
 
+// globals.js: sheet
+// TODOsheet/TODOlibrary.js: languages
+
 const setLanguageEnglish = () => setLanguage('English');
 const setLanguageSpanish = () => setLanguage('Spanish');
 const setLanguageCatalan = () => setLanguage('Catalan');
@@ -1695,11 +1698,15 @@ function setLanguage(language) {
     }
 }
 
+/**
+ * Translates the sheet to the selected language
+ * @returns {void}
+ * @customfunction
+ */
 function translateSheetTODO() {
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-    // Upda with the corresponding styles
+    // Update with the corresponding styles
     for (const cell in cellStyles) {
         const cellData = cellStyles[cell];
         if (cellData.value[language]) {
@@ -1731,6 +1738,8 @@ function translateSheetTODO() {
         }
     }
 }
+
+// for testing
 
 // Contents of ./TODOsheet/TODOtriggers.js
 

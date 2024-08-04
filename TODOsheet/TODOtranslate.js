@@ -1,5 +1,8 @@
 /* eslint-disable no-unused-vars */
 
+// globals.js: sheet
+// TODOsheet/TODOlibrary.js: languages
+
 const setLanguageEnglish = () => setLanguage('English');
 const setLanguageSpanish = () => setLanguage('Spanish');
 const setLanguageCatalan = () => setLanguage('Catalan');
@@ -13,11 +16,15 @@ function setLanguage(language) {
     }
 }
 
+/**
+ * Translates the sheet to the selected language
+ * @returns {void}
+ * @customfunction
+ */
 function translateSheetTODO() {
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-    // Upda with the corresponding styles
+    // Update with the corresponding styles
     for (const cell in cellStyles) {
         const cellData = cellStyles[cell];
         if (cellData.value[language]) {
@@ -47,5 +54,16 @@ function translateSheetTODO() {
                 }
             }
         }
+    }
+}
+
+// for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        setLanguageEnglish,
+        setLanguageSpanish,
+        setLanguageCatalan,
+        setLanguage,
+        translateSheetTODO
     }
 }

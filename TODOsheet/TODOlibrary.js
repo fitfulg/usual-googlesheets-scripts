@@ -1,9 +1,9 @@
 const cellStyles = {
     "A1": {
         value: {
-            "English": "QUICK PATTERNS",
-            "Spanish": "PATRONES RÁPIDOS",
-            "Catalan": "PATRONS RÀPIDS"
+            "English": "BEHAVIOR PATTERNS",
+            "Spanish": "PATRONES DE CONDUCTA",
+            "Catalan": "PATRONS DE CONDUCTA"
         },
         fontWeight: "bold",
         fontColor: "#FFFFFF",
@@ -67,9 +67,9 @@ const cellStyles = {
     },
     "H1": {
         value: {
-            "English": "IN QUARANTINE BEFORE BEING CANCELED",
-            "Spanish": "EN CUARENTENA ANTES DE CANCELAR",
-            "Catalan": "EN QUARANTENA ABANS DE CANCEL·LAR"
+            "English": "IN QUARANTINE",
+            "Spanish": "EN CUARENTENA",
+            "Catalan": "EN QUARANTENA"
         },
         fontWeight: "bold",
         fontColor: "#FF0000",
@@ -79,8 +79,8 @@ const cellStyles = {
     "C1": {
         value: {
             "English": "HIGH PRIORITY",
-            "Spanish": "ALTA PRIORIDAD",
-            "Catalan": "ALTA PRIORITAT"
+            "Spanish": "PRIORIDAD ALTA",
+            "Catalan": "PRIORITAT ALTA"
         },
         fontWeight: "bold",
         fontColor: null,
