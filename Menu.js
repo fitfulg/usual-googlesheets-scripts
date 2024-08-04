@@ -59,6 +59,13 @@ function onOpen() {
         .addSubMenu(todoSubMenu)
         .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
+
+    ui.createMenu('Language')
+        .addItem('English', 'setLanguageEnglish')
+        .addItem('Spanish', 'setLanguageSpanish')
+        .addItem('Catalan', 'setLanguageCatalan')
+        .addToUi();
+    translateSheetTODO();
 }
 
 /**

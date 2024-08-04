@@ -1,26 +1,184 @@
 const cellStyles = {
-    "A1": { value: "QUICK PATTERNS", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#000000", alignment: "center" },
-    "B1": { value: "TOMORROW", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#b5a642", alignment: "center" },
-    "B3": { value: "WEEK", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#b5a642", alignment: "center" },
-    "B8": { value: "MONTH", fontWeight: "bold", fontColor: "#FFFFFF", backgroundColor: "#b5a642", alignment: "center" },
-    "F1": { value: "💡IDEAS AND PLANS", fontWeight: "bold", fontColor: "#000000", backgroundColor: "#FFC0CB", alignment: "center" },
-    "G1": { value: "👀 EYES ON", fontWeight: "bold", fontColor: "#000000", backgroundColor: "#b7b7b7", alignment: "center" },
-    "H1": { value: "IN QUARANTINE BEFORE BEING CANCELED", fontWeight: "bold", fontColor: "#FF0000", backgroundColor: null, alignment: "center" },
-    "C1": { value: "HIGH PRIORITY", fontWeight: "bold", fontColor: null, backgroundColor: "#fce5cd", alignment: "center" },
-    "D1": { value: "MEDIUM PRIORITY", fontWeight: "bold", fontColor: null, backgroundColor: "#fff2cc", alignment: "center" },
-    "E1": { value: "LOW PRIORITY", fontWeight: "bold", fontColor: null, backgroundColor: "#d9ead3", alignment: "center" }
+    "A1": {
+        value: {
+            "English": "QUICK PATTERNS",
+            "Spanish": "PATRONES RÁPIDOS",
+            "Catalan": "PATRONS RÀPIDS"
+        },
+        fontWeight: "bold",
+        fontColor: "#FFFFFF",
+        backgroundColor: "#000000",
+        alignment: "center"
+    },
+    "B1": {
+        value: {
+            "English": "TOMORROW",
+            "Spanish": "MAÑANA",
+            "Catalan": "DEMÀ"
+        },
+        fontWeight: "bold",
+        fontColor: "#FFFFFF",
+        backgroundColor: "#b5a642",
+        alignment: "center"
+    },
+    "B3": {
+        value: {
+            "English": "WEEK",
+            "Spanish": "SEMANA",
+            "Catalan": "SETMANA"
+        },
+        fontWeight: "bold",
+        fontColor: "#FFFFFF",
+        backgroundColor: "#b5a642",
+        alignment: "center"
+    },
+    "B8": {
+        value: {
+            "English": "MONTH",
+            "Spanish": "MES",
+            "Catalan": "MES"
+        },
+        fontWeight: "bold",
+        fontColor: "#FFFFFF",
+        backgroundColor: "#b5a642",
+        alignment: "center"
+    },
+    "F1": {
+        value: {
+            "English": "IDEAS AND PLANS",
+            "Spanish": "IDEAS Y PLANES",
+            "Catalan": "IDEES I PLANS"
+        },
+        fontWeight: "bold",
+        fontColor: "#000000",
+        backgroundColor: "#FFC0CB",
+        alignment: "center"
+    },
+    "G1": {
+        value: {
+            "English": "EYES ON",
+            "Spanish": "ATENTO A",
+            "Catalan": "ATENT A"
+        },
+        fontWeight: "bold",
+        fontColor: "#000000",
+        backgroundColor: "#b7b7b7",
+        alignment: "center"
+    },
+    "H1": {
+        value: {
+            "English": "IN QUARANTINE BEFORE BEING CANCELED",
+            "Spanish": "EN CUARENTENA ANTES DE CANCELAR",
+            "Catalan": "EN QUARANTENA ABANS DE CANCEL·LAR"
+        },
+        fontWeight: "bold",
+        fontColor: "#FF0000",
+        backgroundColor: null,
+        alignment: "center"
+    },
+    "C1": {
+        value: {
+            "English": "HIGH PRIORITY",
+            "Spanish": "ALTA PRIORIDAD",
+            "Catalan": "ALTA PRIORITAT"
+        },
+        fontWeight: "bold",
+        fontColor: null,
+        backgroundColor: "#fce5cd",
+        alignment: "center"
+    },
+    "D1": {
+        value: {
+            "English": "MEDIUM PRIORITY",
+            "Spanish": "PRIORIDAD MEDIA",
+            "Catalan": "PRIORITAT MITJANA"
+        },
+        fontWeight: "bold",
+        fontColor: null,
+        backgroundColor: "#fff2cc",
+        alignment: "center"
+    },
+    "E1": {
+        value: {
+            "English": "LOW PRIORITY",
+            "Spanish": "BAJA PRIORIDAD",
+            "Catalan": "BAIXA PRIORITAT"
+        },
+        fontWeight: "bold",
+        fontColor: null,
+        backgroundColor: "#d9ead3",
+        alignment: "center"
+    }
 };
 
+
 const exampleTexts = {
-    "A": { text: "Example: Do it with fear but do it.", color: "#FFFFFF" },
-    "B": { text: "Example: 45min of cardio", color: "#A9A9A9" },
-    "C": { text: "Example: Join that gym club", color: "#A9A9A9" },
-    "D": { text: "Example: Submit that pending data science task.", color: "#A9A9A9" },
-    "E": { text: "Example: Buy a new mattress.", color: "#A9A9A9" },
-    "F": { text: "Example: Santiago route.", color: "#A9A9A9" },
-    "G": { text: "Example: Change front brake pad at 44500km", color: "#FFFFFF" },
-    "H": { text: "Example: Join that Crossfit club", color: "#A9A9A9" },
+    "A": {
+        text: {
+            "English": "Example: Do it with fear but do it.",
+            "Spanish": "Ejemplo: Hazlo con miedo pero hazlo.",
+            "Catalan": "Exemple: Fes-ho si cal amb por però fes-ho."
+        },
+        color: "#FFFFFF"
+    },
+    "B": {
+        text: {
+            "English": "Example: 45min of cardio",
+            "Spanish": "Ejemplo: 45min de cardio",
+            "Catalan": "Exemple: 45min de cardio"
+        },
+        color: "#A9A9A9"
+    },
+    "C": {
+        text: {
+            "English": "Example: Join that gym club",
+            "Spanish": "Ejemplo: Apuntate al gym",
+            "Catalan": "Exemple: Apunta't al gym"
+        },
+        color: "#A9A9A9"
+    },
+    "D": {
+        text: {
+            "English": "Example: Submit that pending data science task.",
+            "Spanish": "Ejemplo: Entrega esa tarea pendiente de ciencia de datos.",
+            "Catalan": "Exemple: Lliura aquella tasca pendent de ciència de dades."
+        },
+        color: "#A9A9A9"
+    },
+    "E": {
+        text: {
+            "English": "Example: Buy a new mattress.",
+            "Spanish": "Ejemplo: Compra un nuevo colchón.",
+            "Catalan": "Exemple: Compra un nou matalàs."
+        },
+        color: "#A9A9A9"
+    },
+    "F": {
+        text: {
+            "English": "Example: Santiago route.",
+            "Spanish": "Ejemplo: Ruta de Santiago.",
+            "Catalan": "Exemple: Ruta de Santiago."
+        },
+        color: "#A9A9A9"
+    },
+    "G": {
+        text: {
+            "English": "Example: Change front brake pad at 44500km",
+            "Spanish": "Ejemplo: Cambia la pastilla de freno delantera a los 44500km",
+            "Catalan": "Exemple: Canvia la pastilla de fren davanter als 44500km"
+        },
+        color: "#FFFFFF"
+    },
+    "H": {
+        text: {
+            "English": "Example: Join that Crossfit club",
+            "Spanish": "Ejemplo: Únete al club de Crossfit",
+            "Catalan": "Exemple: Uneix-te al club de Crossfit"
+        },
+        color: "#A9A9A9"
+    }
 };
+
 
 const dateColorConfig = {
     C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
@@ -31,10 +189,17 @@ const dateColorConfig = {
     H: { warning: 0, danger: 0, warningColor: '#FF0000', dangerColor: '#FF0000', defaultColor: '#FF0000' } // Always red
 };
 
+const languages = {
+    English: 'English',
+    Spanish: 'Spanish',
+    Catalan: 'Catalan'
+};
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         cellStyles,
         exampleTexts,
-        dateColorConfig
+        dateColorConfig,
+        languages
     }
 }

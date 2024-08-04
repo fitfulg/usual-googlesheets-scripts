@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-// shared/util.js: saveSnapshot, restoreSnapshot, filterSnapshot
+// shared/util.js: saveSnapshot, restoreSnapshot
 
 /**
  * Saves a snapshot of the current state of the active sheet while ignoring specific cells.

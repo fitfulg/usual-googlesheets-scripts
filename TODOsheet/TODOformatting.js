@@ -83,31 +83,26 @@ function exampleTextTODO(column, exampleText) {
  */
 function applyFormatToAllTODO() {
     const totalRows = sheet.getMaxRows();
-
-    // Get the range for all the columns A to H up to the last row
-    let range = sheet.getRange(1, 1, totalRows, 8); // A1:H(last row)
+    let range = sheet.getRange(1, 1, totalRows, 8);
     if (range) {
         Format(range);
         applyBorders(range);
     }
 
-    // Apply thicker borders to specific columns C, D, and E for defined rows
-    applyThickBorders(sheet.getRange(1, 3, 11, 1)); // C1:C11
-    applyThickBorders(sheet.getRange(1, 4, 21, 1)); // D1:D21
-    applyThickBorders(sheet.getRange(1, 5, 21, 1)); // E1:E21
+    applyThickBorders(sheet.getRange(1, 3, 11, 1));
+    applyThickBorders(sheet.getRange(1, 4, 21, 1));
+    applyThickBorders(sheet.getRange(1, 5, 21, 1));
 
-    // Set the specific content and styles in the specified cells
     setCellContentAndStyleTODO();
-
-    // Check the number of occupied cells in columns C, D, and E
     checkAndSetColumnTODO("C", 9, "HIGH PRIORITY");
     checkAndSetColumnTODO("D", 19, "MEDIUM PRIORITY");
     checkAndSetColumnTODO("E", 19, "LOW PRIORITY");
 
-    // Add example text to specific columns if empty
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
     for (const column in exampleTexts) {
         const { text } = exampleTexts[column];
-        exampleTextTODO(column, text);
+        const translatedText = text[language];
+        exampleTextTODO(column, translatedText);
     }
 }
 
@@ -180,9 +175,11 @@ function customCeilBGColorTODO() {
  * @customfunction
  */
 function setCellContentAndStyleTODO() {
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
     for (const cell in cellStyles) {
         const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
-        setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment);
+        const translatedValue = value[language];
+        setCellStyle(cell, translatedValue, fontWeight, fontColor, backgroundColor, alignment);
     }
 }
 

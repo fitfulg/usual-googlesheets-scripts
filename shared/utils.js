@@ -160,7 +160,6 @@ function restoreSnapshot(formatCallback) {
     Logger.log("Snapshot restored.");
 }
 
-
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         extractUrls,
