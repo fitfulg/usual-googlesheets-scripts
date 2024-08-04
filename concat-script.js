@@ -31,7 +31,7 @@ function onOpen() {
     Logger.log('onOpen triggered');
 
     // bad practice but only way (by the moment) to not lose links from shifted up cells after reloading the page  
-    saveSnapshot();
+    saveSnapshotTODO()
 
     const docProperties = PropertiesService.getDocumentProperties();
     const lastHash = docProperties.getProperty('lastHash');
@@ -349,10 +349,12 @@ function getSheetContentHash() {
 /**
  * Saves a snapshot of the current state of the active sheet.
  * The snapshot includes the text content and links of each cell.
+ * You can specify cells to ignore by passing an array of cell references.
  * 
- * @return {void}
+ * @param {Array<string>} cellsToIgnore - (e.g., ["R1C3", "R1C4", "R1C5"] for C1, D1, E1).
+ * @return {object} The snapshot object.
  */
-function saveSnapshot() {
+function saveSnapshot(cellsToIgnore = []) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     const richTextValues = range.getRichTextValues();
@@ -360,9 +362,14 @@ function saveSnapshot() {
 
     for (let row = 0; row < richTextValues.length; row++) {
         for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellKey = `R${row + 1}C${col + 1}`;
+            if (cellsToIgnore.includes(cellKey)) {
+                Logger.log(`Ignoring cell ${cellKey} from snapshot.`);
+                continue;
+            }
+
             const cellValue = richTextValues[row][col];
             if (cellValue) {
-                const cellKey = `R${row + 1}C${col + 1}`;
                 snapshot[cellKey] = {
                     text: cellValue.getText(),
                     links: []
@@ -382,6 +389,8 @@ function saveSnapshot() {
     const properties = PropertiesService.getScriptProperties();
     properties.setProperty('sheetSnapshot', JSON.stringify(snapshot));
     Logger.log("Snapshot saved.");
+
+    return snapshot;
 }
 
 /**
@@ -1251,34 +1260,6 @@ function parseDaysLeftTODO(value) {
 }
 
 /**
- * Restores the sheet snapshot and applies custom formatting for dates and "days left".
- *
- * @return {void}
- */
-function restoreSnapshotTODO() {
-    restoreSnapshot((builder, text) => {
-        // Reapply formatting for dates and "days left"
-        const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
-        const daysLeftPattern = /\((\d+)\) days left/;
-        const daysLeftMatch = text.match(daysLeftPattern);
-
-        if (dateMatches) {
-            for (const date of dateMatches) {
-                const start = text.lastIndexOf(date);
-                const end = start + date.length;
-                builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-            }
-        }
-
-        if (daysLeftMatch) {
-            const start = text.lastIndexOf(daysLeftMatch[0]);
-            const end = start + daysLeftMatch[0].length;
-            builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
-        }
-    });
-}
-
-/**
  * Updates the days left counter for each cell in column H.
  * If the counter reaches zero, the cell is cleared.
  * 
@@ -1438,6 +1419,56 @@ function deleteAllChartsTODO() {
     isPieChartVisible = false;
 }
 
+
+// Contents of ./TODOsheet/TODOsnapshot.js
+
+// shared/util.js: saveSnapshot, restoreSnapshot, filterSnapshot
+
+/**
+ * Saves a snapshot of the current state of the active sheet while ignoring specific cells.
+ * Ignores cells C1, D1, and E1 so we retain the changed column titles when cell max limit is reached.
+ * 
+ * @return {void}
+ */
+function saveSnapshotTODO() {
+    const cellsToIgnore = ["R1C1", "R1C2", "R1C3", "R1C4", "R1C5", "R1C6", "R1C7", "R1C8"]
+    const snapshot = saveSnapshot(cellsToIgnore);
+
+    // Save filtered snapshot to script properties
+    const properties = PropertiesService.getScriptProperties();
+    properties.setProperty('sheetSnapshot', JSON.stringify(snapshot));
+    Logger.log("Snapshot saved, excluding specified cells.");
+}
+
+/**
+ * Restores the sheet snapshot and applies custom formatting for dates and "days left".
+ *
+ * @return {void}
+ */
+function restoreSnapshotTODO() {
+    restoreSnapshot((builder, text) => {
+        // Reapply formatting for dates and "days left"
+        const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
+        const daysLeftPattern = /\((\d+)\) days left/;
+        const daysLeftMatch = text.match(daysLeftPattern);
+
+        if (dateMatches) {
+            for (const date of dateMatches) {
+                const start = text.lastIndexOf(date);
+                const end = start + date.length;
+                builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
+            }
+        }
+
+        if (daysLeftMatch) {
+            const start = text.lastIndexOf(daysLeftMatch[0]);
+            const end = start + daysLeftMatch[0].length;
+            builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
+        }
+    });
+}
+
+// for testing
 
 // Contents of ./TODOsheet/TODOtoggleFn.js
 

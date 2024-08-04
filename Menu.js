@@ -14,7 +14,7 @@ function onOpen() {
     Logger.log('onOpen triggered');
 
     // bad practice but only way (by the moment) to not lose links from shifted up cells after reloading the page  
-    saveSnapshot();
+    saveSnapshotTODO()
 
     const docProperties = PropertiesService.getDocumentProperties();
     const lastHash = docProperties.getProperty('lastHash');

@@ -532,34 +532,6 @@ function parseDaysLeftTODO(value) {
 }
 
 /**
- * Restores the sheet snapshot and applies custom formatting for dates and "days left".
- *
- * @return {void}
- */
-function restoreSnapshotTODO() {
-    restoreSnapshot((builder, text) => {
-        // Reapply formatting for dates and "days left"
-        const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
-        const daysLeftPattern = /\((\d+)\) days left/;
-        const daysLeftMatch = text.match(daysLeftPattern);
-
-        if (dateMatches) {
-            for (const date of dateMatches) {
-                const start = text.lastIndexOf(date);
-                const end = start + date.length;
-                builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-            }
-        }
-
-        if (daysLeftMatch) {
-            const start = text.lastIndexOf(daysLeftMatch[0]);
-            const end = start + daysLeftMatch[0].length;
-            builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
-        }
-    });
-}
-
-/**
  * Updates the days left counter for each cell in column H.
  * If the counter reaches zero, the cell is cleared.
  * 
@@ -642,7 +614,6 @@ if (typeof module !== 'undefined' && module.exports) {
         removeMultipleDatesTODO,
         shiftCellsUpTODO,
         handleColumnEditTODO,
-        restoreSnapshotTODO,
         updateDaysLeftCounterTODO
     }
 }

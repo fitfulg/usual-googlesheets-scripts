@@ -68,10 +68,12 @@ function getSheetContentHash() {
 /**
  * Saves a snapshot of the current state of the active sheet.
  * The snapshot includes the text content and links of each cell.
+ * You can specify cells to ignore by passing an array of cell references.
  * 
- * @return {void}
+ * @param {Array<string>} cellsToIgnore - (e.g., ["R1C3", "R1C4", "R1C5"] for C1, D1, E1).
+ * @return {object} The snapshot object.
  */
-function saveSnapshot() {
+function saveSnapshot(cellsToIgnore = []) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     const richTextValues = range.getRichTextValues();
@@ -79,9 +81,14 @@ function saveSnapshot() {
 
     for (let row = 0; row < richTextValues.length; row++) {
         for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellKey = `R${row + 1}C${col + 1}`;
+            if (cellsToIgnore.includes(cellKey)) {
+                Logger.log(`Ignoring cell ${cellKey} from snapshot.`);
+                continue;
+            }
+
             const cellValue = richTextValues[row][col];
             if (cellValue) {
-                const cellKey = `R${row + 1}C${col + 1}`;
                 snapshot[cellKey] = {
                     text: cellValue.getText(),
                     links: []
@@ -101,6 +108,8 @@ function saveSnapshot() {
     const properties = PropertiesService.getScriptProperties();
     properties.setProperty('sheetSnapshot', JSON.stringify(snapshot));
     Logger.log("Snapshot saved.");
+
+    return snapshot;
 }
 
 /**
