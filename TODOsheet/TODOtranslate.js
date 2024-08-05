@@ -11,13 +11,6 @@ function setLanguage(language) {
     if (languages[language]) {
         PropertiesService.getDocumentProperties().setProperty('language', language);
         translateSheetTODO();
-        const ui = SpreadsheetApp.getUi();
-        const message = {
-            'English': 'Language changed.\n Please reload the sheet to update menus.',
-            'Spanish': 'Idioma cambiado.\n Por favor, recargue la hoja para actualizar los menús.',
-            'Catalan': 'Idioma canviat.\n Si us plau, recarregui el full per actualitzar els menús.'
-        };
-        ui.alert(message[language]);
     } else {
         Logger.log('Language not supported: ' + language);
     }

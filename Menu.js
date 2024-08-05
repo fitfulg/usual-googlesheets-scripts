@@ -30,7 +30,40 @@ function onOpen() {
         Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
     }
 
-    createMenusTODO();
+    const ui = SpreadsheetApp.getUi();
+
+    // Custom menu
+    ui.createMenu('TODO sheet')
+        .addItem('RESTORE DEFAULT TODO TEMPLATE', 'applyFormatToAllTODO')
+        .addItem('RESTORE Ceil Background Colors', 'customCeilBGColorTODO')
+        .addSeparator()
+        .addItem('Add Checkboxes to Selected Cells', 'addCheckboxesTODO')
+        .addItem('Mark Checkbox in Selected Cells', 'markCheckboxTODO')
+        .addItem('Mark All Checkboxes in Selected Cells', 'markAllCheckboxesTODO')
+        .addItem('Restore Checkboxes', 'restoreCheckboxesTODO')
+        .addItem('Remove All Checkboxes in Selected Cells', 'removeCheckboxesTODO')
+        .addSeparator()
+        .addItem('Save Snapshot', 'saveSnapshot')
+        .addItem('Restore Snapshot', 'restoreSnapshot')
+        .addSeparator()
+        .addItem('Create Pie Chart', 'createPieChartTODO')
+        .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
+        .addSeparator()
+        .addItem('Version and feature details', 'updateCellCommentTODO')
+        .addSeparator()
+        .addItem('Log Hello World', 'logHelloWorld')
+        .addToUi();
+
+    ui.createMenu('Custom Formats')
+        .addItem('Apply Format', 'applyFormatToSelected')
+        .addItem('Apply Format to All', 'applyFormatToAll')
+        .addToUi();
+
+    ui.createMenu('Language')
+        .addItem('English', 'setLanguageEnglish')
+        .addItem('Spanish', 'setLanguageSpanish')
+        .addItem('Catalan', 'setLanguageCatalan')
+        .addToUi();
     translateSheetTODO();
 }
 
@@ -50,6 +83,17 @@ function runAllFunctionsTODO() {
     removeMultipleDatesTODO();
     updateDaysLeftCounterTODO();
     Logger.log('All functions called successfully!');
+}
+
+/**
+ * Displays a "Hello World" message in an alert.
+ *
+ * @customfunction
+ */
+function logHelloWorld() {
+    const ui = SpreadsheetApp.getUi();
+    ui.alert('Hello World!!');
+    Logger.log('hello world test');
 }
 
 if (typeof module !== 'undefined' && module.exports) {

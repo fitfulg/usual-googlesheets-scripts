@@ -47,7 +47,40 @@ function onOpen() {
         Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
     }
 
-    createMenusTODO();
+    const ui = SpreadsheetApp.getUi();
+
+    // Custom menu
+    ui.createMenu('TODO sheet')
+        .addItem('RESTORE DEFAULT TODO TEMPLATE', 'applyFormatToAllTODO')
+        .addItem('RESTORE Ceil Background Colors', 'customCeilBGColorTODO')
+        .addSeparator()
+        .addItem('Add Checkboxes to Selected Cells', 'addCheckboxesTODO')
+        .addItem('Mark Checkbox in Selected Cells', 'markCheckboxTODO')
+        .addItem('Mark All Checkboxes in Selected Cells', 'markAllCheckboxesTODO')
+        .addItem('Restore Checkboxes', 'restoreCheckboxesTODO')
+        .addItem('Remove All Checkboxes in Selected Cells', 'removeCheckboxesTODO')
+        .addSeparator()
+        .addItem('Save Snapshot', 'saveSnapshot')
+        .addItem('Restore Snapshot', 'restoreSnapshot')
+        .addSeparator()
+        .addItem('Create Pie Chart', 'createPieChartTODO')
+        .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
+        .addSeparator()
+        .addItem('Version and feature details', 'updateCellCommentTODO')
+        .addSeparator()
+        .addItem('Log Hello World', 'logHelloWorld')
+        .addToUi();
+
+    ui.createMenu('Custom Formats')
+        .addItem('Apply Format', 'applyFormatToSelected')
+        .addItem('Apply Format to All', 'applyFormatToAll')
+        .addToUi();
+
+    ui.createMenu('Language')
+        .addItem('English', 'setLanguageEnglish')
+        .addItem('Spanish', 'setLanguageSpanish')
+        .addItem('Catalan', 'setLanguageCatalan')
+        .addToUi();
     translateSheetTODO();
 }
 
@@ -67,6 +100,17 @@ function runAllFunctionsTODO() {
     removeMultipleDatesTODO();
     updateDaysLeftCounterTODO();
     Logger.log('All functions called successfully!');
+}
+
+/**
+ * Displays a "Hello World" message in an alert.
+ *
+ * @customfunction
+ */
+function logHelloWorld() {
+    const ui = SpreadsheetApp.getUi();
+    ui.alert('Hello World!!');
+    Logger.log('Hello world!!');
 }
 
 
@@ -1249,234 +1293,6 @@ const languages = {
     Catalan: 'Catalan'
 };
 
-const menuLanguage = [
-    {
-        title: {
-            English: 'Language',
-            Spanish: 'Idioma',
-            Catalan: 'Idioma'
-        },
-        items: {
-            setLanguageEnglish: {
-                English: 'English',
-                Spanish: 'Inglés',
-                Catalan: 'Anglès'
-            },
-            setLanguageSpanish: {
-                English: 'Spanish',
-                Spanish: 'Español',
-                Catalan: 'Espanyol'
-            },
-            setLanguageCatalan: {
-                English: 'Catalan',
-                Spanish: 'Catalán',
-                Catalan: 'Català'
-            }
-        }
-    }
-]
-const menuTodoSheet = [
-    {
-        title: {
-            English: 'TODO sheet',
-            Spanish: 'Hoja TODO',
-            Catalan: 'Full de TODO'
-        },
-        items: {
-            restoreDefaultTodoTemplate: {
-                English: 'RESTORE DEFAULT TODO TEMPLATE',
-                Spanish: 'RESTAURAR PLANTILLA POR DEFECTO',
-                Catalan: 'RESTAURAR PLANTILLA PER DEFECTE'
-            },
-            restoreCellBackgroundColors: {
-                English: 'RESTORE Cell Background Colors',
-                Spanish: 'RESTAURAR Colores de Fondo de Celda',
-                Catalan: 'RESTAURAR Colors de Fons de Cel·la'
-            },
-            addCheckboxesToSelectedCells: {
-                English: 'Add Checkboxes to Selected Cells',
-                Spanish: 'Añadir Casillas a las Celdas Seleccionadas',
-                Catalan: 'Afegir Caselles a les Cel·les Seleccionades'
-            },
-            markCheckboxInSelectedCells: {
-                English: 'Mark Checkbox in Selected Cells',
-                Spanish: 'Marcar Casilla en las Celdas Seleccionadas',
-                Catalan: 'Marcar Casella a les Cel·les Seleccionades'
-            },
-            markAllCheckboxesInSelectedCells: {
-                English: 'Mark All Checkboxes in Selected Cells',
-                Spanish: 'Marcar Todas las Casillas en las Celdas Seleccionadas',
-                Catalan: 'Marcar Totes les Caselles a les Cel·les Seleccionades'
-            },
-            restoreCheckboxes: {
-                English: 'Restore Checkboxes',
-                Spanish: 'Restaurar Casillas',
-                Catalan: 'Restaurar Caselles'
-            },
-            removeAllCheckboxesInSelectedCells: {
-                English: 'Remove All Checkboxes in Selected Cells',
-                Spanish: 'Eliminar Todas las Casillas en las Celdas Seleccionadas',
-                Catalan: 'Eliminar Totes les Caselles a les Cel·les Seleccionades'
-            },
-            saveSnapshot: {
-                English: 'Save Snapshot',
-                Spanish: 'Guardar Instantánea',
-                Catalan: 'Guardar Instantània'
-            },
-            restoreSnapshot: {
-                English: 'Restore Snapshot',
-                Spanish: 'Restaurar Instantánea',
-                Catalan: 'Restaurar Instantània'
-            },
-            createPieChart: {
-                English: 'Create Pie Chart',
-                Spanish: 'Crear Gráfico Circular',
-                Catalan: 'Crear Gràfic Circular'
-            },
-            deletePieCharts: {
-                English: 'Delete Pie Charts',
-                Spanish: 'Eliminar Gráficos Circulares',
-                Catalan: 'Eliminar Gràfics Circulars'
-            },
-            versionAndFeatureDetails: {
-                English: 'Version and feature details',
-                Spanish: 'Detalles de Versión y Funcionalidades',
-                Catalan: 'Detalls de Versió i Funcionalitats'
-            },
-            logHelloWorld: {
-                English: 'Log Hello World',
-                Spanish: 'Registrar Hola Mundo',
-                Catalan: 'Registrar Hola Món'
-            }
-        }
-    }]
-
-const menuCustomFormats = [
-    {
-        title: {
-            English: 'Custom Formats',
-            Spanish: 'Formatos Personalizados',
-            Catalan: 'Formats Personalitzats'
-        },
-        items: {
-            applyFormat: {
-                English: 'Apply Format',
-                Spanish: 'Aplicar Formato',
-                Catalan: 'Aplicar Format'
-            },
-            applyFormatToAll: {
-                English: 'Apply Format to All',
-                Spanish: 'Aplicar Formato a Todo',
-                Catalan: 'Aplicar Format a Tot'
-            }
-        }
-    }]
-
-const menus = [
-    {
-        config: menuTodoSheet,
-        items: [
-            { key: 'restoreDefaultTodoTemplate', separatorAfter: false },
-            { key: 'restoreCellBackgroundColors', separatorAfter: true },
-            { key: 'addCheckboxesToSelectedCells', separatorAfter: false },
-            { key: 'markCheckboxInSelectedCells', separatorAfter: false },
-            { key: 'markAllCheckboxesInSelectedCells', separatorAfter: false },
-            { key: 'restoreCheckboxes', separatorAfter: false },
-            { key: 'removeAllCheckboxesInSelectedCells', separatorAfter: true },
-            { key: 'saveSnapshot', separatorAfter: false },
-            { key: 'restoreSnapshot', separatorAfter: true },
-            { key: 'createPieChart', separatorAfter: false },
-            { key: 'deletePieCharts', separatorAfter: true },
-            { key: 'versionAndFeatureDetails', separatorAfter: false },
-            { key: 'logHelloWorld', separatorAfter: false }
-        ],
-        suffix: ''
-    },
-    {
-        config: menuCustomFormats,
-        items: [
-            { key: 'applyFormat', separatorAfter: false },
-            { key: 'applyFormatToAll', separatorAfter: false }
-        ],
-        suffix: ''
-    },
-    {
-        config: menuLanguage,
-        items: [
-            { key: 'setLanguageEnglish', separatorAfter: false },
-            { key: 'setLanguageSpanish', separatorAfter: false },
-            { key: 'setLanguageCatalan', separatorAfter: false }
-        ],
-        suffix: ''
-    }
-];
-
-
-
-// Contents of ./TODOsheet/TODOmenu.js
-
-/**
- * Gets the current language from document properties or returns 'English' as default.
- * @returns {string} The current language
- */
-const getCurrentLanguageTODO = () => PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-
-/**
- * Creates custom menus in the spreadsheet.
- * Adds menu items to the UI and assigns functions to them.
- * 
- * @customfunction
- */
-function createMenusTODO() {
-    const ui = SpreadsheetApp.getUi();
-    const currentLanguage = getCurrentLanguageTODO();
-
-    const functionNameMap = {
-        'restoreDefaultTodoTemplate': 'applyFormatToAllTODO',
-        'restoreCellBackgroundColors': 'customCeilBGColorTODO',
-        'addCheckboxesToSelectedCells': 'addCheckboxesTODO',
-        'markCheckboxInSelectedCells': 'markCheckboxTODO',
-        'markAllCheckboxesInSelectedCells': 'markAllCheckboxesTODO',
-        'restoreCheckboxes': 'restoreCheckboxesTODO',
-        'removeAllCheckboxesInSelectedCells': 'removeCheckboxesTODO',
-        'applyFormat': 'applyFormatToSelected',
-        'applyFormatToAll': 'applyFormatToAll',
-        'createPieChart': 'createPieChartTODO',
-        'deletePieCharts': 'deleteAllChartsTODO',
-        'logHelloWorld': 'logHelloWorld',
-        'versionAndFeatureDetails': 'updateCellCommentTODO',
-        'saveSnapshot': 'saveSnapshotTODO',
-        'restoreSnapshot': 'restoreSnapshotTODO'
-    };
-
-    menus.forEach(menuConfig => {
-        const menuTitle = menuConfig.config[0].title[currentLanguage];
-        let menu = ui.createMenu(menuTitle);
-
-        menuConfig.items.forEach(item => {
-            const itemTitle = menuConfig.config[0].items[item.key][currentLanguage];
-            let functionName = functionNameMap[item.key] || item.key;
-
-            menu.addItem(itemTitle, functionName);
-            if (item.separatorAfter) {
-                menu.addSeparator();
-            }
-        });
-
-        menu.addToUi();
-    });
-}
-
-/**
- * Displays a "Hello World" message in an alert.
- *
- * @customfunction
- */
-function logHelloWorld() {
-    const ui = SpreadsheetApp.getUi();
-    ui.alert('Hello World!!');
-    Logger.log('hello world test');
-}
 
 // Contents of ./TODOsheet/TODOpiechart.js
 
@@ -1870,13 +1686,6 @@ function setLanguage(language) {
     if (languages[language]) {
         PropertiesService.getDocumentProperties().setProperty('language', language);
         translateSheetTODO();
-        const ui = SpreadsheetApp.getUi();
-        const message = {
-            'English': 'Language changed.\n Please reload the sheet to update menus.',
-            'Spanish': 'Idioma cambiado.\n Por favor, recargue la hoja para actualizar los menús.',
-            'Catalan': 'Idioma canviat.\n Si us plau, recarregui el full per actualitzar els menús.'
-        };
-        ui.alert(message[language]);
     } else {
         Logger.log('Language not supported: ' + language);
     }
