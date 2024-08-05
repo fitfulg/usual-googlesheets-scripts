@@ -5,11 +5,9 @@ const { updateCellCommentTODO,
     setColumnBackground,
     customCeilBGColorTODO,
     setCellContentAndStyleTODO,
-    updateDateColorsTODO,
     setupDropdownTODO,
     pushUpEmptyCellsTODO,
     updateRichTextTODO,
-    removeMultipleDatesTODO,
     shiftCellsUpTODO } = require('../TODOsheet/TODOformatting');
 
 describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
@@ -78,9 +76,6 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         test('setCellContentAndStyleTODO function exists', () => {
             expect(typeof setCellContentAndStyleTODO).toBe('function');
         });
-        test('updateDateColorsTODO function exists', () => {
-            expect(typeof updateDateColorsTODO).toBe('function');
-        });
         test('setupDropdownTODO function exists', () => {
             expect(typeof setupDropdownTODO).toBe('function');
         });
@@ -89,9 +84,6 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         });
         test('updateRichTextTODO function exists', () => {
             expect(typeof updateRichTextTODO).toBe('function');
-        });
-        test('removeMultipleDatesTODO function exists', () => {
-            expect(typeof removeMultipleDatesTODO).toBe('function');
         });
         test('shiftCellsUpTODO function exists', () => {
             expect(typeof shiftCellsUpTODO).toBe('function');
