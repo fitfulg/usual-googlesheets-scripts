@@ -93,7 +93,7 @@ function runAllFunctionsTODO() {
 function logHelloWorld() {
     const ui = SpreadsheetApp.getUi();
     ui.alert('Hello World!!');
-    Logger.log('Hello world!!');
+    Logger.log('hello world test');
 }
 
 if (typeof module !== 'undefined' && module.exports) {
