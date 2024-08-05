@@ -1270,62 +1270,48 @@ function parseDaysLeftTODO(value) {
  * @return {void}
  */
 function updateDaysLeftCounterTODO() {
-    Logger.log('Updating days left counter');
+    const properties = PropertiesService.getDocumentProperties();
+    const lastUpdateDate = properties.getProperty('lastUpdateDate');
+    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
+
+    Logger.log(`Last update was on: ${lastUpdateDate}`);
+    Logger.log(`Today's date is: ${today}`);
+
+    const now = new Date();
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const hoursLeftUntilNextUpdate = (endOfDay - now) / 3600000; // milliseconds to hours
+
+    Logger.log(`Hours left until the next days left update: ${hoursLeftUntilNextUpdate.toFixed(2)} hours`);
+
+    if (lastUpdateDate === today) {
+        Logger.log("No days left counter update needed yet.");
+        return;
+    }
+
     const range = sheet.getRange('H2:H' + sheet.getLastRow());
     const values = range.getValues();
-    const richTextValues = range.getRichTextValues();
-    const now = new Date();
-    let cellsCleared = 0;
-    const properties = PropertiesService.getDocumentProperties();
+    Logger.log("Starting to update days left for each cell.");
 
     for (let i = 0; i < values.length; i++) {
         const cellValue = values[i][0].toString();
         const match = cellValue.match(/\((\d+)\) days left/);
         if (match) {
             const originalDays = parseInt(match[1]);
-            const cellNotation = `H${i + 2}`;
-            const startDateString = properties.getProperty(cellNotation);
-            if (!startDateString) {
-                Logger.log(`No start date found for cell ${cellNotation}. Clearing cell.`);
-                values[i][0] = '';
-                richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
-                cellsCleared++;
-                continue;
-            }
-            const cellDate = new Date(startDateString);
-            const timeDiff = now.getTime() - cellDate.getTime();
-            const daysLeft = Math.max(0, originalDays - Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
+            const daysLeft = Math.max(0, originalDays - 1);
 
-            if (daysLeft <= 0 || isNaN(daysLeft)) {
-                // Clear the cell when the counter reaches zero or is NaN
-                Logger.log(`Clearing cell ${cellNotation}. Days left: ${daysLeft}`);
+            Logger.log(`Row ${i + 2}: original days left = ${originalDays}, new days left = ${daysLeft}`);
+
+            if (daysLeft <= 0) {
                 values[i][0] = '';
-                richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
-                properties.deleteProperty(cellNotation); // Remove the start date property
-                cellsCleared++;
+                Logger.log(`Row ${i + 2}: Days left counter reached zero, clearing cell.`);
             } else {
-                const newText = cellValue.replace(/\(\d+\) days left/, `(${daysLeft}) days left`);
-                const richTextValue = SpreadsheetApp.newRichTextValue()
-                    .setText(newText)
-                    .setTextStyle(0, newText.length, richTextValues[i][0].getTextStyle())
-                    .setTextStyle(newText.lastIndexOf('('), newText.length,
-                        SpreadsheetApp.newTextStyle().setForegroundColor('#FF0000').setItalic(true).build())
-                    .build();
-
-                values[i][0] = newText;
-                richTextValues[i][0] = richTextValue;
+                values[i][0] = `(${daysLeft}) days left`;
             }
         }
     }
-
     range.setValues(values);
-    range.setRichTextValues(richTextValues);
-    Logger.log(`Days left counter updated. ${cellsCleared} cells cleared.`);
-
-    if (cellsCleared > 0) {
-        // If any cells were cleared, call pushUpEmptyCellsTODO to reorganize the column
-        pushUpEmptyCellsTODO();
-    }
+    properties.setProperty('lastUpdateDate', today);
+    Logger.log("Days left counter updated for all applicable cells.");
 }
 
 // for testing
@@ -1413,8 +1399,8 @@ const cellStyles = {
     "C1": {
         value: {
             "English": "HIGH PRIORITY",
-            "Spanish": "ALTA PRIORIDAD",
-            "Catalan": "ALTA PRIORITAT"
+            "Spanish": "PRIORIDAD ALTA",
+            "Catalan": "PRIORITAT ALTA"
         },
         fontWeight: "bold",
         fontColor: null,
