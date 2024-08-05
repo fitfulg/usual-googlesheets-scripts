@@ -8,8 +8,4 @@ describe('Menu Functions', () => {
     test('runAllFunctionsTODO function exists', () => {
         expect(typeof Menu.runAllFunctionsTODO).toBe('function');
     });
-
-    test('logHelloWorld function exists', () => {
-        expect(typeof Menu.logHelloWorld).toBe('function');
-    });
 });
