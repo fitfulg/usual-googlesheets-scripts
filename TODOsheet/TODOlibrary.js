@@ -195,11 +195,119 @@ const languages = {
     Catalan: 'Catalan'
 };
 
+const menuLanguage = {
+    title: {
+        English: 'Language',
+        Spanish: 'Idioma',
+        Catalan: 'Idioma'
+    },
+    items: languages
+};
+
+const menuTodoSheet = {
+    title: {
+        English: 'TODO sheet',
+        Spanish: 'Hoja TODO',
+        Catalan: 'Full de TODO'
+    },
+    items: {
+        restoreDefaultTodoTemplate: {
+            English: 'RESTORE DEFAULT TODO TEMPLATE',
+            Spanish: 'RESTAURAR PLANTILLA POR DEFECTO',
+            Catalan: 'RESTAURAR PLANTILLA PER DEFECTE'
+        },
+        restoreCellBackgroundColors: {
+            English: 'RESTORE Cell Background Colors',
+            Spanish: 'RESTAURAR Colores de Fondo de Celda',
+            Catalan: 'RESTAURAR Colors de Fons de Cel·la'
+        },
+        addCheckboxesToSelectedCells: {
+            English: 'Add Checkboxes to Selected Cells',
+            Spanish: 'Añadir Casillas a las Celdas Seleccionadas',
+            Catalan: 'Afegir Caselles a les Cel·les Seleccionades'
+        },
+        markCheckboxInSelectedCells: {
+            English: 'Mark Checkbox in Selected Cells',
+            Spanish: 'Marcar Casilla en las Celdas Seleccionadas',
+            Catalan: 'Marcar Casella a les Cel·les Seleccionades'
+        },
+        markAllCheckboxesInSelectedCells: {
+            English: 'Mark All Checkboxes in Selected Cells',
+            Spanish: 'Marcar Todas las Casillas en las Celdas Seleccionadas',
+            Catalan: 'Marcar Totes les Caselles a les Cel·les Seleccionades'
+        },
+        restoreCheckboxes: {
+            English: 'Restore Checkboxes',
+            Spanish: 'Restaurar Casillas',
+            Catalan: 'Restaurar Caselles'
+        },
+        removeAllCheckboxesInSelectedCells: {
+            English: 'Remove All Checkboxes in Selected Cells',
+            Spanish: 'Eliminar Todas las Casillas en las Celdas Seleccionadas',
+            Catalan: 'Eliminar Totes les Caselles a les Cel·les Seleccionades'
+        },
+        saveSnapshot: {
+            English: 'Save Snapshot',
+            Spanish: 'Guardar Instantánea',
+            Catalan: 'Guardar Instantània'
+        },
+        restoreSnapshot: {
+            English: 'Restore Snapshot',
+            Spanish: 'Restaurar Instantánea',
+            Catalan: 'Restaurar Instantània'
+        },
+        createPieChart: {
+            English: 'Create Pie Chart',
+            Spanish: 'Crear Gráfico Circular',
+            Catalan: 'Crear Gràfic Circular'
+        },
+        deletePieCharts: {
+            English: 'Delete Pie Charts',
+            Spanish: 'Eliminar Gráficos Circulares',
+            Catalan: 'Eliminar Gràfics Circulars'
+        },
+        versionAndFeatureDetails: {
+            English: 'Version and feature details',
+            Spanish: 'Detalles de Versión y Funcionalidades',
+            Catalan: 'Detalls de Versió i Funcionalitats'
+        },
+        logHelloWorld: {
+            English: 'Log Hello World',
+            Spanish: 'Registrar Hola Mundo',
+            Catalan: 'Registrar Hola Món'
+        }
+    }
+};
+
+const menuCustomFormats = {
+    title: {
+        English: 'Custom Formats',
+        Spanish: 'Formatos Personalizados',
+        Catalan: 'Formats Personalitzats'
+    },
+    items: {
+        applyFormat: {
+            English: 'Apply Format',
+            Spanish: 'Aplicar Formato',
+            Catalan: 'Aplicar Format'
+        },
+        applyFormatToAll: {
+            English: 'Apply Format to All',
+            Spanish: 'Aplicar Formato a Todo',
+            Catalan: 'Aplicar Format a Tot'
+        }
+    }
+};
+
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         cellStyles,
         exampleTexts,
         dateColorConfig,
-        languages
+        languages,
+        menuLanguage,
+        menuTodoSheet,
+        menuCustomFormats
     }
 }
