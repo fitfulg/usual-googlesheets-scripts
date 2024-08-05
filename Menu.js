@@ -33,7 +33,7 @@ function onOpen() {
     const ui = SpreadsheetApp.getUi();
 
     // Custom menu
-    let todoSubMenu = ui.createMenu('TODO sheet')
+    ui.createMenu('TODO sheet')
         .addItem('RESTORE DEFAULT TODO TEMPLATE', 'applyFormatToAllTODO')
         .addItem('RESTORE Ceil Background Colors', 'customCeilBGColorTODO')
         .addSeparator()
@@ -50,14 +50,13 @@ function onOpen() {
         .addItem('Delete Pie Charts', 'deleteAllChartsTODO')
         .addSeparator()
         .addItem('Version and feature details', 'updateCellCommentTODO')
-
+        .addSeparator()
+        .addItem('Log Hello World', 'logHelloWorld')
+        .addToUi();
 
     ui.createMenu('Custom Formats')
         .addItem('Apply Format', 'applyFormatToSelected')
         .addItem('Apply Format to All', 'applyFormatToAll')
-        .addSeparator()
-        .addSubMenu(todoSubMenu)
-        .addItem('Log Hello World', 'logHelloWorld')
         .addToUi();
 
     ui.createMenu('Language')
