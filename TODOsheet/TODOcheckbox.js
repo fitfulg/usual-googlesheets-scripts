@@ -1,4 +1,4 @@
- 
+
 
 // globals.js: sheet
 
@@ -12,8 +12,8 @@ function addCheckboxToCellTODO(range) {
     const cellValue = range.getValue().toString();
     const richTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(cellValue).build();
 
-    // Check if checkbox is already present at the beginning
-    if (cellValue.startsWith('☑️')) {
+    // Check if any checkbox is already present at the beginning
+    if (cellValue.startsWith('☑️') || cellValue.startsWith('✅')) {
         Logger.log(`Checkbox already present at the start of cell ${range.getA1Notation()}`);
         return;
     }
