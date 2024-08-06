@@ -1415,6 +1415,8 @@ const menus = [
 
 // Contents of ./TODOsheet/TODOmenu.js
 
+// globals.js: ui
+
 /**
  * Gets the current language from document properties or returns 'English' as default.
  * @returns {string} The current language
@@ -1428,7 +1430,6 @@ const getCurrentLanguageTODO = () => PropertiesService.getDocumentProperties().g
  * @customfunction
  */
 function createMenusTODO() {
-    const ui = SpreadsheetApp.getUi();
     const currentLanguage = getCurrentLanguageTODO();
 
     const functionNameMap = {
@@ -1449,22 +1450,22 @@ function createMenusTODO() {
         'restoreSnapshot': 'restoreSnapshotTODO'
     };
 
-    menus.forEach(menuConfig => {
-        const menuTitle = menuConfig.config[0].title[currentLanguage];
-        let menu = ui.createMenu(menuTitle);
+    for (const { config, items } of menus) {
+        const menuTitle = config[0].title[currentLanguage];
+        const menu = ui.createMenu(menuTitle);
 
-        menuConfig.items.forEach(item => {
-            const itemTitle = menuConfig.config[0].items[item.key][currentLanguage];
-            let functionName = functionNameMap[item.key] || item.key;
+        for (const { key, separatorAfter } of items) {
+            const itemTitle = config[0].items[key][currentLanguage];
+            const functionName = functionNameMap[key] || key;
 
             menu.addItem(itemTitle, functionName);
-            if (item.separatorAfter) {
+            if (separatorAfter) {
                 menu.addSeparator();
             }
-        });
+        }
 
         menu.addToUi();
-    });
+    }
 }
 
 /**
@@ -1473,10 +1474,10 @@ function createMenusTODO() {
  * @customfunction
  */
 function logHelloWorld() {
-    const ui = SpreadsheetApp.getUi();
     ui.alert('Hello World!!');
     Logger.log('hello world test');
 }
+
 
 // Contents of ./TODOsheet/TODOpiechart.js
 
