@@ -29,26 +29,38 @@ let isPieChartVisible = false;
  */
 function onOpen() {
     Logger.log('onOpen triggered');
-
-    // bad practice but only way (by the moment) to not lose links from shifted up cells after reloading the page  
-    saveSnapshotTODO()
-
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
     const docProperties = PropertiesService.getDocumentProperties();
-    const lastHash = docProperties.getProperty('lastHash');
-    const currentHash = getSheetContentHash();
+    const language = docProperties.getProperty('language') || 'English';
 
-    if (shouldRunUpdates(lastHash, currentHash)) {
-        runAllFunctionsTODO();
-        restoreSnapshotTODO();
-        updateDaysLeftCounterTODO();
-        docProperties.setProperty('lastHash', currentHash);
-        Logger.log('Running all update functions');
-    } else {
-        Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
+    saveSnapshotTODO()
+    Logger.log('Current language: ' + language);
+
+    ss.toast(toastMessages.loading[language], 'Status:', 13);
+    try {
+        // Aquí se ejecuta el código de carga de datos
+        const docProperties = PropertiesService.getDocumentProperties();
+        const lastHash = docProperties.getProperty('lastHash');
+        const currentHash = getSheetContentHash();
+
+        if (shouldRunUpdates(lastHash, currentHash)) {
+            runAllFunctionsTODO();
+
+            restoreSnapshotTODO();
+            updateDaysLeftCounterTODO();
+            docProperties.setProperty('lastHash', currentHash);
+            Logger.log('Running all update functions');
+        } else {
+            Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
+        }
+
+        createMenusTODO();
+        translateSheetTODO();
+        ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
+    } catch (e) {
+        Logger.log('Error: ' + e.toString());
+        ui.alert('Error during processing: ' + e.toString());
     }
-
-    createMenusTODO();
-    translateSheetTODO();
 }
 
 /**
@@ -1410,6 +1422,19 @@ const menus = [
         suffix: ''
     }
 ];
+
+const toastMessages = {
+    loading: {
+        English: 'Data is loading...\n Please wait.',
+        Spanish: 'Cargando datos...\n Por favor espera.',
+        Catalan: "S'estan carregant les dades...\n Si us plau, espera."
+    },
+    updateComplete: {
+        English: 'Update Complete!',
+        Spanish: 'Actualización completada!',
+        Catalan: 'Actualització completada!'
+    }
+};
 
 
 

@@ -357,6 +357,19 @@ const menus = [
     }
 ];
 
+const toastMessages = {
+    loading: {
+        English: 'Data is loading...\n Please wait.',
+        Spanish: 'Cargando datos...\n Por favor espera.',
+        Catalan: "S'estan carregant les dades...\n Si us plau, espera."
+    },
+    updateComplete: {
+        English: 'Update Complete!',
+        Spanish: 'Actualización completada!',
+        Catalan: 'Actualització completada!'
+    }
+};
+
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -367,6 +380,7 @@ if (typeof module !== 'undefined' && module.exports) {
         menuLanguage,
         menuTodoSheet,
         menuCustomFormats,
-        menus
+        menus,
+        toastMessages
     }
 }
