@@ -3,7 +3,7 @@ const { updateCellCommentTODO,
     applyFormatToAllTODO,
     checkAndSetColumnTODO,
     setColumnBackground,
-    customCeilBGColorTODO,
+    customCellBGColorTODO,
     setCellContentAndStyleTODO,
     setupDropdownTODO,
     pushUpEmptyCellsTODO,
@@ -52,6 +52,11 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         };
 
         global.getDataRange = jest.fn().mockReturnValue(mockDataRange);
+
+        // Mocking the Logger object
+        global.Logger = {
+            log: jest.fn()  // Mock the log method
+        };
     });
 
     describe('Function Existence', () => {
@@ -70,8 +75,8 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         test('setColumnBackground function exists', () => {
             expect(typeof setColumnBackground).toBe('function');
         });
-        test('customCeilBGColorTODO function exists', () => {
-            expect(typeof customCeilBGColorTODO).toBe('function');
+        test('customCellBGColorTODO function exists', () => {
+            expect(typeof customCellBGColorTODO).toBe('function');
         });
         test('setCellContentAndStyleTODO function exists', () => {
             expect(typeof setCellContentAndStyleTODO).toBe('function');
