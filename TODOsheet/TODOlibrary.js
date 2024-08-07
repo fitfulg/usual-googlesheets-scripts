@@ -82,6 +82,16 @@ const cellStyles = {
             "Spanish": "PRIORIDAD ALTA",
             "Catalan": "PRIORITAT ALTA"
         },
+        limit: {
+            "English": 10,
+            "Spanish": 10,
+            "Catalan": 10
+        },
+        priority: {
+            "English": "HIGH PRIORITY",
+            "Spanish": "PRIORIDAD ALTA",
+            "Catalan": "PRIORITAT ALTA"
+        },
         fontWeight: "bold",
         fontColor: null,
         backgroundColor: "#fce5cd",
@@ -93,6 +103,16 @@ const cellStyles = {
             "Spanish": "PRIORIDAD MEDIA",
             "Catalan": "PRIORITAT MITJANA"
         },
+        limit: {
+            "English": 20,
+            "Spanish": 20,
+            "Catalan": 20
+        },
+        priority: {
+            "English": "MEDIUM PRIORITY",
+            "Spanish": "PRIORIDAD MEDIA",
+            "Catalan": "PRIORITAT MITJANA"
+        },
         fontWeight: "bold",
         fontColor: null,
         backgroundColor: "#fff2cc",
@@ -100,6 +120,16 @@ const cellStyles = {
     },
     "E1": {
         value: {
+            "English": "LOW PRIORITY",
+            "Spanish": "BAJA PRIORIDAD",
+            "Catalan": "BAIXA PRIORITAT"
+        },
+        limit: {
+            "English": 20,
+            "Spanish": 20,
+            "Catalan": 20
+        },
+        priority: {
             "English": "LOW PRIORITY",
             "Spanish": "BAJA PRIORIDAD",
             "Catalan": "BAIXA PRIORITAT"

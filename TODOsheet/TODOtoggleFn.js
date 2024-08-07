@@ -27,6 +27,7 @@ function togglePieChartTODO(action) {
  * @returns {void}
  */
 function handlePieChartToggleTODO(range) {
+    Logger.log('handlePieChartToggleTODO called');
     const action = range.getValue().toString().trim();
     Logger.log(`Action selected: ${action}`);
     if (action === 'Show Piechart' || action === 'Hide Piechart') {

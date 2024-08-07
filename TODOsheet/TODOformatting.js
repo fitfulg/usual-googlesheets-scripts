@@ -10,6 +10,7 @@
  * @customfunction
  */
 function updateCellCommentTODO() {
+    Logger.log('updateCellCommentTODO called');
     const cell = sheet.getRange("I2");
     const version = "v1.2";
     const emoji = "💡";
@@ -54,25 +55,33 @@ function updateCellCommentTODO() {
  * @param {string} exampleText - The example text to set if cells are empty.
  */
 function exampleTextTODO(column, exampleText) {
+    Logger.log(`exampleTextTODO called for column: ${column}, example text: ${exampleText}`);
     const dataRange = getDataRange();
+    const lastRow = dataRange.getLastRow();  // Get the last row with data
     let values;
 
     if (column === "B") {
         // Get values excluding B3 and B8
-        values = [
-            sheet.getRange(column + "2").getValue(),
-            ...sheet.getRange(column + "4:" + column + "7").getValues().flat(),
-            ...sheet.getRange(column + "9:" + column + dataRange.getLastRow()).getValues().flat()
-        ];
+        const firstPart = sheet.getRange(column + "2").getValues().flat();  // Get value from B2
+        const middlePart = sheet.getRange(column + "4:" + column + "7").getValues().flat();  // Get values from B4-B7
+        const lastPart = sheet.getRange(column + "9:" + column + lastRow).getValues().flat();  // Get values from B9 to the last row
+
+        values = [...firstPart, ...middlePart, ...lastPart];
     } else {
-        values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
+        values = sheet.getRange(column + "2:" + column + lastRow).getValues().flat();  // Get values from the column's 2nd row to the last row
     }
 
-    const isEmpty = values.every(value => !value.toString().trim());
+    Logger.log(`Values in column ${column}: ${values}`);
 
-    if (isEmpty) {
+    // Check if the first cell of the column is empty
+    const firstCellEmpty = values[0].toString().trim() === '';
+
+    if (firstCellEmpty) {
         const cell = sheet.getRange(column + "2");
-        cell.setValue(exampleText);
+        cell.setValue(exampleText);  // Set example text if the first cell is empty
+        Logger.log(`Example text set for column ${column} at ${column}2: ${exampleText}`);
+    } else {
+        Logger.log(`Column ${column} is not empty at ${column}2, skipping setting example text.`);
     }
 }
 
@@ -82,27 +91,45 @@ function exampleTextTODO(column, exampleText) {
  * @customfunction
  */
 function applyFormatToAllTODO() {
-    const totalRows = sheet.getMaxRows();
-    let range = sheet.getRange(1, 1, totalRows, 8);
+    Logger.log('applyFormatToAllTODO called');
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
+    const totalRows = sheet.getMaxRows();  // Get the total number of rows
+    let range = sheet.getRange(1, 1, totalRows, 8);  // Define the range covering all rows and 8 columns
     if (range) {
-        Format(range);
-        applyBorders(range);
+        Format(range);  // Apply formatting to the range
+        applyBorders(range);  // Apply borders to the range
     }
 
-    applyThickBorders(sheet.getRange(1, 3, 11, 1));
-    applyThickBorders(sheet.getRange(1, 4, 21, 1));
-    applyThickBorders(sheet.getRange(1, 5, 21, 1));
+    Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
+    applyThickBorders(sheet.getRange(1, 3, 11, 1));  // Apply thick borders to a specific range
+    applyThickBorders(sheet.getRange(1, 4, 21, 1));  // Apply thick borders to another range
+    applyThickBorders(sheet.getRange(1, 5, 21, 1));  // Apply thick borders to yet another range
 
-    setCellContentAndStyleTODO();
-    checkAndSetColumnTODO("C", 9, "HIGH PRIORITY");
-    checkAndSetColumnTODO("D", 19, "MEDIUM PRIORITY");
-    checkAndSetColumnTODO("E", 19, "LOW PRIORITY");
+    Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
+    setCellContentAndStyleTODO();  // Set cell content and styles
 
-    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
+    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
+    for (const column in cellStyles) {
+        const { limit, priority, value } = cellStyles[column];
+
+        // Validate if the limit and priority are available in the selected language
+        const translatedLimit = limit?.[language];
+        const translatedPriority = priority?.[language];
+
+        if (translatedLimit !== undefined && translatedPriority !== undefined) {
+            checkAndSetColumnTODO(column.charAt(0), translatedLimit, translatedPriority);  // Apply column-specific settings
+            Logger.log(`applyFormatToAllTODO(): translatedText set for column ${column} - limit: ${translatedLimit}, priority: ${translatedPriority}`);
+        } else {
+            Logger.log(`applyFormatToAllTODO(): limit or priority not found for column ${column} and language ${language}`);
+        }
+    }
+
+    Logger.log('applyFormatToAllTODO()/exampleTextTODO(): setting example text');
     for (const column in exampleTexts) {
         const { text } = exampleTexts[column];
-        const translatedText = text[language];
-        exampleTextTODO(column, translatedText);
+        const translatedText = text[language];  // Get the example text based on the selected language
+        exampleTextTODO(column, translatedText);  // Set example text for the column
+        Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
     }
 }
 
@@ -115,6 +142,7 @@ function applyFormatToAllTODO() {
  * @param {string} priority - The priority level.
  */
 function checkAndSetColumnTODO(column, limit, priority) {
+    Logger.log(`checkAndSetColumnTODO called for column: ${column}, limit: ${limit}, priority: ${priority}`);
     const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
@@ -142,6 +170,7 @@ function checkAndSetColumnTODO(column, limit, priority) {
  * @param {number} [startRow=2] - The starting row number.
  */
 function setColumnBackground(sheet, col, color, startRow = 2) {
+    Logger.log(`setColumnBackground called for column: ${col}, color: ${color}, startRow: ${startRow}`);
     let totalRows = sheet.getMaxRows();
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
@@ -152,7 +181,8 @@ function setColumnBackground(sheet, col, color, startRow = 2) {
  * 
  * @customfunction
  */
-function customCeilBGColorTODO() {
+function customCellBGColorTODO() {
+    Logger.log('customCellBGColorTODO called');
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
     setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
@@ -175,6 +205,7 @@ function customCeilBGColorTODO() {
  * @customfunction
  */
 function setCellContentAndStyleTODO() {
+    Logger.log('setCellContentAndStyleTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
     for (const cell in cellStyles) {
         const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
@@ -190,6 +221,7 @@ function setCellContentAndStyleTODO() {
  * @customfunction
  */
 function setupDropdownTODO() {
+    Logger.log('setupDropdownTODO called');
     // Setup dropdown in I1
     const buttonCell = sheet.getRange("I1");
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Piechart', 'Show Piechart', 'Hide Piechart'], true).build();
@@ -283,7 +315,7 @@ function pushUpEmptyCellsTODO() {
  * @param {Event} e - The edit event object.
  */
 function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e) {
-    Logger.log(`Updating cell ${columnLetter}${row}. Original value: "${originalValue}", New value: "${newValue}"`);
+    Logger.log(`updateRichTextTODO called for column: ${columnLetter}, row: ${row}, original value: "${originalValue}", new value: "${newValue}"`);
 
     let updatedText = newValue.toString().trim();
     const dateFormatted = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
@@ -294,6 +326,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     if (columnLetter !== 'H') {
         const daysLeftPattern = /\((\d+)\) days left/;
         const daysLeftMatch = updatedText.match(daysLeftPattern);
+        Logger.log(`Days left match: ${daysLeftMatch}`);
 
         if (daysLeftMatch) {
             // Convert "days left" pattern to a date
@@ -302,10 +335,13 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
             date.setDate(date.getDate() + daysLeft);
             const futureDateFormatted = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
             updatedText = updatedText.replace(daysLeftPattern, '').trim() + '\n' + futureDateFormatted;
+            Logger.log(`Updated text with future date: "${updatedText}"`);
         } else if (!datePattern.test(updatedText)) {
             updatedText = updatedText + '\n' + dateFormatted;
+            Logger.log(`No date found, updated text with new date: "${updatedText}"`);
         } else {
             updatedText = updatedText.replace(datePattern, '\n' + dateFormatted);
+            Logger.log(`Replaced date with new date: "${updatedText}"`);
         }
     }
 
@@ -317,6 +353,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
 
     // Apply style to the date or "days left"
     const lastLineIndex = updatedText.lastIndexOf('\n');
+    Logger.log(`Last line index: ${lastLineIndex}`);
     if (lastLineIndex !== -1) {
         const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
         newRichTextValueBuilder.setTextStyle(
@@ -324,15 +361,18 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
             updatedText.length,
             SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
         );
+        Logger.log(`Applied style to last line: ${lastLineIndex + 1} to ${updatedText.length}`);
     }
 
     // Preserve links from the original rich text value, but not for the last line
     const originalText = originalRichTextValue.getText();
+    Logger.log(`Preserving links from original text: ${originalText}`);
     for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {
         const url = originalRichTextValue.getLinkUrl(i, i + 1);
         if (url) {
             newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
         }
+        Logger.log(`Preserved link for index: ${i}`);
     }
 
     range.setRichTextValue(newRichTextValueBuilder.build());
@@ -350,6 +390,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
  * @param {Event} e - The edit event object.
  */
 function handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e) {
+    Logger.log(`handleColumnEditTODO called for column: ${columnLetter}, row: ${row}, original value: "${originalValue}", new value: "${newValue}"`);
     if (columnLetter === 'H') {
         let daysLeft = parseDaysLeftTODO(newValue);
         updateDaysLeftCellTODO(range, daysLeft);
@@ -367,7 +408,7 @@ if (typeof module !== 'undefined' && module.exports) {
         applyFormatToAllTODO,
         checkAndSetColumnTODO,
         setColumnBackground,
-        customCeilBGColorTODO,
+        customCellBGColorTODO,
         setCellContentAndStyleTODO,
         setupDropdownTODO,
         pushUpEmptyCellsTODO,

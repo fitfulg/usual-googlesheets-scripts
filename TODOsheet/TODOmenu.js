@@ -13,11 +13,12 @@ const getCurrentLanguageTODO = () => PropertiesService.getDocumentProperties().g
  * @customfunction
  */
 function createMenusTODO() {
+    Logger.log('createMenusTODO triggered');
     const currentLanguage = getCurrentLanguageTODO();
 
     const functionNameMap = {
         'restoreDefaultTodoTemplate': 'applyFormatToAllTODO',
-        'restoreCellBackgroundColors': 'customCeilBGColorTODO',
+        'restoreCellBackgroundColors': 'customCellBGColorTODO',
         'addCheckboxesToSelectedCells': 'addCheckboxesTODO',
         'markCheckboxInSelectedCells': 'markCheckboxTODO',
         'markAllCheckboxesInSelectedCells': 'markAllCheckboxesTODO',

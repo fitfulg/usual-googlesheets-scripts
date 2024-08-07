@@ -8,6 +8,7 @@
  * @customfunction
  */
 function onEdit(e) {
+    Logger.log('onEdit triggered');
     try {
         if (!e || !e.range) {
             Logger.log('Edit event is undefined or does not have range property');
@@ -31,21 +32,22 @@ function onEdit(e) {
         const originalValue = e.oldValue || '';
         const newValue = range.getValue().toString();
 
-        Logger.log(`Original value: "${originalValue}", New value: "${newValue}"`);
+        Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
 
         // Shift cells up if the edited cell is now empty
         if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
-            Logger.log(`Shifting cells up for column ${column}`);
+            Logger.log(`onEdit(): Shifting cells up for column ${column}`);
             shiftCellsUpTODO(column, 2, totalRows);
             return;
         }
 
         // Handle edits in different columns
         if (row >= 2 && column >= 3 && column <= 8) {
+            Logger.log(`onEdit()/handleColumnEditTODO(): Handling column edit for column ${column}`);
             handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
             // Only add a checkbox if the newValue is non-empty and doesn't already contain a checkbox
             if (newValue && !newValue.includes('☑️')) {
-                Logger.log(`Adding default checkbox to cell ${columnLetter}${row}`);
+                Logger.log(`onEdit(): Adding default checkbox to cell ${columnLetter}${row}`);
                 addCheckboxToCellTODO(range);
             }
         }
