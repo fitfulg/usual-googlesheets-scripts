@@ -5,7 +5,7 @@
  * @customfunction
  */
 function createPieChartTODO() {
-    Logger.log('createPieChartTODO triggered');
+    Logger.log('Creating piechart');
     const dataRange = getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
@@ -40,7 +40,7 @@ function createPieChartTODO() {
  * @customfunction
  */
 function deleteAllChartsTODO() {
-    Logger.log('deleteAllChartsTODO triggered');
+    Logger.log('Deleting all charts');
     const charts = sheet.getCharts();
 
     charts.forEach(chart => {

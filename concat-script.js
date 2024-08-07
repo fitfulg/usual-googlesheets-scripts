@@ -38,6 +38,7 @@ function onOpen() {
 
     ss.toast(toastMessages.loading[language], 'Status:', 13);
     try {
+        // Aquí se ejecuta el código de carga de datos
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
@@ -69,8 +70,7 @@ function onOpen() {
  * @customfunction
  */
 function runAllFunctionsTODO() {
-    Logger.log('runAllFunctionsTODO triggered');
-    customCellBGColorTODO();
+    customCeilBGColorTODO();
     applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
@@ -84,7 +84,7 @@ function runAllFunctionsTODO() {
 
 // Contents of ./shared/formatting.js
 
-
+ 
 // globals.js: sheet, getDataRange
 
 /**
@@ -101,7 +101,6 @@ const withValidRange = (fn) => (range, ...args) => range && fn(range, ...args);
  * @param {Range} range - The range to format.
  */
 const Format = withValidRange((range) => {
-    Logger.log('Format triggered');
     range.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
     range.setHorizontalAlignment("center");
     range.setVerticalAlignment("middle");
@@ -135,7 +134,6 @@ const applyThickBorders = range => applyBordersWithStyle(range, SpreadsheetApp.B
  * @customfunction
  */
 function applyFormatToSelected() {
-    Logger.log('applyFormatToSelected triggered');
     let range = sheet.getActiveRange();
     Format(range);
     applyBorders(range);
@@ -147,7 +145,6 @@ function applyFormatToSelected() {
  * @customfunction
  */
 function applyFormatToAll() {
-    Logger.log('applyFormatToAll triggered');
     let range = getDataRange();
     Format(range);
     applyBorders(range);
@@ -164,14 +161,12 @@ function applyFormatToAll() {
  * @param {string} alignment - The alignment to set.
  */
 function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, alignment) {
-    Logger.log('setCellStyle triggered');
     let range = sheet.getRange(cell);
-    Logger.log('setCellStyle: setting value');
     range.setValue(value)
         .setFontWeight(fontWeight)
         .setFontColor(fontColor)
         .setHorizontalAlignment(alignment);
-    Logger.log('setCellStyle: setting background color');
+
     if (backgroundColor) {
         range.setBackground(backgroundColor);
     }
@@ -187,9 +182,7 @@ function setCellStyle(cell, value, fontWeight, fontColor, backgroundColor, align
  * @return {RichTextValue} The new rich text value.
  */
 function appendDateWithStyle(cellValue, dateFormatted, column, config) {
-    Logger.log('appendDateWithStyle triggered');
     const newText = cellValue.endsWith('\n' + dateFormatted) ? cellValue : cellValue.trim() + '\n' + dateFormatted;
-    Logger.log('returning createRichTextValue');
     return createRichTextValue(newText, dateFormatted, column, config);
 }
 
@@ -204,7 +197,6 @@ function appendDateWithStyle(cellValue, dateFormatted, column, config) {
  */
 function updateDateWithStyle(cellValue, dateFormatted, column, config) {
     const newText = cellValue.replace(datePattern, '\n' + dateFormatted).trim();
-    Logger.log('returning createRichTextValue');
     return createRichTextValue(newText, dateFormatted, column, config);
 }
 
@@ -218,10 +210,9 @@ function updateDateWithStyle(cellValue, dateFormatted, column, config) {
  * @return {RichTextValue} The new rich text value.
  */
 function createRichTextValue(text, dateFormatted, column, config) {
-    Logger.log('createRichTextValue triggered');
     const columnConfig = config[column];
     const color = columnConfig.defaultColor || '#A9A9A9'; // Default color (dark gray)
-    Logger.log('returning SpreadsheetApp.newRichTextValue');
+
     return SpreadsheetApp.newRichTextValue()
         .setText(text)
         .setTextStyle(text.length - dateFormatted.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())
@@ -234,12 +225,11 @@ function createRichTextValue(text, dateFormatted, column, config) {
  * @param {Range} range - The range to reset.
  */
 function resetTextStyle(range) {
-    Logger.log('resetTextStyle triggered');
     const richTextValue = SpreadsheetApp.newRichTextValue()
         .setText(range.getValue())
         .setTextStyle(SpreadsheetApp.newTextStyle().build())
         .build();
-    Logger.log('resetTextStyle: setting rich text value');
+
     range.setRichTextValue(richTextValue);
 }
 
@@ -249,7 +239,6 @@ function resetTextStyle(range) {
  * @param {Range} range - The range to clear.
  */
 function clearTextFormatting(range) {
-    Logger.log('clearTextFormatting triggered');
     const values = range.getValues();
     const richTextValues = values.map(row => row.map(value =>
         SpreadsheetApp.newRichTextValue()
@@ -257,7 +246,6 @@ function clearTextFormatting(range) {
             .setTextStyle(SpreadsheetApp.newTextStyle().build())
             .build()
     ));
-    Logger.log('clearTextFormatting: setting rich text values');
     range.setRichTextValues(richTextValues);
 }
 
@@ -274,7 +262,6 @@ function clearTextFormatting(range) {
  * @return {string[]} The extracted URLs.
  */
 function extractUrls(richTextValue) {
-    Logger.log('extractUrls triggered');
     const urls = [];
     const text = richTextValue.getText();
     for (let i = 0; i < text.length; i++) {
@@ -283,7 +270,6 @@ function extractUrls(richTextValue) {
             urls.push(url);
         }
     }
-    Logger.log('returning urls');
     return urls;
 }
 
@@ -295,7 +281,6 @@ function extractUrls(richTextValue) {
  * @return {boolean} True if the arrays are equal, false otherwise.
  */
 function arraysEqual(arr1, arr2) {
-    Logger.log('arraysEqual triggered');
     if (arr1.length !== arr2.length) return false;
     for (let i = 0; i < arr1.length; i++) {
         if (arr1[i] !== arr2[i]) return false;
@@ -310,7 +295,6 @@ function arraysEqual(arr1, arr2) {
  * @return {string} The generated hash in base64 encoding.
  */
 function generateHash(content) {
-    Logger.log('generateHash triggered');
     return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, content));
 }
 
@@ -322,7 +306,6 @@ function generateHash(content) {
  * @return {boolean} True if the hash has changed, false otherwise.
  */
 function shouldRunUpdates(lastHash, currentHash) {
-    Logger.log('shouldRunUpdates triggered');
     return lastHash !== currentHash;
 }
 
@@ -332,10 +315,8 @@ function shouldRunUpdates(lastHash, currentHash) {
  * @return {string} The generated hash of the sheet content.
  */
 function getSheetContentHash() {
-    Logger.log('getSheetContentHash triggered');
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
-    Logger.log('getSheetContentHash: returning generateHash');
     return generateHash(values);
 }
 
@@ -348,7 +329,6 @@ function getSheetContentHash() {
  * @return {object} The snapshot object.
  */
 function saveSnapshot(cellsToIgnore = []) {
-    Logger.log('saveSnapshot triggered');
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     const richTextValues = range.getRichTextValues();
@@ -363,13 +343,12 @@ function saveSnapshot(cellsToIgnore = []) {
             }
 
             const cellValue = richTextValues[row][col];
-
             if (cellValue) {
                 snapshot[cellKey] = {
                     text: cellValue.getText(),
                     links: []
                 };
-                Logger.log(`Snapshot saved for cell ${cellKey}.`);
+
                 for (let i = 0; i < cellValue.getText().length; i++) {
                     const url = cellValue.getLinkUrl(i, i + 1);
                     if (url) {
@@ -396,7 +375,6 @@ function saveSnapshot(cellsToIgnore = []) {
  * @return {void}
  */
 function restoreSnapshot(formatCallback) {
-    Logger.log('restoreSnapshot triggered');
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     const properties = PropertiesService.getScriptProperties();
@@ -417,19 +395,17 @@ function restoreSnapshot(formatCallback) {
                 const cellData = snapshot[cellKey];
                 const builder = SpreadsheetApp.newRichTextValue()
                     .setText(cellData.text);
-                Logger.log(`Restoring snapshot for cell ${cellKey}.`);
+
                 // Restore links
                 for (const link of cellData.links) {
-                    Logger.log(`Restoring link: ${link.url} at ${link.start}-${link.end}.`);
                     builder.setLinkUrl(link.start, link.end, link.url);
                 }
-                Logger.log(`Restored links: ${cellData.links.length}.`);
+
                 // Apply custom formatting if a callback is provided
                 if (formatCallback) {
-                    Logger.log(`restoreSnapshot()/formatCallback(): Applying custom formatting for cell ${cellKey}.`);
                     formatCallback(builder, cellData.text);
                 }
-                Logger.log(`Applying custom formatting for cell ${cellKey}.`);
+
                 richTextValues[row][col] = builder.build();
             }
         }
@@ -621,7 +597,6 @@ function markAllCheckboxesTODO() {
  * @returns {void}
  */
 function restoreCheckboxesTODO() {
-    Logger.log("restoreCheckboxesTODO triggered");
     try {
         const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
         const range = sheet.getActiveRange();
@@ -683,7 +658,6 @@ function restoreCheckboxesTODO() {
  * @returns {void}
  */
 function removeCheckboxesTODO() {
-    Logger.log("removeCheckboxesTODO triggered");
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getActiveRange();
     const richTextValues = range.getRichTextValues();
@@ -700,23 +674,18 @@ function removeCheckboxesTODO() {
             const builder = SpreadsheetApp.newRichTextValue().setText(newText);
 
             // Apply existing text styles
-            Logger.log('removeCheckboxesTODO(): Applying existing text styles to the cell.');
             for (let i = 0; i < newText.length; i++) {
                 const textStyle = cell.getTextStyle(i, i + 1);
                 builder.setTextStyle(i, i + 1, textStyle);
-                Logger.log(`Applied text style from position ${i} to ${i + 1}.`);
             }
 
             // Restore existing links
-            Logger.log('removeCheckboxesTODO(): Restoring existing links to the cell.');
             for (let i = 0; i < newText.length; i++) {
                 const originalIndex = cellText.indexOf(newText[i]);
                 if (originalIndex !== -1) {
                     const url = cell.getLinkUrl(originalIndex, originalIndex + 1);
                     if (url) {
-                        Logger.log(`Url found at position ${i}: ${url}`);
                         builder.setLinkUrl(i, i + 1, url);
-                        Logger.log(`Restored ${url} at position ${i}.`);
                     }
                 }
             }
@@ -742,7 +711,6 @@ function removeCheckboxesTODO() {
  * @customfunction
  */
 function updateCellCommentTODO() {
-    Logger.log('updateCellCommentTODO called');
     const cell = sheet.getRange("I2");
     const version = "v1.2";
     const emoji = "💡";
@@ -787,33 +755,25 @@ function updateCellCommentTODO() {
  * @param {string} exampleText - The example text to set if cells are empty.
  */
 function exampleTextTODO(column, exampleText) {
-    Logger.log(`exampleTextTODO called for column: ${column}, example text: ${exampleText}`);
     const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();  // Get the last row with data
     let values;
 
     if (column === "B") {
         // Get values excluding B3 and B8
-        const firstPart = sheet.getRange(column + "2").getValues().flat();  // Get value from B2
-        const middlePart = sheet.getRange(column + "4:" + column + "7").getValues().flat();  // Get values from B4-B7
-        const lastPart = sheet.getRange(column + "9:" + column + lastRow).getValues().flat();  // Get values from B9 to the last row
-
-        values = [...firstPart, ...middlePart, ...lastPart];
+        values = [
+            sheet.getRange(column + "2").getValue(),
+            ...sheet.getRange(column + "4:" + column + "7").getValues().flat(),
+            ...sheet.getRange(column + "9:" + column + dataRange.getLastRow()).getValues().flat()
+        ];
     } else {
-        values = sheet.getRange(column + "2:" + column + lastRow).getValues().flat();  // Get values from the column's 2nd row to the last row
+        values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     }
 
-    Logger.log(`Values in column ${column}: ${values}`);
+    const isEmpty = values.every(value => !value.toString().trim());
 
-    // Check if the first cell of the column is empty
-    const firstCellEmpty = values[0].toString().trim() === '';
-
-    if (firstCellEmpty) {
+    if (isEmpty) {
         const cell = sheet.getRange(column + "2");
-        cell.setValue(exampleText);  // Set example text if the first cell is empty
-        Logger.log(`Example text set for column ${column} at ${column}2: ${exampleText}`);
-    } else {
-        Logger.log(`Column ${column} is not empty at ${column}2, skipping setting example text.`);
+        cell.setValue(exampleText);
     }
 }
 
@@ -823,45 +783,27 @@ function exampleTextTODO(column, exampleText) {
  * @customfunction
  */
 function applyFormatToAllTODO() {
-    Logger.log('applyFormatToAllTODO called');
-    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-    const totalRows = sheet.getMaxRows();  // Get the total number of rows
-    let range = sheet.getRange(1, 1, totalRows, 8);  // Define the range covering all rows and 8 columns
+    const totalRows = sheet.getMaxRows();
+    let range = sheet.getRange(1, 1, totalRows, 8);
     if (range) {
-        Format(range);  // Apply formatting to the range
-        applyBorders(range);  // Apply borders to the range
+        Format(range);
+        applyBorders(range);
     }
 
-    Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
-    applyThickBorders(sheet.getRange(1, 3, 11, 1));  // Apply thick borders to a specific range
-    applyThickBorders(sheet.getRange(1, 4, 21, 1));  // Apply thick borders to another range
-    applyThickBorders(sheet.getRange(1, 5, 21, 1));  // Apply thick borders to yet another range
+    applyThickBorders(sheet.getRange(1, 3, 11, 1));
+    applyThickBorders(sheet.getRange(1, 4, 21, 1));
+    applyThickBorders(sheet.getRange(1, 5, 21, 1));
 
-    Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
-    setCellContentAndStyleTODO();  // Set cell content and styles
+    setCellContentAndStyleTODO();
+    checkAndSetColumnTODO("C", 9, "HIGH PRIORITY");
+    checkAndSetColumnTODO("D", 19, "MEDIUM PRIORITY");
+    checkAndSetColumnTODO("E", 19, "LOW PRIORITY");
 
-    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
-    for (const column in cellStyles) {
-        const { limit, priority, value } = cellStyles[column];
-
-        // Validate if the limit and priority are available in the selected language
-        const translatedLimit = limit?.[language];
-        const translatedPriority = priority?.[language];
-
-        if (translatedLimit !== undefined && translatedPriority !== undefined) {
-            checkAndSetColumnTODO(column.charAt(0), translatedLimit, translatedPriority);  // Apply column-specific settings
-            Logger.log(`applyFormatToAllTODO(): translatedText set for column ${column} - limit: ${translatedLimit}, priority: ${translatedPriority}`);
-        } else {
-            Logger.log(`applyFormatToAllTODO(): limit or priority not found for column ${column} and language ${language}`);
-        }
-    }
-
-    Logger.log('applyFormatToAllTODO()/exampleTextTODO(): setting example text');
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
     for (const column in exampleTexts) {
         const { text } = exampleTexts[column];
-        const translatedText = text[language];  // Get the example text based on the selected language
-        exampleTextTODO(column, translatedText);  // Set example text for the column
-        Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
+        const translatedText = text[language];
+        exampleTextTODO(column, translatedText);
     }
 }
 
@@ -874,7 +816,6 @@ function applyFormatToAllTODO() {
  * @param {string} priority - The priority level.
  */
 function checkAndSetColumnTODO(column, limit, priority) {
-    Logger.log(`checkAndSetColumnTODO called for column: ${column}, limit: ${limit}, priority: ${priority}`);
     const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
@@ -902,7 +843,6 @@ function checkAndSetColumnTODO(column, limit, priority) {
  * @param {number} [startRow=2] - The starting row number.
  */
 function setColumnBackground(sheet, col, color, startRow = 2) {
-    Logger.log(`setColumnBackground called for column: ${col}, color: ${color}, startRow: ${startRow}`);
     let totalRows = sheet.getMaxRows();
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
@@ -913,8 +853,7 @@ function setColumnBackground(sheet, col, color, startRow = 2) {
  * 
  * @customfunction
  */
-function customCellBGColorTODO() {
-    Logger.log('customCellBGColorTODO called');
+function customCeilBGColorTODO() {
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
     setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
@@ -937,7 +876,6 @@ function customCellBGColorTODO() {
  * @customfunction
  */
 function setCellContentAndStyleTODO() {
-    Logger.log('setCellContentAndStyleTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
     for (const cell in cellStyles) {
         const { value, fontWeight, fontColor, backgroundColor, alignment } = cellStyles[cell];
@@ -953,7 +891,6 @@ function setCellContentAndStyleTODO() {
  * @customfunction
  */
 function setupDropdownTODO() {
-    Logger.log('setupDropdownTODO called');
     // Setup dropdown in I1
     const buttonCell = sheet.getRange("I1");
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(['Piechart', 'Show Piechart', 'Hide Piechart'], true).build();
@@ -1047,7 +984,7 @@ function pushUpEmptyCellsTODO() {
  * @param {Event} e - The edit event object.
  */
 function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e) {
-    Logger.log(`updateRichTextTODO called for column: ${columnLetter}, row: ${row}, original value: "${originalValue}", new value: "${newValue}"`);
+    Logger.log(`Updating cell ${columnLetter}${row}. Original value: "${originalValue}", New value: "${newValue}"`);
 
     let updatedText = newValue.toString().trim();
     const dateFormatted = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
@@ -1058,7 +995,6 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     if (columnLetter !== 'H') {
         const daysLeftPattern = /\((\d+)\) days left/;
         const daysLeftMatch = updatedText.match(daysLeftPattern);
-        Logger.log(`Days left match: ${daysLeftMatch}`);
 
         if (daysLeftMatch) {
             // Convert "days left" pattern to a date
@@ -1067,13 +1003,10 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
             date.setDate(date.getDate() + daysLeft);
             const futureDateFormatted = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
             updatedText = updatedText.replace(daysLeftPattern, '').trim() + '\n' + futureDateFormatted;
-            Logger.log(`Updated text with future date: "${updatedText}"`);
         } else if (!datePattern.test(updatedText)) {
             updatedText = updatedText + '\n' + dateFormatted;
-            Logger.log(`No date found, updated text with new date: "${updatedText}"`);
         } else {
             updatedText = updatedText.replace(datePattern, '\n' + dateFormatted);
-            Logger.log(`Replaced date with new date: "${updatedText}"`);
         }
     }
 
@@ -1085,7 +1018,6 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
 
     // Apply style to the date or "days left"
     const lastLineIndex = updatedText.lastIndexOf('\n');
-    Logger.log(`Last line index: ${lastLineIndex}`);
     if (lastLineIndex !== -1) {
         const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
         newRichTextValueBuilder.setTextStyle(
@@ -1093,18 +1025,15 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
             updatedText.length,
             SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
         );
-        Logger.log(`Applied style to last line: ${lastLineIndex + 1} to ${updatedText.length}`);
     }
 
     // Preserve links from the original rich text value, but not for the last line
     const originalText = originalRichTextValue.getText();
-    Logger.log(`Preserving links from original text: ${originalText}`);
     for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {
         const url = originalRichTextValue.getLinkUrl(i, i + 1);
         if (url) {
             newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
         }
-        Logger.log(`Preserved link for index: ${i}`);
     }
 
     range.setRichTextValue(newRichTextValueBuilder.build());
@@ -1122,7 +1051,6 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
  * @param {Event} e - The edit event object.
  */
 function handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e) {
-    Logger.log(`handleColumnEditTODO called for column: ${columnLetter}, row: ${row}, original value: "${originalValue}", new value: "${newValue}"`);
     if (columnLetter === 'H') {
         let daysLeft = parseDaysLeftTODO(newValue);
         updateDaysLeftCellTODO(range, daysLeft);
@@ -1220,16 +1148,6 @@ const cellStyles = {
             "Spanish": "PRIORIDAD ALTA",
             "Catalan": "PRIORITAT ALTA"
         },
-        limit: {
-            "English": 10,
-            "Spanish": 10,
-            "Catalan": 10
-        },
-        priority: {
-            "English": "HIGH PRIORITY",
-            "Spanish": "PRIORIDAD ALTA",
-            "Catalan": "PRIORITAT ALTA"
-        },
         fontWeight: "bold",
         fontColor: null,
         backgroundColor: "#fce5cd",
@@ -1241,16 +1159,6 @@ const cellStyles = {
             "Spanish": "PRIORIDAD MEDIA",
             "Catalan": "PRIORITAT MITJANA"
         },
-        limit: {
-            "English": 20,
-            "Spanish": 20,
-            "Catalan": 20
-        },
-        priority: {
-            "English": "MEDIUM PRIORITY",
-            "Spanish": "PRIORIDAD MEDIA",
-            "Catalan": "PRIORITAT MITJANA"
-        },
         fontWeight: "bold",
         fontColor: null,
         backgroundColor: "#fff2cc",
@@ -1258,16 +1166,6 @@ const cellStyles = {
     },
     "E1": {
         value: {
-            "English": "LOW PRIORITY",
-            "Spanish": "BAJA PRIORIDAD",
-            "Catalan": "BAIXA PRIORITAT"
-        },
-        limit: {
-            "English": 20,
-            "Spanish": 20,
-            "Catalan": 20
-        },
-        priority: {
             "English": "LOW PRIORITY",
             "Spanish": "BAJA PRIORIDAD",
             "Catalan": "BAIXA PRIORITAT"
@@ -1557,12 +1455,11 @@ const getCurrentLanguageTODO = () => PropertiesService.getDocumentProperties().g
  * @customfunction
  */
 function createMenusTODO() {
-    Logger.log('createMenusTODO triggered');
     const currentLanguage = getCurrentLanguageTODO();
 
     const functionNameMap = {
         'restoreDefaultTodoTemplate': 'applyFormatToAllTODO',
-        'restoreCellBackgroundColors': 'customCellBGColorTODO',
+        'restoreCellBackgroundColors': 'customCeilBGColorTODO',
         'addCheckboxesToSelectedCells': 'addCheckboxesTODO',
         'markCheckboxInSelectedCells': 'markCheckboxTODO',
         'markAllCheckboxesInSelectedCells': 'markAllCheckboxesTODO',
@@ -1616,7 +1513,7 @@ function logHelloWorld() {
  * @customfunction
  */
 function createPieChartTODO() {
-    Logger.log('createPieChartTODO triggered');
+    Logger.log('Creating piechart');
     const dataRange = getDataRange();
     const valuesC = sheet.getRange("C2:C" + dataRange.getLastRow()).getValues().flat();
     const valuesD = sheet.getRange("D2:D" + dataRange.getLastRow()).getValues().flat();
@@ -1651,7 +1548,7 @@ function createPieChartTODO() {
  * @customfunction
  */
 function deleteAllChartsTODO() {
-    Logger.log('deleteAllChartsTODO triggered');
+    Logger.log('Deleting all charts');
     const charts = sheet.getCharts();
 
     charts.forEach(chart => {
@@ -1675,9 +1572,7 @@ function deleteAllChartsTODO() {
  * @return {void}
  */
 function saveSnapshotTODO() {
-    Logger.log('saveSnapshotTODO triggered');
     const cellsToIgnore = ["R1C1", "R1C2", "R1C3", "R1C4", "R1C5", "R1C6", "R1C7", "R1C8"]
-    Logger.log(`Ignoring cells ${cellsToIgnore.join(', ')} from snapshot.`);
     const snapshot = saveSnapshot(cellsToIgnore);
 
     // Save filtered snapshot to script properties
@@ -1692,7 +1587,6 @@ function saveSnapshotTODO() {
  * @return {void}
  */
 function restoreSnapshotTODO() {
-    Logger.log('restoreSnapshotTODO triggered');
     restoreSnapshot((builder, text) => {
         // Reapply formatting for dates and "days left"
         const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
@@ -1700,21 +1594,17 @@ function restoreSnapshotTODO() {
         const daysLeftMatch = text.match(daysLeftPattern);
 
         if (dateMatches) {
-            Logger.log('restoreSnapshotTODO)(): dateMatches :', dateMatches);
             for (const date of dateMatches) {
                 const start = text.lastIndexOf(date);
                 const end = start + date.length;
                 builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-                Logger.log('restoreSnapshotTODO() date to be formatted :', date);
             }
         }
 
         if (daysLeftMatch) {
-            Logger.log('restoreSnapshotTODO() daysLeftMatch :', daysLeftMatch);
             const start = text.lastIndexOf(daysLeftMatch[0]);
             const end = start + daysLeftMatch[0].length;
             builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
-            Logger.log('restoreSnapshotTODO() days left to be formatted :', daysLeftMatch[0]);
         }
     });
 }
@@ -1732,7 +1622,6 @@ function restoreSnapshotTODO() {
  * @customfunction
  */
 function updateDateColorsTODO() {
-    Logger.log('updateDateColorsTODO called');
     const columns = ['C', 'D', 'E', 'F', 'G'];
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
@@ -1742,7 +1631,6 @@ function updateDateColorsTODO() {
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
-            Logger.log(`updateDateColorsTODO(): Checking if cell ${cellValue} contains a date that matches the pattern ${datePattern}`);
             if (datePattern.test(cellValue)) {
                 const dateText = cellValue.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
@@ -1764,7 +1652,6 @@ function updateDateColorsTODO() {
                 cell.setRichTextValue(richTextValue);
             }
         }
-        Logger.log(`updateDateColorsTODO(): Updated date colors for column ${column}`);
     }
 }
 
@@ -1776,7 +1663,6 @@ function updateDateColorsTODO() {
  * @return {void}
  */
 function updateDaysLeftCounterTODO() {
-    Logger.log("updateDaysLeftCounterTODO called");
     const properties = PropertiesService.getDocumentProperties();
     const lastUpdateDate = properties.getProperty('lastUpdateDate');
     const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
@@ -1828,7 +1714,6 @@ function updateDaysLeftCounterTODO() {
  * @param {number} daysLeft - The number of days left to display.
  */
 function updateDaysLeftCellTODO(range, daysLeft) {
-    Logger.log(`updateDaysLeftCellTODO called`);
     let originalText = range.getValue().toString().split('\n')[0];
     let daysLeftText = `(${daysLeft}) days left`;
     let newText = originalText + '\n' + daysLeftText;
@@ -1837,7 +1722,6 @@ function updateDaysLeftCellTODO(range, daysLeft) {
 
     // Get the original rich text value to preserve links
     const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalText).build();
-    Logger.log(`updateDaysLeftCellTODO(): getting original rich text value: ${originalRichTextValue.getText()}`);
 
     // Create new rich text value with updated text and styling
     let newRichTextValue = SpreadsheetApp.newRichTextValue()
@@ -1845,27 +1729,21 @@ function updateDaysLeftCellTODO(range, daysLeft) {
         .setTextStyle(0, originalText.length, SpreadsheetApp.newTextStyle().build())
         .setTextStyle(originalText.length + 1, newText.length,
             SpreadsheetApp.newTextStyle().setForegroundColor('#FF0000').setItalic(true).build());
-    Logger.log(`updateDaysLeftCellTODO(): created new rich text value: ${newRichTextValue.getText()}`);
 
     // Preserve links from the original rich text value
     const originalTextLength = originalRichTextValue.getText().length;
-    Logger.log(`updateDaysLeftCellTODO(): original text length: ${originalTextLength}`);
     for (let i = 0; i < Math.min(newText.length, originalTextLength); i++) {
         const url = originalRichTextValue.getLinkUrl(i, i + 1);
         if (url) {
             newRichTextValue.setLinkUrl(i, i + 1, url);
-            Logger.log(`updateDaysLeftCellTODO(): set link for character ${i}: ${url}`);
         }
     }
 
-
     // Set the new rich text value to the cell
     range.setRichTextValue(newRichTextValue.build());
-    Logger.log(`updateDaysLeftCellTODO(): updated cell with value: ${newRichTextValue.getText()}`);
 
     // Set a custom property to store the initial date
     PropertiesService.getDocumentProperties().setProperty(range.getA1Notation(), now.toISOString());
-    Logger.log(`updateDaysLeftCellTODO(): set custom property for cell ${range.getA1Notation()}: ${now.toISOString()}`);
 
     Logger.log(`Updated days left for cell ${range.getA1Notation()}: ${newText}`);
 }
@@ -1877,18 +1755,13 @@ function updateDaysLeftCellTODO(range, daysLeft) {
  * @returns {number} The number of days left, or 60 if not parseable.
  */
 function parseDaysLeftTODO(value) {
-    Logger.log(`parseDaysLeftTODO called with value: ${value}`);
-    const daysLeftMatch = value.match(/\((\d+)\) days left/); // regex to match the days left pattern
+    const daysLeftMatch = value.match(/\((\d+)\) days left/);
     if (daysLeftMatch) {
-        Logger.log(`parseDaysLeftTODO(): parsed days left: ${daysLeftMatch[1]}`);
         return parseInt(daysLeftMatch[1]);
-    } else if (/^\d+$/.test(value.trim())) { // regex to check if the value is a number
-        Logger.log(`parseDaysLeftTODO(): parsed days left: ${value.trim()}`);
+    } else if (/^\d+$/.test(value.trim())) {
         return parseInt(value.trim());
     }
-    const defaultDays = 60;
-    Logger.log(`parseDaysLeftTODO(): default days left: ${defaultDays}`);
-    return defaultDays;
+    return 60; // Default value: 60 days
 }
 
 /**
@@ -1897,10 +1770,11 @@ function parseDaysLeftTODO(value) {
  * @customfunction
  */
 function removeMultipleDatesTODO() {
-    Logger.log('removeMultipleDatesTODO called');
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
     const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
+    Logger.log('Init removeMultipleDatesTODO');
 
     for (const column of columns) {
         for (let row = 2; row <= lastRow; row++) {
@@ -1909,14 +1783,14 @@ function removeMultipleDatesTODO() {
             const richTextValue = cell.getRichTextValue();
             const text = richTextValue ? richTextValue.getText() : cellValue;
 
-            Logger.log(`removeMultipleDatesTODO(): Checking cell ${column}${row}: ${text}`);
+            Logger.log(`Checking cell ${column}${row}: ${text}`);
 
             const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
             if (dateMatches && dateMatches.length > 1) {
-                Logger.log(`removeMultipleDatesTODO(): Found dates in ${column}${row}: ${dateMatches.join(', ')}`);
+                Logger.log(`Found dates in ${column}${row}: ${dateMatches.join(', ')}`);
 
                 const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
-                Logger.log(`removeMultipleDatesTODO(): Today is: ${today}`);
+                Logger.log(`Today is: ${today}`);
 
                 // filter and keep only the last occurrence of today's date
                 const datesToKeep = [today];
@@ -1925,7 +1799,6 @@ function removeMultipleDatesTODO() {
                         datesToKeep.push(date);
                     }
                 }
-                Logger.log(`removeMultipleDatesTODO(): Dates to keep: ${datesToKeep.join(', ')}`);
 
                 // create updated text with only the last occurrence of today's date
                 let updatedText = text;
@@ -1935,10 +1808,9 @@ function removeMultipleDatesTODO() {
                         updatedText = updatedText.substring(0, lastOccurrence) + updatedText.substring(lastOccurrence).replace(new RegExp(date, 'g'), '');
                     }
                 }
-                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
 
                 updatedText = updatedText.replace(new RegExp(`\\b(${dateMatches.join('|')})\\b`, 'g'), '').trim() + `\n${today}`;
-                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
+                Logger.log(`Updated text for ${column}${row}: ${updatedText}`);
 
                 // build new rich text value with updated text
                 let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
@@ -1956,7 +1828,6 @@ function removeMultipleDatesTODO() {
                     }
                     currentPos += part.length + 1; // +1 for the newline character
                 }
-                Logger.log(`removeMultipleDatesTODO(): Updated rich text value for ${column}${row}: ${builder.build().getText()}`);
 
                 const richTextResult = builder.build();
                 cell.setRichTextValue(richTextResult);
@@ -2000,7 +1871,6 @@ function togglePieChartTODO(action) {
  * @returns {void}
  */
 function handlePieChartToggleTODO(range) {
-    Logger.log('handlePieChartToggleTODO called');
     const action = range.getValue().toString().trim();
     Logger.log(`Action selected: ${action}`);
     if (action === 'Show Piechart' || action === 'Hide Piechart') {
@@ -2023,7 +1893,6 @@ const setLanguageSpanish = () => setLanguage('Spanish');
 const setLanguageCatalan = () => setLanguage('Catalan');
 
 function setLanguage(language) {
-    Logger.log('setLanguage called with language: ' + language);
     if (languages[language]) {
         PropertiesService.getDocumentProperties().setProperty('language', language);
         translateSheetTODO();
@@ -2045,7 +1914,6 @@ function setLanguage(language) {
  * @customfunction
  */
 function translateSheetTODO() {
-    Logger.log('translateSheetTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
 
     // Update with the corresponding styles
@@ -2095,7 +1963,6 @@ function translateSheetTODO() {
  * @customfunction
  */
 function onEdit(e) {
-    Logger.log('onEdit triggered');
     try {
         if (!e || !e.range) {
             Logger.log('Edit event is undefined or does not have range property');
@@ -2119,22 +1986,21 @@ function onEdit(e) {
         const originalValue = e.oldValue || '';
         const newValue = range.getValue().toString();
 
-        Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
+        Logger.log(`Original value: "${originalValue}", New value: "${newValue}"`);
 
         // Shift cells up if the edited cell is now empty
         if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
-            Logger.log(`onEdit(): Shifting cells up for column ${column}`);
+            Logger.log(`Shifting cells up for column ${column}`);
             shiftCellsUpTODO(column, 2, totalRows);
             return;
         }
 
         // Handle edits in different columns
         if (row >= 2 && column >= 3 && column <= 8) {
-            Logger.log(`onEdit()/handleColumnEditTODO(): Handling column edit for column ${column}`);
             handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
             // Only add a checkbox if the newValue is non-empty and doesn't already contain a checkbox
             if (newValue && !newValue.includes('☑️')) {
-                Logger.log(`onEdit(): Adding default checkbox to cell ${columnLetter}${row}`);
+                Logger.log(`Adding default checkbox to cell ${columnLetter}${row}`);
                 addCheckboxToCellTODO(range);
             }
         }

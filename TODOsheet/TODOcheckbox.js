@@ -177,7 +177,6 @@ function markAllCheckboxesTODO() {
  * @returns {void}
  */
 function restoreCheckboxesTODO() {
-    Logger.log("restoreCheckboxesTODO triggered");
     try {
         const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
         const range = sheet.getActiveRange();
@@ -239,7 +238,6 @@ function restoreCheckboxesTODO() {
  * @returns {void}
  */
 function removeCheckboxesTODO() {
-    Logger.log("removeCheckboxesTODO triggered");
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getActiveRange();
     const richTextValues = range.getRichTextValues();
@@ -256,23 +254,18 @@ function removeCheckboxesTODO() {
             const builder = SpreadsheetApp.newRichTextValue().setText(newText);
 
             // Apply existing text styles
-            Logger.log('removeCheckboxesTODO(): Applying existing text styles to the cell.');
             for (let i = 0; i < newText.length; i++) {
                 const textStyle = cell.getTextStyle(i, i + 1);
                 builder.setTextStyle(i, i + 1, textStyle);
-                Logger.log(`Applied text style from position ${i} to ${i + 1}.`);
             }
 
             // Restore existing links
-            Logger.log('removeCheckboxesTODO(): Restoring existing links to the cell.');
             for (let i = 0; i < newText.length; i++) {
                 const originalIndex = cellText.indexOf(newText[i]);
                 if (originalIndex !== -1) {
                     const url = cell.getLinkUrl(originalIndex, originalIndex + 1);
                     if (url) {
-                        Logger.log(`Url found at position ${i}: ${url}`);
                         builder.setLinkUrl(i, i + 1, url);
-                        Logger.log(`Restored ${url} at position ${i}.`);
                     }
                 }
             }

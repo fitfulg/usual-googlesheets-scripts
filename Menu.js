@@ -52,8 +52,7 @@ function onOpen() {
  * @customfunction
  */
 function runAllFunctionsTODO() {
-    Logger.log('runAllFunctionsTODO triggered');
-    customCellBGColorTODO();
+    customCeilBGColorTODO();
     applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();

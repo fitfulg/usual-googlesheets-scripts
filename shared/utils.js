@@ -7,7 +7,6 @@
  * @return {string[]} The extracted URLs.
  */
 function extractUrls(richTextValue) {
-    Logger.log('extractUrls triggered');
     const urls = [];
     const text = richTextValue.getText();
     for (let i = 0; i < text.length; i++) {
@@ -16,7 +15,6 @@ function extractUrls(richTextValue) {
             urls.push(url);
         }
     }
-    Logger.log('returning urls');
     return urls;
 }
 
@@ -28,7 +26,6 @@ function extractUrls(richTextValue) {
  * @return {boolean} True if the arrays are equal, false otherwise.
  */
 function arraysEqual(arr1, arr2) {
-    Logger.log('arraysEqual triggered');
     if (arr1.length !== arr2.length) return false;
     for (let i = 0; i < arr1.length; i++) {
         if (arr1[i] !== arr2[i]) return false;
@@ -43,7 +40,6 @@ function arraysEqual(arr1, arr2) {
  * @return {string} The generated hash in base64 encoding.
  */
 function generateHash(content) {
-    Logger.log('generateHash triggered');
     return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, content));
 }
 
@@ -55,7 +51,6 @@ function generateHash(content) {
  * @return {boolean} True if the hash has changed, false otherwise.
  */
 function shouldRunUpdates(lastHash, currentHash) {
-    Logger.log('shouldRunUpdates triggered');
     return lastHash !== currentHash;
 }
 
@@ -65,10 +60,8 @@ function shouldRunUpdates(lastHash, currentHash) {
  * @return {string} The generated hash of the sheet content.
  */
 function getSheetContentHash() {
-    Logger.log('getSheetContentHash triggered');
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
-    Logger.log('getSheetContentHash: returning generateHash');
     return generateHash(values);
 }
 
@@ -81,7 +74,6 @@ function getSheetContentHash() {
  * @return {object} The snapshot object.
  */
 function saveSnapshot(cellsToIgnore = []) {
-    Logger.log('saveSnapshot triggered');
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     const richTextValues = range.getRichTextValues();
@@ -96,13 +88,12 @@ function saveSnapshot(cellsToIgnore = []) {
             }
 
             const cellValue = richTextValues[row][col];
-
             if (cellValue) {
                 snapshot[cellKey] = {
                     text: cellValue.getText(),
                     links: []
                 };
-                Logger.log(`Snapshot saved for cell ${cellKey}.`);
+
                 for (let i = 0; i < cellValue.getText().length; i++) {
                     const url = cellValue.getLinkUrl(i, i + 1);
                     if (url) {
@@ -129,7 +120,6 @@ function saveSnapshot(cellsToIgnore = []) {
  * @return {void}
  */
 function restoreSnapshot(formatCallback) {
-    Logger.log('restoreSnapshot triggered');
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const range = sheet.getDataRange();
     const properties = PropertiesService.getScriptProperties();
@@ -150,19 +140,17 @@ function restoreSnapshot(formatCallback) {
                 const cellData = snapshot[cellKey];
                 const builder = SpreadsheetApp.newRichTextValue()
                     .setText(cellData.text);
-                Logger.log(`Restoring snapshot for cell ${cellKey}.`);
+
                 // Restore links
                 for (const link of cellData.links) {
-                    Logger.log(`Restoring link: ${link.url} at ${link.start}-${link.end}.`);
                     builder.setLinkUrl(link.start, link.end, link.url);
                 }
-                Logger.log(`Restored links: ${cellData.links.length}.`);
+
                 // Apply custom formatting if a callback is provided
                 if (formatCallback) {
-                    Logger.log(`restoreSnapshot()/formatCallback(): Applying custom formatting for cell ${cellKey}.`);
                     formatCallback(builder, cellData.text);
                 }
-                Logger.log(`Applying custom formatting for cell ${cellKey}.`);
+
                 richTextValues[row][col] = builder.build();
             }
         }

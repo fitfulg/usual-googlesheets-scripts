@@ -8,9 +8,7 @@
  * @return {void}
  */
 function saveSnapshotTODO() {
-    Logger.log('saveSnapshotTODO triggered');
     const cellsToIgnore = ["R1C1", "R1C2", "R1C3", "R1C4", "R1C5", "R1C6", "R1C7", "R1C8"]
-    Logger.log(`Ignoring cells ${cellsToIgnore.join(', ')} from snapshot.`);
     const snapshot = saveSnapshot(cellsToIgnore);
 
     // Save filtered snapshot to script properties
@@ -25,7 +23,6 @@ function saveSnapshotTODO() {
  * @return {void}
  */
 function restoreSnapshotTODO() {
-    Logger.log('restoreSnapshotTODO triggered');
     restoreSnapshot((builder, text) => {
         // Reapply formatting for dates and "days left"
         const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
@@ -33,21 +30,17 @@ function restoreSnapshotTODO() {
         const daysLeftMatch = text.match(daysLeftPattern);
 
         if (dateMatches) {
-            Logger.log('restoreSnapshotTODO)(): dateMatches :', dateMatches);
             for (const date of dateMatches) {
                 const start = text.lastIndexOf(date);
                 const end = start + date.length;
                 builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-                Logger.log('restoreSnapshotTODO() date to be formatted :', date);
             }
         }
 
         if (daysLeftMatch) {
-            Logger.log('restoreSnapshotTODO() daysLeftMatch :', daysLeftMatch);
             const start = text.lastIndexOf(daysLeftMatch[0]);
             const end = start + daysLeftMatch[0].length;
             builder.setTextStyle(start, end, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#FF0000').build());
-            Logger.log('restoreSnapshotTODO() days left to be formatted :', daysLeftMatch[0]);
         }
     });
 }

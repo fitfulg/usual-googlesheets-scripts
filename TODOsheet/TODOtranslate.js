@@ -8,7 +8,6 @@ const setLanguageSpanish = () => setLanguage('Spanish');
 const setLanguageCatalan = () => setLanguage('Catalan');
 
 function setLanguage(language) {
-    Logger.log('setLanguage called with language: ' + language);
     if (languages[language]) {
         PropertiesService.getDocumentProperties().setProperty('language', language);
         translateSheetTODO();
@@ -30,7 +29,6 @@ function setLanguage(language) {
  * @customfunction
  */
 function translateSheetTODO() {
-    Logger.log('translateSheetTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
 
     // Update with the corresponding styles
