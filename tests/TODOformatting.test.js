@@ -55,7 +55,7 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
 
         // Mocking the Logger object
         global.Logger = {
-            log: jest.fn()  // Mock the log method
+            log: jest.fn()
         };
     });
 
@@ -139,3 +139,4 @@ describe('Google Sheets Functions from TODOsheet/TODOformatting.js', () => {
         });
     });
 });
+

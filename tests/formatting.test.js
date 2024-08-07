@@ -70,6 +70,11 @@ describe('setCellStyle', () => {
         getRange: jest.fn().mockReturnValue(mockRange),
     };
 
+    // Mocking the Logger object
+    global.Logger = {
+        log: jest.fn()  // Mock the log method
+    };
+
     setCellStyle('A1', 'Test Value', 'bold', '#000000', '#ffffff', 'center');
 
     expect(mockRange.setValue).toHaveBeenCalledWith('Test Value');
