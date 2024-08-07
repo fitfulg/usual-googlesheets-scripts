@@ -1833,37 +1833,35 @@ function updateDaysLeftCellTODO(range, daysLeft) {
     let daysLeftText = `(${daysLeft}) days left`;
     let newText = originalText + '\n' + daysLeftText;
 
-    const now = new Date();
-
     // Get the original rich text value to preserve links
-    const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalText).build();
+    const originalRichTextValue = range.getRichTextValue();
     Logger.log(`updateDaysLeftCellTODO(): getting original rich text value: ${originalRichTextValue.getText()}`);
 
     // Create new rich text value with updated text and styling
-    let newRichTextValue = SpreadsheetApp.newRichTextValue()
+    let newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
         .setText(newText)
         .setTextStyle(0, originalText.length, SpreadsheetApp.newTextStyle().build())
         .setTextStyle(originalText.length + 1, newText.length,
             SpreadsheetApp.newTextStyle().setForegroundColor('#FF0000').setItalic(true).build());
-    Logger.log(`updateDaysLeftCellTODO(): created new rich text value: ${newRichTextValue.getText()}`);
 
-    // Preserve links from the original rich text value
+    // Preservar enlaces del valor de texto enriquecido original
     const originalTextLength = originalRichTextValue.getText().length;
     Logger.log(`updateDaysLeftCellTODO(): original text length: ${originalTextLength}`);
     for (let i = 0; i < Math.min(newText.length, originalTextLength); i++) {
         const url = originalRichTextValue.getLinkUrl(i, i + 1);
         if (url) {
-            newRichTextValue.setLinkUrl(i, i + 1, url);
+            newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
             Logger.log(`updateDaysLeftCellTODO(): set link for character ${i}: ${url}`);
         }
     }
 
-
-    // Set the new rich text value to the cell
-    range.setRichTextValue(newRichTextValue.build());
+    // Finalizar la construcción del nuevo valor de texto enriquecido y actualizar la celda
+    let newRichTextValue = newRichTextValueBuilder.build();
+    range.setRichTextValue(newRichTextValue);
     Logger.log(`updateDaysLeftCellTODO(): updated cell with value: ${newRichTextValue.getText()}`);
 
     // Set a custom property to store the initial date
+    const now = new Date();
     PropertiesService.getDocumentProperties().setProperty(range.getA1Notation(), now.toISOString());
     Logger.log(`updateDaysLeftCellTODO(): set custom property for cell ${range.getA1Notation()}: ${now.toISOString()}`);
 
