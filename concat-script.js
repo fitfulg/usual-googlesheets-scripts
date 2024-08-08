@@ -483,6 +483,20 @@ function preserveStylesAndLinks(originalTextValue, newTextValueBuilder, offset) 
     Logger.log('preserveStylesAndLinks completed');
 }
 
+function getCurrentDate() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet();
+    const timeZone = sheet.getSpreadsheetTimeZone();
+    return new Date().toLocaleDateString('en-GB', { timeZone: timeZone });
+}
+
+function testFutureDateCalculation() {
+    const daysToAdd = 60;
+    const today = new Date();
+    today.setDate(today.getDate() + daysToAdd);
+    const futureDateFormatted = Utilities.formatDate(today, Session.getScriptTimeZone(), "dd/MM/yy");
+    Logger.log(`Today's date: ${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`);
+    Logger.log(`Future date after adding ${daysToAdd} days: ${futureDateFormatted}`);
+}
 
 
 // Contents of ./TODOsheet/TODOcheckbox.js
@@ -490,6 +504,7 @@ function preserveStylesAndLinks(originalTextValue, newTextValueBuilder, offset) 
 
 
 // globals.js: sheet
+// shared/utils.js: processCells, preserveStylesAndLinks
 
 /**
  * Adds by default a checkbox to a cell while preserving existing rich text styles and links.
@@ -944,30 +959,21 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
 
     let updatedText = newValue.toString().trim();
     const dateFormatted = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
+    Logger.log(`Today's date: ${dateFormatted}`);
 
-    // Get the original rich text value to preserve links
     const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
 
-    if (columnLetter !== 'H') {
-        const daysLeftPattern = /\((\d+)\) days left/;
-        const daysLeftMatch = updatedText.match(daysLeftPattern);
-        Logger.log(`Days left match: ${daysLeftMatch}`);
-
-        if (daysLeftMatch) {
-            // Convert "days left" pattern to a date
-            const daysLeft = parseInt(daysLeftMatch[1]);
-            const date = new Date();
-            date.setDate(date.getDate() + daysLeft);
-            const futureDateFormatted = Utilities.formatDate(date, Session.getScriptTimeZone(), "dd/MM/yy");
-            updatedText = updatedText.replace(daysLeftPattern, '').trim() + '\n' + futureDateFormatted;
-            Logger.log(`Updated text with future date: "${updatedText}"`);
-        } else if (!datePattern.test(updatedText)) {
-            updatedText = updatedText + '\n' + dateFormatted;
-            Logger.log(`No date found, updated text with new date: "${updatedText}"`);
-        } else {
-            updatedText = updatedText.replace(datePattern, '\n' + dateFormatted);
-            Logger.log(`Replaced date with new date: "${updatedText}"`);
-        }
+    // Reemplazar el patrón (n) days left por la fecha actual
+    const daysLeftPattern = /\(\d+\) days left/;
+    if (daysLeftPattern.test(updatedText)) {
+        updatedText = updatedText.replace(daysLeftPattern, dateFormatted);
+        Logger.log(`Replaced (n) days left with today's date: "${updatedText}"`);
+    } else if (!/\d{2}\/\d{2}\/\d{2}/.test(updatedText)) {
+        updatedText = updatedText + '\n' + dateFormatted;
+        Logger.log(`No date found, updated text with new date: "${updatedText}"`);
+    } else {
+        updatedText = updatedText.replace(/\d{2}\/\d{2}\/\d{2}/, dateFormatted);
+        Logger.log(`Replaced date with new date: "${updatedText}"`);
     }
 
     Logger.log(`Updated text: "${updatedText}"`);
@@ -976,7 +982,6 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
         .setText(updatedText)
         .setTextStyle(0, updatedText.length, SpreadsheetApp.newTextStyle().build());
 
-    // Apply style to the date or "days left"
     const lastLineIndex = updatedText.lastIndexOf('\n');
     Logger.log(`Last line index: ${lastLineIndex}`);
     if (lastLineIndex !== -1) {
@@ -989,7 +994,6 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
         Logger.log(`Applied style to last line: ${lastLineIndex + 1} to ${updatedText.length}`);
     }
 
-    // Preserve links from the original rich text value, but not for the last line
     const originalText = originalRichTextValue.getText();
     Logger.log(`Preserving links from original text: ${originalText}`);
     for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {
@@ -1808,7 +1812,6 @@ function removeMultipleDatesTODO() {
                 const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
                 Logger.log(`removeMultipleDatesTODO(): Today is: ${today}`);
 
-                // filter and keep only the last occurrence of today's date
                 const datesToKeep = [today];
                 for (let date of dateMatches) {
                     if (date !== today) {
@@ -1817,7 +1820,6 @@ function removeMultipleDatesTODO() {
                 }
                 Logger.log(`removeMultipleDatesTODO(): Dates to keep: ${datesToKeep.join(', ')}`);
 
-                // create updated text with only the last occurrence of today's date
                 let updatedText = text;
                 for (let date of datesToKeep) {
                     let lastOccurrence = updatedText.lastIndexOf(date);
@@ -1830,21 +1832,19 @@ function removeMultipleDatesTODO() {
                 updatedText = updatedText.replace(new RegExp(`\\b(${dateMatches.join('|')})\\b`, 'g'), '').trim() + `\n${today}`;
                 Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
 
-                // build new rich text value with updated text
                 let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
                 let currentPos = 0;
 
-                // apply styles to the updated text
                 for (let part of updatedText.split('\n')) {
                     let startPos = currentPos;
                     let endPos = startPos + part.length;
-                    if (datePattern.test(part)) {
+                    if (/\d{2}\/\d{2}\/\d{2}/.test(part)) {
                         builder.setTextStyle(startPos, endPos, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
                     } else {
                         let style = richTextValue.getTextStyle(startPos, endPos);
                         builder.setTextStyle(startPos, endPos, style);
                     }
-                    currentPos += part.length + 1; // +1 for the newline character
+                    currentPos += part.length + 1;
                 }
                 Logger.log(`removeMultipleDatesTODO(): Updated rich text value for ${column}${row}: ${builder.build().getText()}`);
 
@@ -2000,7 +2000,6 @@ function onEdit(e) {
 
         Logger.log(`onEdit triggered: column ${column}, row ${row}`);
 
-        // Check if the edited cell is for toggling the pie chart (cell I1)
         if (column === 9 && row === 1) {
             handlePieChartToggleTODO(range);
             return;
@@ -2011,18 +2010,15 @@ function onEdit(e) {
 
         Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
 
-        // Shift cells up if the edited cell is now empty
         if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
             Logger.log(`onEdit(): Shifting cells up for column ${column}`);
             shiftCellsUpTODO(column, 2, totalRows);
             return;
         }
 
-        // Handle edits in different columns
         if (row >= 2 && column >= 3 && column <= 8) {
             Logger.log(`onEdit()/handleColumnEditTODO(): Handling column edit for column ${column}`);
             handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
-            // Only add a checkbox if the newValue is non-empty and doesn't already contain a checkbox
             if (newValue && !newValue.includes('☑️')) {
                 Logger.log(`onEdit(): Adding default checkbox to cell ${columnLetter}${row}`);
                 addCheckboxToCellTODO(range);

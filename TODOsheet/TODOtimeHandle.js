@@ -191,7 +191,6 @@ function removeMultipleDatesTODO() {
                 const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
                 Logger.log(`removeMultipleDatesTODO(): Today is: ${today}`);
 
-                // filter and keep only the last occurrence of today's date
                 const datesToKeep = [today];
                 for (let date of dateMatches) {
                     if (date !== today) {
@@ -200,7 +199,6 @@ function removeMultipleDatesTODO() {
                 }
                 Logger.log(`removeMultipleDatesTODO(): Dates to keep: ${datesToKeep.join(', ')}`);
 
-                // create updated text with only the last occurrence of today's date
                 let updatedText = text;
                 for (let date of datesToKeep) {
                     let lastOccurrence = updatedText.lastIndexOf(date);
@@ -213,21 +211,19 @@ function removeMultipleDatesTODO() {
                 updatedText = updatedText.replace(new RegExp(`\\b(${dateMatches.join('|')})\\b`, 'g'), '').trim() + `\n${today}`;
                 Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
 
-                // build new rich text value with updated text
                 let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
                 let currentPos = 0;
 
-                // apply styles to the updated text
                 for (let part of updatedText.split('\n')) {
                     let startPos = currentPos;
                     let endPos = startPos + part.length;
-                    if (datePattern.test(part)) {
+                    if (/\d{2}\/\d{2}\/\d{2}/.test(part)) {
                         builder.setTextStyle(startPos, endPos, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
                     } else {
                         let style = richTextValue.getTextStyle(startPos, endPos);
                         builder.setTextStyle(startPos, endPos, style);
                     }
-                    currentPos += part.length + 1; // +1 for the newline character
+                    currentPos += part.length + 1;
                 }
                 Logger.log(`removeMultipleDatesTODO(): Updated rich text value for ${column}${row}: ${builder.build().getText()}`);
 
