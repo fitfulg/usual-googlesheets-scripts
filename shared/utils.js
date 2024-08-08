@@ -4,7 +4,7 @@
  * Extracts URLs from a rich text value.
  *
  * @param {RichTextValue} richTextValue - The rich text value to extract URLs from.
- * @return {string[]} The extracted URLs.
+ * @return {Array} The extracted URLs with their start and end positions.
  */
 function extractUrls(richTextValue) {
     Logger.log('extractUrls triggered');
@@ -13,7 +13,7 @@ function extractUrls(richTextValue) {
     for (let i = 0; i < text.length; i++) {
         const url = richTextValue.getLinkUrl(i, i + 1);
         if (url) {
-            urls.push(url);
+            urls.push({ url, start: i, end: i + 1 });
         }
     }
     Logger.log('returning urls');
@@ -33,6 +33,7 @@ function arraysEqual(arr1, arr2) {
     for (let i = 0; i < arr1.length; i++) {
         if (arr1[i] !== arr2[i]) return false;
     }
+    Logger.log('arrays are equal');
     return true;
 }
 
@@ -44,7 +45,9 @@ function arraysEqual(arr1, arr2) {
  */
 function generateHash(content) {
     Logger.log('generateHash triggered');
-    return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, content));
+    const hash = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, content));
+    Logger.log('hash generated');
+    return hash;
 }
 
 /**
@@ -56,7 +59,9 @@ function generateHash(content) {
  */
 function shouldRunUpdates(lastHash, currentHash) {
     Logger.log('shouldRunUpdates triggered');
-    return lastHash !== currentHash;
+    const hasChanged = lastHash !== currentHash;
+    Logger.log(`hash has changed: ${hasChanged}`);
+    return hasChanged;
 }
 
 /**
@@ -69,7 +74,9 @@ function getSheetContentHash() {
     const range = getDataRange();
     const values = range.getValues().flat().join(",");
     Logger.log('getSheetContentHash: returning generateHash');
-    return generateHash(values);
+    const hash = generateHash(values);
+    Logger.log(`generated hash: ${hash}`);
+    return hash;
 }
 
 /**
@@ -96,19 +103,13 @@ function saveSnapshot(cellsToIgnore = []) {
             }
 
             const cellValue = richTextValues[row][col];
-
             if (cellValue) {
+                const urls = extractUrls(cellValue);
                 snapshot[cellKey] = {
                     text: cellValue.getText(),
-                    links: []
+                    links: urls
                 };
                 Logger.log(`Snapshot saved for cell ${cellKey}.`);
-                for (let i = 0; i < cellValue.getText().length; i++) {
-                    const url = cellValue.getLinkUrl(i, i + 1);
-                    if (url) {
-                        snapshot[cellKey].links.push({ start: i, end: i + 1, url });
-                    }
-                }
             }
         }
     }
@@ -117,7 +118,6 @@ function saveSnapshot(cellsToIgnore = []) {
     const properties = PropertiesService.getScriptProperties();
     properties.setProperty('sheetSnapshot', JSON.stringify(snapshot));
     Logger.log("Snapshot saved.");
-
     return snapshot;
 }
 
@@ -162,7 +162,6 @@ function restoreSnapshot(formatCallback) {
                     Logger.log(`restoreSnapshot()/formatCallback(): Applying custom formatting for cell ${cellKey}.`);
                     formatCallback(builder, cellData.text);
                 }
-                Logger.log(`Applying custom formatting for cell ${cellKey}.`);
                 richTextValues[row][col] = builder.build();
             }
         }
@@ -172,6 +171,52 @@ function restoreSnapshot(formatCallback) {
     Logger.log("Snapshot restored.");
 }
 
+/**
+ * Iterates over each cell in the selected range and applies the specified function to it.
+ * @param {function(Range, RichTextValue): void} cellFunction - The function to apply to each cell.
+ */
+function processCells(cellFunction) {
+    Logger.log('processCells triggered');
+    const range = sheet.getActiveRange();
+    const richTextValues = range.getRichTextValues();
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const cellValue = richTextValues[row][col];
+            if (cellValue) {
+                const cellRange = range.getCell(row + 1, col + 1);
+                cellFunction(cellRange, cellValue);
+            }
+        }
+    }
+    Logger.log('processCells completed');
+}
+
+/**
+ * Preserves existing text styles and links from the original text to the new text.
+ * @param {RichTextValue} originalTextValue - The original rich text value.
+ * @param {RichTextValueBuilder} newTextValueBuilder - The rich text value builder for the new text.
+ * @param {number} offset - The offset to apply to the new text positions.
+ */
+function preserveStylesAndLinks(originalTextValue, newTextValueBuilder, offset) {
+    Logger.log('preserveStylesAndLinks triggered');
+    const originalText = originalTextValue.getText();
+    const newText = newTextValueBuilder.build().getText();
+    const minLength = Math.min(originalText.length, newText.length - offset);
+
+    for (let i = 0; i < minLength; i++) {
+        const style = originalTextValue.getTextStyle(i, i + 1);
+        newTextValueBuilder.setTextStyle(i + offset, i + offset + 1, style);
+
+        const url = originalTextValue.getLinkUrl(i, i + 1);
+        if (url) {
+            newTextValueBuilder.setLinkUrl(i + offset, i + offset + 1, url);
+        }
+    }
+    Logger.log('preserveStylesAndLinks completed');
+}
+
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         extractUrls,
@@ -180,6 +225,8 @@ if (typeof module !== 'undefined' && module.exports) {
         shouldRunUpdates,
         getSheetContentHash,
         saveSnapshot,
-        restoreSnapshot
+        restoreSnapshot,
+        processCells,
+        preserveStylesAndLinks
     };
 }
