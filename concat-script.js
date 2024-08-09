@@ -483,20 +483,6 @@ function preserveStylesAndLinks(originalTextValue, newTextValueBuilder, offset) 
     Logger.log('preserveStylesAndLinks completed');
 }
 
-function getCurrentDate() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet();
-    const timeZone = sheet.getSpreadsheetTimeZone();
-    return new Date().toLocaleDateString('en-GB', { timeZone: timeZone });
-}
-
-function testFutureDateCalculation() {
-    const daysToAdd = 60;
-    const today = new Date();
-    today.setDate(today.getDate() + daysToAdd);
-    const futureDateFormatted = Utilities.formatDate(today, Session.getScriptTimeZone(), "dd/MM/yy");
-    Logger.log(`Today's date: ${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`);
-    Logger.log(`Future date after adding ${daysToAdd} days: ${futureDateFormatted}`);
-}
 
 
 // Contents of ./TODOsheet/TODOcheckbox.js
@@ -1676,47 +1662,67 @@ function updateDaysLeftCounterTODO() {
     Logger.log("updateDaysLeftCounterTODO called");
     const properties = PropertiesService.getDocumentProperties();
     const lastUpdateDate = properties.getProperty('lastUpdateDate');
-    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
+    const today = new Date();
+    const todayFormatted = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyy-MM-dd");
 
     Logger.log(`Last update was on: ${lastUpdateDate}`);
-    Logger.log(`Today's date is: ${today}`);
+    Logger.log(`Today's date is: ${todayFormatted}`);
 
-    const now = new Date();
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-    const hoursLeftUntilNextUpdate = (endOfDay - now) / 3600000; // milliseconds to hours
-
-    Logger.log(`Hours left until the next days left update: ${hoursLeftUntilNextUpdate.toFixed(2)} hours`);
-
-    if (lastUpdateDate === today) {
-        Logger.log("No days left counter update needed yet.");
-        return;
+    // Calcular los días transcurridos desde la última actualización
+    let daysElapsed = 0;
+    if (lastUpdateDate) {
+        const lastUpdate = new Date(lastUpdateDate);
+        daysElapsed = Math.floor((today - lastUpdate) / (1000 * 60 * 60 * 24));
+        Logger.log(`Days elapsed since last update: ${daysElapsed}`);
     }
 
     const range = sheet.getRange('H2:H' + sheet.getLastRow());
-    const values = range.getValues();
+    const richTextValues = range.getRichTextValues(); // Obtener valores con formato
     Logger.log("Starting to update days left for each cell.");
 
-    for (let i = 0; i < values.length; i++) {
-        const cellValue = values[i][0].toString();
+    for (let i = 0; i < richTextValues.length; i++) {
+        let cellRichTextValue = richTextValues[i][0];
+        const cellValue = cellRichTextValue.getText().toString();
         const match = cellValue.match(/\((\d+)\) days left/);
+
         if (match) {
             const originalDays = parseInt(match[1]);
-            const daysLeft = Math.max(0, originalDays - 1);
+            const daysLeft = Math.max(0, originalDays - daysElapsed); // Restar los días transcurridos
 
             Logger.log(`Row ${i + 2}: original days left = ${originalDays}, new days left = ${daysLeft}`);
 
             if (daysLeft <= 0) {
-                values[i][0] = '';
+                // Borrar celda si días restantes es 0
+                richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
                 Logger.log(`Row ${i + 2}: Days left counter reached zero, clearing cell.`);
             } else {
-                values[i][0] = `(${daysLeft}) days left`;
+                // Actualizar el texto manteniendo el formato
+                let newText = cellValue.replace(`(${originalDays}) days left`, `(${daysLeft}) days left`);
+                let newRichTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(newText);
+
+                // Copiar el formato del texto antiguo al nuevo
+                for (let j = 0; j < cellRichTextValue.getRuns().length; j++) {
+                    const startOffset = cellRichTextValue.getRuns()[j].getStartIndex();
+                    const endOffset = cellRichTextValue.getRuns()[j].getEndIndex();
+                    const textStyle = cellRichTextValue.getTextStyle(startOffset, endOffset);
+
+                    newRichTextValueBuilder.setTextStyle(startOffset, endOffset, textStyle);
+                }
+
+                richTextValues[i][0] = newRichTextValueBuilder.build();
             }
         }
     }
-    range.setValues(values);
-    properties.setProperty('lastUpdateDate', today);
+
+    range.setRichTextValues(richTextValues); // Establecer valores con formato
+
+    if (daysElapsed > 0) {
+        properties.setProperty('lastUpdateDate', todayFormatted); // Actualizar la fecha de la última actualización
+    }
+
     Logger.log("Days left counter updated for all applicable cells.");
 }
+
 
 /**
  * Updates the cell with the number of days left, preserving any existing links.
