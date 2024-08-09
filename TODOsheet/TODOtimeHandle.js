@@ -10,36 +10,30 @@
 function updateDateColorsTODO() {
     Logger.log('updateDateColorsTODO called');
     const columns = ['C', 'D', 'E', 'F', 'G'];
-    const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();
+    const today = new Date();
 
-    for (const column of columns) {
+    for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+        const column = columns[columnIndex];
         const config = dateColorConfig[column];
-        for (let row = 2; row <= lastRow; row++) {
-            const cell = sheet.getRange(`${column}${row}`);
-            const cellValue = cell.getValue();
-            Logger.log(`updateDateColorsTODO(): Checking if cell ${cellValue} contains a date that matches the pattern ${datePattern}`);
-            if (datePattern.test(cellValue)) {
-                const dateText = cellValue.match(datePattern)[0].trim();
+
+        processCells((cellRange, cellValue) => {
+            const text = cellValue.getText();
+            Logger.log(`updateDateColorsTODO(): Checking if cell ${text} contains a date that matches the pattern ${datePattern}`);
+
+            if (datePattern.test(text)) {
+                const dateText = text.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
-                const today = new Date();
                 const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
 
-                let color = config.defaultColor || '#A9A9A9'; // Default color (dark gray)
-                if (diffDays >= config.danger) {
-                    color = config.dangerColor;
-                } else if (diffDays >= config.warning) {
-                    color = config.warningColor;
-                }
+                const color = diffDays >= config.danger ? config.dangerColor :
+                    diffDays >= config.warning ? config.warningColor :
+                        config.defaultColor || '#A9A9A9';
 
-                const richTextValue = SpreadsheetApp.newRichTextValue()
-                    .setText(cellValue)
-                    .setTextStyle(cellValue.length - dateText.length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())
-                    .build();
-
-                cell.setRichTextValue(richTextValue);
+                const richTextValue = buildRichTextValue(text, dateText, color, cellValue);
+                cellRange.setRichTextValue(richTextValue);
             }
-        }
+        });
+
         Logger.log(`updateDateColorsTODO(): Updated date colors for column ${column}`);
     }
 }
@@ -54,47 +48,40 @@ function updateDateColorsTODO() {
 function updateDaysLeftCounterTODO() {
     Logger.log("updateDaysLeftCounterTODO called");
     const properties = PropertiesService.getDocumentProperties();
-    const lastUpdateDate = properties.getProperty('lastUpdateDate');
     const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
-
-    Logger.log(`Last update was on: ${lastUpdateDate}`);
-    Logger.log(`Today's date is: ${today}`);
-
-    const now = new Date();
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-    const hoursLeftUntilNextUpdate = (endOfDay - now) / 3600000; // milliseconds to hours
-
-    Logger.log(`Hours left until the next days left update: ${hoursLeftUntilNextUpdate.toFixed(2)} hours`);
-
-    if (lastUpdateDate === today) {
-        Logger.log("No days left counter update needed yet.");
-        return;
-    }
 
     const range = sheet.getRange('H2:H' + sheet.getLastRow());
     const values = range.getValues();
+    let updated = false;
+
     Logger.log("Starting to update days left for each cell.");
 
     for (let i = 0; i < values.length; i++) {
         const cellValue = values[i][0].toString();
         const match = cellValue.match(/\((\d+)\) days left/);
+
         if (match) {
-            const originalDays = parseInt(match[1]);
-            const daysLeft = Math.max(0, originalDays - 1);
+            const daysLeft = Math.max(0, parseInt(match[1]) - 1);
+            Logger.log(`Row ${i + 2}: original days left = ${match[1]}, new days left = ${daysLeft}`);
 
-            Logger.log(`Row ${i + 2}: original days left = ${originalDays}, new days left = ${daysLeft}`);
-
-            if (daysLeft <= 0) {
-                values[i][0] = '';
+            if (daysLeft === 0) {
+                sheet.getRange(i + 2, 8).clearContent();
                 Logger.log(`Row ${i + 2}: Days left counter reached zero, clearing cell.`);
+                values[i][0] = '';
             } else {
-                values[i][0] = `(${daysLeft}) days left`;
+                values[i][0] = cellValue.replace(/\(\d+\) days left/, `(${daysLeft}) days left`);
+                updated = true;
             }
         }
     }
-    range.setValues(values);
-    properties.setProperty('lastUpdateDate', today);
-    Logger.log("Days left counter updated for all applicable cells.");
+
+    if (updated) {
+        range.setValues(values);
+        properties.setProperty('lastUpdateDate', today);
+        Logger.log("Days left counter updated for all applicable cells.");
+    } else {
+        Logger.log("No updates were necessary.");
+    }
 }
 
 /**
@@ -105,42 +92,19 @@ function updateDaysLeftCounterTODO() {
  */
 function updateDaysLeftCellTODO(range, daysLeft) {
     Logger.log(`updateDaysLeftCellTODO called`);
-    let originalText = range.getValue().toString().split('\n')[0];
-    let daysLeftText = `(${daysLeft}) days left`;
-    let newText = originalText + '\n' + daysLeftText;
+    const originalText = range.getValue().toString().split('\n')[0];
+    const daysLeftText = `(${daysLeft}) days left`;
+    const newText = `${originalText}\n${daysLeftText}`;
 
-    // Get the original rich text value to preserve links
     const originalRichTextValue = range.getRichTextValue();
-    Logger.log(`updateDaysLeftCellTODO(): getting original rich text value: ${originalRichTextValue.getText()}`);
+    const richTextValue = buildRichTextValue(newText, daysLeftText, '#FF0000', originalRichTextValue);
 
-    // Create new rich text value with updated text and styling
-    let newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
-        .setText(newText)
-        .setTextStyle(0, originalText.length, SpreadsheetApp.newTextStyle().build())
-        .setTextStyle(originalText.length + 1, newText.length,
-            SpreadsheetApp.newTextStyle().setForegroundColor('#FF0000').setItalic(true).build());
+    range.setRichTextValue(richTextValue);
+    Logger.log(`updateDaysLeftCellTODO(): updated cell with value: ${richTextValue.getText()}`);
 
-    // Preserve links from the original rich text value
-    const originalTextLength = originalRichTextValue.getText().length;
-    Logger.log(`updateDaysLeftCellTODO(): original text length: ${originalTextLength}`);
-    for (let i = 0; i < Math.min(newText.length, originalTextLength); i++) {
-        const url = originalRichTextValue.getLinkUrl(i, i + 1);
-        if (url) {
-            newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
-            Logger.log(`updateDaysLeftCellTODO(): set link for character ${i}: ${url}`);
-        }
-    }
-
-    let newRichTextValue = newRichTextValueBuilder.build();
-    range.setRichTextValue(newRichTextValue);
-    Logger.log(`updateDaysLeftCellTODO(): updated cell with value: ${newRichTextValue.getText()}`);
-
-    // Set a custom property to store the initial date
     const now = new Date();
     PropertiesService.getDocumentProperties().setProperty(range.getA1Notation(), now.toISOString());
     Logger.log(`updateDaysLeftCellTODO(): set custom property for cell ${range.getA1Notation()}: ${now.toISOString()}`);
-
-    Logger.log(`Updated days left for cell ${range.getA1Notation()}: ${newText}`);
 }
 
 /**
@@ -151,17 +115,10 @@ function updateDaysLeftCellTODO(range, daysLeft) {
  */
 function parseDaysLeftTODO(value) {
     Logger.log(`parseDaysLeftTODO called with value: ${value}`);
-    const daysLeftMatch = value.match(/\((\d+)\) days left/); // regex to match the days left pattern
-    if (daysLeftMatch) {
-        Logger.log(`parseDaysLeftTODO(): parsed days left: ${daysLeftMatch[1]}`);
-        return parseInt(daysLeftMatch[1]);
-    } else if (/^\d+$/.test(value.trim())) { // regex to check if the value is a number
-        Logger.log(`parseDaysLeftTODO(): parsed days left: ${value.trim()}`);
-        return parseInt(value.trim());
-    }
-    const defaultDays = 60;
-    Logger.log(`parseDaysLeftTODO(): default days left: ${defaultDays}`);
-    return defaultDays;
+    const daysLeftMatch = value.match(/\((\d+)\) days left/);
+    const daysLeft = daysLeftMatch ? parseInt(daysLeftMatch[1]) : (/^\d+$/.test(value.trim()) ? parseInt(value.trim()) : 60);
+    Logger.log(`parseDaysLeftTODO(): parsed days left: ${daysLeft}`);
+    return daysLeft;
 }
 
 /**
@@ -171,68 +128,39 @@ function parseDaysLeftTODO(value) {
  */
 function removeMultipleDatesTODO() {
     Logger.log('removeMultipleDatesTODO called');
-    const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();
     const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
 
-    for (const column of columns) {
-        for (let row = 2; row <= lastRow; row++) {
-            const cell = sheet.getRange(`${column}${row}`);
-            const cellValue = cell.getValue();
-            const richTextValue = cell.getRichTextValue();
-            const text = richTextValue ? richTextValue.getText() : cellValue;
+    for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+        const column = columns[columnIndex];
 
-            Logger.log(`removeMultipleDatesTODO(): Checking cell ${column}${row}: ${text}`);
+        processCells((cellRange, cellValue) => {
+            const text = cellValue.getText();
+            Logger.log(`removeMultipleDatesTODO(): Checking cell ${column}${cellRange.getRow()}: ${text}`);
 
             const dateMatches = text.match(/\d{2}\/\d{2}\/\d{2}/g);
             if (dateMatches && dateMatches.length > 1) {
-                Logger.log(`removeMultipleDatesTODO(): Found dates in ${column}${row}: ${dateMatches.join(', ')}`);
-
-                const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
-                Logger.log(`removeMultipleDatesTODO(): Today is: ${today}`);
-
-                const datesToKeep = [today];
-                for (let date of dateMatches) {
-                    if (date !== today) {
-                        datesToKeep.push(date);
-                    }
-                }
-                Logger.log(`removeMultipleDatesTODO(): Dates to keep: ${datesToKeep.join(', ')}`);
+                Logger.log(`removeMultipleDatesTODO(): Found dates in ${column}${cellRange.getRow()}: ${dateMatches.join(', ')}`);
 
                 let updatedText = text;
-                for (let date of datesToKeep) {
-                    let lastOccurrence = updatedText.lastIndexOf(date);
+                for (let i = 0; i < dateMatches.length; i++) {
+                    const date = dateMatches[i];
+                    const lastOccurrence = updatedText.lastIndexOf(date);
                     if (lastOccurrence !== -1) {
                         updatedText = updatedText.substring(0, lastOccurrence) + updatedText.substring(lastOccurrence).replace(new RegExp(date, 'g'), '');
                     }
                 }
-                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
 
                 updatedText = updatedText.replace(new RegExp(`\\b(${dateMatches.join('|')})\\b`, 'g'), '').trim() + `\n${today}`;
-                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
+                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${cellRange.getRow()}: ${updatedText}`);
 
-                let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
-                let currentPos = 0;
-
-                for (let part of updatedText.split('\n')) {
-                    let startPos = currentPos;
-                    let endPos = startPos + part.length;
-                    if (/\d{2}\/\d{2}\/\d{2}/.test(part)) {
-                        builder.setTextStyle(startPos, endPos, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
-                    } else {
-                        let style = richTextValue.getTextStyle(startPos, endPos);
-                        builder.setTextStyle(startPos, endPos, style);
-                    }
-                    currentPos += part.length + 1;
-                }
-                Logger.log(`removeMultipleDatesTODO(): Updated rich text value for ${column}${row}: ${builder.build().getText()}`);
-
-                const richTextResult = builder.build();
-                cell.setRichTextValue(richTextResult);
-                Logger.log(`Cell ${column}${row} updated with value: ${richTextResult.getText()}`);
+                const richTextValue = buildRichTextValue(updatedText, today, '#A9A9A9', cellValue);
+                cellRange.setRichTextValue(richTextValue);
+                Logger.log(`Cell ${column}${cellRange.getRow()} updated with value: ${richTextValue.getText()}`);
             }
-        }
+        });
     }
+
     Logger.log('End removeMultipleDatesTODO');
 }
 

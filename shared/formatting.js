@@ -143,6 +143,37 @@ function createRichTextValue(text, dateFormatted, column, config) {
 }
 
 /**
+ * Helper function to create or update RichTextValue with the given parameters.
+ * 
+ * @param {string} text - The full text for the RichTextValue.
+ * @param {string} subText - The part of the text to be styled.
+ * @param {string} color - The color to apply to the subText.
+ * @param {RichTextValue} originalRichTextValue - The original RichTextValue to preserve links.
+ * @return {RichTextValue} The updated RichTextValue.
+ */
+function buildRichTextValue(text, subText, color, originalRichTextValue) {
+    Logger.log(`buildRichTextValue(): Building rich text for "${subText}" with color ${color}`);
+
+    const newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
+        .setText(text)
+        .setTextStyle(0, text.length, SpreadsheetApp.newTextStyle().build())
+        .setTextStyle(text.length - subText.length, text.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build());
+
+    if (originalRichTextValue) {
+        const originalTextLength = originalRichTextValue.getText().length;
+        for (let i = 0; i < Math.min(text.length, originalTextLength); i++) {
+            const url = originalRichTextValue.getLinkUrl(i, i + 1);
+            if (url) {
+                newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
+                Logger.log(`buildRichTextValue(): Set link for character ${i}: ${url}`);
+            }
+        }
+    }
+
+    return newRichTextValueBuilder.build();
+}
+
+/**
  * Resets the text style of a cell.
  *
  * @param {Range} range - The range to reset.
@@ -188,6 +219,7 @@ if (typeof module !== 'undefined' && module.exports) {
         updateDateWithStyle,
         createRichTextValue,
         resetTextStyle,
-        clearTextFormatting
+        clearTextFormatting,
+        buildRichTextValue
     };
 }
