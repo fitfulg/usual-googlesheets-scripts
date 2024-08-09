@@ -61,7 +61,7 @@ function updateDaysLeftCounterTODO() {
     Logger.log(`Last update was on: ${lastUpdateDate}`);
     Logger.log(`Today's date is: ${todayFormatted}`);
 
-    // Calcular los días transcurridos desde la última actualización
+    // Calculate the number of days elapsed since the last update
     let daysElapsed = 0;
     if (lastUpdateDate) {
         const lastUpdate = new Date(lastUpdateDate);
@@ -70,7 +70,7 @@ function updateDaysLeftCounterTODO() {
     }
 
     const range = sheet.getRange('H2:H' + sheet.getLastRow());
-    const richTextValues = range.getRichTextValues(); // Obtener valores con formato
+    const richTextValues = range.getRichTextValues();
     Logger.log("Starting to update days left for each cell.");
 
     for (let i = 0; i < richTextValues.length; i++) {
@@ -80,20 +80,18 @@ function updateDaysLeftCounterTODO() {
 
         if (match) {
             const originalDays = parseInt(match[1]);
-            const daysLeft = Math.max(0, originalDays - daysElapsed); // Restar los días transcurridos
+            const daysLeft = Math.max(0, originalDays - daysElapsed); // No negative days left
 
             Logger.log(`Row ${i + 2}: original days left = ${originalDays}, new days left = ${daysLeft}`);
 
             if (daysLeft <= 0) {
-                // Borrar celda si días restantes es 0
                 richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
                 Logger.log(`Row ${i + 2}: Days left counter reached zero, clearing cell.`);
             } else {
-                // Actualizar el texto manteniendo el formato
                 let newText = cellValue.replace(`(${originalDays}) days left`, `(${daysLeft}) days left`);
                 let newRichTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(newText);
 
-                // Copiar el formato del texto antiguo al nuevo
+                // copy text styles from the original rich text value
                 for (let j = 0; j < cellRichTextValue.getRuns().length; j++) {
                     const startOffset = cellRichTextValue.getRuns()[j].getStartIndex();
                     const endOffset = cellRichTextValue.getRuns()[j].getEndIndex();
@@ -107,10 +105,10 @@ function updateDaysLeftCounterTODO() {
         }
     }
 
-    range.setRichTextValues(richTextValues); // Establecer valores con formato
+    range.setRichTextValues(richTextValues);
 
     if (daysElapsed > 0) {
-        properties.setProperty('lastUpdateDate', todayFormatted); // Actualizar la fecha de la última actualización
+        properties.setProperty('lastUpdateDate', todayFormatted);
     }
 
     Logger.log("Days left counter updated for all applicable cells.");
