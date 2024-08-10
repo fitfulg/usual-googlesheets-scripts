@@ -254,7 +254,6 @@ function shiftCellsUpTODO(column, startRow, endRow) {
         if (values[i][0] === '' && values[i + 1][0] !== '') {
             Logger.log(`Empty cell found at row ${i + startRow}, shifting cells up`);
 
-            // Preserve the original rich text, including links
             values[i][0] = values[i + 1][0];
             richTextValues[i][0] = richTextValues[i + 1][0];
 
@@ -291,11 +290,11 @@ function pushUpEmptyCellsTODO() {
             if (sheet.getRange(row, col).getValue() === '' && startRow === null) {
                 startRow = row;
             } else if (sheet.getRange(row, col).getValue() !== '' && startRow !== null) {
-                shiftCellsUpTODO(col, startRow, row - 1);
+                shiftCellsUpTODO(col, startRow, numRows);
                 startRow = null;
             }
         }
-        // Handle the case where the last rows are empty
+        // If the last rows in the column are empty
         if (startRow !== null) {
             shiftCellsUpTODO(col, startRow, numRows);
         }

@@ -29,11 +29,7 @@ function onOpen() {
 
         if (shouldRunUpdates(lastHash, currentHash)) {
             isLoaded = false;
-            runAllFunctionsTODO();
-
-            restoreSnapshotTODO(); // point B
-
-            updateDaysLeftCounterTODO();
+            runAllFunctionsTODO(); // point B
             docProperties.setProperty('lastHash', currentHash);
             Logger.log('Running all update functions');
             isLoaded = true
@@ -46,6 +42,7 @@ function onOpen() {
             translateSheetTODO();
             applyFormatToAllTODO();
             customCellBGColorTODO();
+            updateCellCommentTODO();
             ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
         }
     } catch (e) {
@@ -82,9 +79,10 @@ function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
     updateDateColorsTODO();
     setupDropdownTODO();
-    pushUpEmptyCellsTODO();
-    updateCellCommentTODO();
     removeMultipleDatesTODO();
+    restoreSnapshotTODO(); // point B
+    // functions that are meant to run on load
+    pushUpEmptyCellsTODO();
     updateDaysLeftCounterTODO();
     Logger.log('All functions called successfully!');
 }
