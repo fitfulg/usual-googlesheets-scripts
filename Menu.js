@@ -77,11 +77,11 @@ function applyGridLoaderTODO(sheet) {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
-    updateDateColorsTODO();
     setupDropdownTODO();
     removeMultipleDatesTODO();
     restoreSnapshotTODO(); // point B
     // functions that are meant to run on load
+    updateDateColorsTODO();
     pushUpEmptyCellsTODO();
     updateDaysLeftCounterTODO();
     Logger.log('All functions called successfully!');
