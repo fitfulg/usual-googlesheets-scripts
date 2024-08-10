@@ -1,4 +1,4 @@
- 
+
 
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -7,6 +7,7 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 
 // state management
 let isPieChartVisible = false;
+let isLoaded = true;
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -14,6 +15,7 @@ if (typeof module !== 'undefined' && module.exports) {
         sheet,
         getDataRange,
         datePattern,
-        isPieChartVisible
+        isPieChartVisible,
+        isLoaded,
     }
 }

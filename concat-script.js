@@ -2,7 +2,7 @@
 
 // Contents of ./globals.js
 
- 
+
 
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -11,11 +11,12 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 
 // state management
 let isPieChartVisible = false;
+let isLoaded = true;
 
 
 // Contents of ./Menu.js
 
-// globals.js: ui
+// globals.js: ui, isLoaded
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO, updateDaysLeftTODO
@@ -30,36 +31,63 @@ let isPieChartVisible = false;
 function onOpen() {
     Logger.log('onOpen triggered');
     const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getActiveSheet();
     const docProperties = PropertiesService.getDocumentProperties();
     const language = docProperties.getProperty('language') || 'English';
 
-    saveSnapshotTODO()
-    Logger.log('Current language: ' + language);
+    saveSnapshotTODO() // point A
 
-    ss.toast(toastMessages.loading[language], 'Status:', 13);
+    Logger.log('Current language: ' + language);
     try {
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
+        ss.toast(toastMessages.loading[language], 'Status:', 13);
+        applyGridLoaderTODO(sheet)
 
         if (shouldRunUpdates(lastHash, currentHash)) {
+            isLoaded = false;
             runAllFunctionsTODO();
 
-            restoreSnapshotTODO();
+            restoreSnapshotTODO(); // point B
+
             updateDaysLeftCounterTODO();
             docProperties.setProperty('lastHash', currentHash);
             Logger.log('Running all update functions');
+            isLoaded = true
         } else {
             Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
         }
 
-        createMenusTODO();
-        translateSheetTODO();
-        ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
+        if (isLoaded) {
+            createMenusTODO();
+            translateSheetTODO();
+            applyFormatToAllTODO();
+            customCellBGColorTODO();
+            ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
+        }
     } catch (e) {
         Logger.log('Error: ' + e.toString());
         ui.alert('Error during processing: ' + e.toString());
     }
+}
+
+/**
+ * Applies a grid loader to the sheet.
+ * Adds a red border to the first 20 rows and 8 columns.
+ * Used to indicate that the sheet is loading.
+ * 
+ * @param {Sheet} sheet - The sheet to apply the grid loader to.
+ * @customfunction
+ */
+function applyGridLoaderTODO(sheet) {
+    const startRow = 1;
+    const endRow = 21;
+    const startColumn = 1;
+    const endColumn = 8;
+
+    const range = sheet.getRange(startRow, startColumn, endRow, endColumn);
+    range.setBorder(true, true, true, true, true, true, '#FF0000', SpreadsheetApp.BorderStyle.SOLID);
 }
 
 /**
@@ -70,8 +98,6 @@ function onOpen() {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
-    customCellBGColorTODO();
-    applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
     pushUpEmptyCellsTODO();
@@ -283,7 +309,7 @@ function extractUrls(richTextValue) {
             urls.push({ url, start: i, end: i + 1 });
         }
     }
-    Logger.log('returning urls');
+    Logger.log(`returning urls: ${urls}`);
     return urls;
 }
 
@@ -420,10 +446,10 @@ function restoreSnapshot(formatCallback) {
                 Logger.log(`Restoring snapshot for cell ${cellKey}.`);
                 // Restore links
                 for (const link of cellData.links) {
-                    Logger.log(`Restoring link: ${link.url} at ${link.start}-${link.end}.`);
+                    Logger.log(`Restoring link: ${link.url} at ${link.start}-${link.end}`);
                     builder.setLinkUrl(link.start, link.end, link.url);
                 }
-                Logger.log(`Restored links: ${cellData.links.length}.`);
+                Logger.log(`Restored links for cell ${cellKey}. With a total of ${cellData.links.length}`);
                 // Apply custom formatting if a callback is provided
                 if (formatCallback) {
                     Logger.log(`restoreSnapshot()/formatCallback(): Applying custom formatting for cell ${cellKey}.`);
@@ -1668,7 +1694,7 @@ function updateDaysLeftCounterTODO() {
     Logger.log(`Last update was on: ${lastUpdateDate}`);
     Logger.log(`Today's date is: ${todayFormatted}`);
 
-    // Calcular los días transcurridos desde la última actualización
+    // Calculate the number of days elapsed since the last update
     let daysElapsed = 0;
     if (lastUpdateDate) {
         const lastUpdate = new Date(lastUpdateDate);
@@ -1677,7 +1703,7 @@ function updateDaysLeftCounterTODO() {
     }
 
     const range = sheet.getRange('H2:H' + sheet.getLastRow());
-    const richTextValues = range.getRichTextValues(); // Obtener valores con formato
+    const richTextValues = range.getRichTextValues();
     Logger.log("Starting to update days left for each cell.");
 
     for (let i = 0; i < richTextValues.length; i++) {
@@ -1687,20 +1713,18 @@ function updateDaysLeftCounterTODO() {
 
         if (match) {
             const originalDays = parseInt(match[1]);
-            const daysLeft = Math.max(0, originalDays - daysElapsed); // Restar los días transcurridos
+            const daysLeft = Math.max(0, originalDays - daysElapsed); // No negative days left
 
             Logger.log(`Row ${i + 2}: original days left = ${originalDays}, new days left = ${daysLeft}`);
 
             if (daysLeft <= 0) {
-                // Borrar celda si días restantes es 0
                 richTextValues[i][0] = SpreadsheetApp.newRichTextValue().setText('').build();
                 Logger.log(`Row ${i + 2}: Days left counter reached zero, clearing cell.`);
             } else {
-                // Actualizar el texto manteniendo el formato
                 let newText = cellValue.replace(`(${originalDays}) days left`, `(${daysLeft}) days left`);
                 let newRichTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(newText);
 
-                // Copiar el formato del texto antiguo al nuevo
+                // copy text styles from the original rich text value
                 for (let j = 0; j < cellRichTextValue.getRuns().length; j++) {
                     const startOffset = cellRichTextValue.getRuns()[j].getStartIndex();
                     const endOffset = cellRichTextValue.getRuns()[j].getEndIndex();
@@ -1714,10 +1738,10 @@ function updateDaysLeftCounterTODO() {
         }
     }
 
-    range.setRichTextValues(richTextValues); // Establecer valores con formato
+    range.setRichTextValues(richTextValues);
 
     if (daysElapsed > 0) {
-        properties.setProperty('lastUpdateDate', todayFormatted); // Actualizar la fecha de la última actualización
+        properties.setProperty('lastUpdateDate', todayFormatted);
     }
 
     Logger.log("Days left counter updated for all applicable cells.");

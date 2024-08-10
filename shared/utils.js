@@ -16,7 +16,7 @@ function extractUrls(richTextValue) {
             urls.push({ url, start: i, end: i + 1 });
         }
     }
-    Logger.log('returning urls');
+    Logger.log(`returning urls: ${urls}`);
     return urls;
 }
 
@@ -153,10 +153,10 @@ function restoreSnapshot(formatCallback) {
                 Logger.log(`Restoring snapshot for cell ${cellKey}.`);
                 // Restore links
                 for (const link of cellData.links) {
-                    Logger.log(`Restoring link: ${link.url} at ${link.start}-${link.end}.`);
+                    Logger.log(`Restoring link: ${link.url} at ${link.start}-${link.end}`);
                     builder.setLinkUrl(link.start, link.end, link.url);
                 }
-                Logger.log(`Restored links: ${cellData.links.length}.`);
+                Logger.log(`Restored links for cell ${cellKey}. With a total of ${cellData.links.length}`);
                 // Apply custom formatting if a callback is provided
                 if (formatCallback) {
                     Logger.log(`restoreSnapshot()/formatCallback(): Applying custom formatting for cell ${cellKey}.`);

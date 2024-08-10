@@ -1,4 +1,4 @@
-// globals.js: ui
+// globals.js: ui, isLoaded
 // shared/utils.js: getSheetContentHash, shouldRunUpdates
 // shared/formatting: applyFormatToSelected, applyFormatToAll
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO, updateDaysLeftTODO
@@ -13,36 +13,63 @@
 function onOpen() {
     Logger.log('onOpen triggered');
     const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getActiveSheet();
     const docProperties = PropertiesService.getDocumentProperties();
     const language = docProperties.getProperty('language') || 'English';
 
-    saveSnapshotTODO()
-    Logger.log('Current language: ' + language);
+    saveSnapshotTODO() // point A
 
-    ss.toast(toastMessages.loading[language], 'Status:', 13);
+    Logger.log('Current language: ' + language);
     try {
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
+        ss.toast(toastMessages.loading[language], 'Status:', 13);
+        applyGridLoaderTODO(sheet)
 
         if (shouldRunUpdates(lastHash, currentHash)) {
+            isLoaded = false;
             runAllFunctionsTODO();
 
-            restoreSnapshotTODO();
+            restoreSnapshotTODO(); // point B
+
             updateDaysLeftCounterTODO();
             docProperties.setProperty('lastHash', currentHash);
             Logger.log('Running all update functions');
+            isLoaded = true
         } else {
             Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
         }
 
-        createMenusTODO();
-        translateSheetTODO();
-        ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
+        if (isLoaded) {
+            createMenusTODO();
+            translateSheetTODO();
+            applyFormatToAllTODO();
+            customCellBGColorTODO();
+            ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
+        }
     } catch (e) {
         Logger.log('Error: ' + e.toString());
         ui.alert('Error during processing: ' + e.toString());
     }
+}
+
+/**
+ * Applies a grid loader to the sheet.
+ * Adds a red border to the first 20 rows and 8 columns.
+ * Used to indicate that the sheet is loading.
+ * 
+ * @param {Sheet} sheet - The sheet to apply the grid loader to.
+ * @customfunction
+ */
+function applyGridLoaderTODO(sheet) {
+    const startRow = 1;
+    const endRow = 21;
+    const startColumn = 1;
+    const endColumn = 8;
+
+    const range = sheet.getRange(startRow, startColumn, endRow, endColumn);
+    range.setBorder(true, true, true, true, true, true, '#FF0000', SpreadsheetApp.BorderStyle.SOLID);
 }
 
 /**
@@ -53,8 +80,6 @@ function onOpen() {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
-    customCellBGColorTODO();
-    applyFormatToAllTODO();
     updateDateColorsTODO();
     setupDropdownTODO();
     pushUpEmptyCellsTODO();
@@ -68,5 +93,6 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         onOpen,
         runAllFunctionsTODO,
+        applyGridLoaderTODO
     }
 }
