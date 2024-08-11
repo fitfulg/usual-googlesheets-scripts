@@ -13,7 +13,6 @@ function updateDateColorsTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
 
-    // Patrón para detectar fechas con y sin salto de línea
     const datePatternWithoutNewline = /\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy sin salto de línea
     const datePatternWithNewline = /\n\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy con salto de línea
 
@@ -26,17 +25,16 @@ function updateDateColorsTODO() {
 
             let dateText = null;
 
-            // Primero, intentamos coincidir con el patrón con salto de línea
+            // Intentar coincidir con el patrón con y sin salto de línea
             if (datePatternWithNewline.test(cellValue)) {
                 dateText = cellValue.match(datePatternWithNewline)[0].trim();
-            }
-            // Si no encuentra, intenta con el patrón sin salto de línea
-            else if (datePatternWithoutNewline.test(cellValue)) {
+            } else if (datePatternWithoutNewline.test(cellValue)) {
                 dateText = cellValue.match(datePatternWithoutNewline)[0].trim();
             }
 
             if (dateText) {
-                const cellDate = new Date(dateText.split('/').reverse().join('/'));
+                // Convertir la fecha de formato dd/MM/yy a un objeto Date
+                const cellDate = parseDate(dateText);
                 const today = new Date();
 
                 // Asegúrate de que las horas estén en cero para evitar errores de cálculo
@@ -60,7 +58,6 @@ function updateDateColorsTODO() {
                 const originalRichTextValue = cell.getRichTextValue();
                 const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
 
-                // Aplicar estilos a la fecha detectada
                 const startIdx = cellValue.indexOf(dateText);
                 const endIdx = startIdx + dateText.length;
 
@@ -87,7 +84,17 @@ function updateDateColorsTODO() {
     }
 }
 
-
+/**
+ * Convierte una fecha en formato dd/MM/yy a un objeto Date en JavaScript.
+ * 
+ * @param {string} dateString - La fecha en formato dd/MM/yy.
+ * @return {Date} - Un objeto Date de JavaScript.
+ */
+function parseDate(dateString) {
+    const [day, month, year] = dateString.split('/').map(Number);
+    const fullYear = year + 2000;  // Asumiendo que los años están en el rango 2000-2099
+    return new Date(fullYear, month - 1, day);  // Meses son 0-indexed en JavaScript
+}
 
 
 /**
