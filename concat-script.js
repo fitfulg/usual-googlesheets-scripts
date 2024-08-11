@@ -47,7 +47,6 @@ function onOpen() {
 
         if (shouldRunUpdates(lastHash, currentHash)) {
             isLoaded = false;
-            Utilities.sleep(2000);
             runAllFunctionsTODO(); // point B
             docProperties.setProperty('lastHash', currentHash);
             Logger.log('Running all update functions');
@@ -96,7 +95,7 @@ function applyGridLoaderTODO(sheet) {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
-    updateDateColorsTODO();
+    // updateDateColorsTODO();
     setupDropdownTODO();
     removeMultipleDatesTODO();
     restoreSnapshotTODO(); // point B
