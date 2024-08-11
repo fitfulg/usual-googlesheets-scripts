@@ -19,6 +19,7 @@ function updateDateColorsTODO() {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
             Logger.log(`updateDateColorsTODO(): Checking if cell ${cellValue} contains a date that matches the pattern ${datePattern}`);
+
             if (datePattern.test(cellValue)) {
                 const dateText = cellValue.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
@@ -32,17 +33,36 @@ function updateDateColorsTODO() {
                     color = config.warningColor;
                 }
 
-                const richTextValue = SpreadsheetApp.newRichTextValue()
-                    .setText(cellValue)
-                    .setTextStyle(cellValue.length - dateText.length, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build())
-                    .build();
+                const originalRichTextValue = cell.getRichTextValue();
+                const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
 
+                // Aplicar estilos a la fecha detectada
+                const startIdx = cellValue.indexOf(dateText);
+                const endIdx = startIdx + dateText.length;
+
+                if (originalRichTextValue) {
+                    for (let i = 0; i < cellValue.length; i++) {
+                        const url = originalRichTextValue.getLinkUrl(i, i + 1);
+                        if (url) {
+                            richTextValueBuilder.setLinkUrl(i, i + 1, url);
+                        }
+                    }
+                }
+
+                richTextValueBuilder.setTextStyle(
+                    startIdx,
+                    endIdx,
+                    SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
+                );
+
+                const richTextValue = richTextValueBuilder.build();
                 cell.setRichTextValue(richTextValue);
             }
         }
         Logger.log(`updateDateColorsTODO(): Updated date colors for column ${column}`);
     }
 }
+
 
 /**
  * Updates the days left counter for each cell in column H.
