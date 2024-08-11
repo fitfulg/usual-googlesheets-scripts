@@ -154,15 +154,15 @@ function checkAndSetColumnTODO(column, limit, priority) {
     const messages = {
         English: {
             cellLimitReached: "⚠️CELL LIMIT REACHED⚠️",
-            alertMessage: "⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority
+            alertMessage: "⚠️CELL LIMIT REACHED⚠️ \nfor " + priority
         },
         Spanish: {
             cellLimitReached: "⚠️LÍMITE DE CELDAS ALCANZADO⚠️",
-            alertMessage: "⚠️LÍMITE DE CELDAS ALCANZADO⚠️ \npara la prioridad: " + priority
+            alertMessage: "⚠️LÍMITE DE CELDAS ALCANZADO⚠️ \npara la " + priority
         },
         Catalan: {
             cellLimitReached: "⚠️LÍMIT DE CEL·LES ASSOLIT⚠️",
-            alertMessage: "⚠️LÍMIT DE CEL·LES ASSOLIT⚠️ \nper a la prioritat: " + priority
+            alertMessage: "⚠️LÍMIT DE CEL·LES ASSOLIT⚠️ \nper a la " + priority
         }
     };
 
