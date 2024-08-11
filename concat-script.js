@@ -1654,13 +1654,23 @@ function updateDateColorsTODO() {
                 const dateText = cellValue.match(datePattern)[0].trim();
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
                 const today = new Date();
+
+                // Asegúrate de que las horas estén en cero para evitar errores de cálculo
+                today.setHours(0, 0, 0, 0);
+                cellDate.setHours(0, 0, 0, 0);
+
                 const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
+                Logger.log(`Date: ${dateText}, CellDate: ${cellDate}, Today: ${today}, diffDays: ${diffDays}`);
 
                 let color = config.defaultColor || '#A9A9A9'; // Default color (dark gray)
                 if (diffDays >= config.danger) {
                     color = config.dangerColor;
+                    Logger.log(`Setting danger color for ${dateText}`);
                 } else if (diffDays >= config.warning) {
                     color = config.warningColor;
+                    Logger.log(`Setting warning color for ${dateText}`);
+                } else {
+                    Logger.log(`Setting default color for ${dateText}`);
                 }
 
                 const originalRichTextValue = cell.getRichTextValue();
@@ -1692,6 +1702,7 @@ function updateDateColorsTODO() {
         Logger.log(`updateDateColorsTODO(): Updated date colors for column ${column}`);
     }
 }
+
 
 
 /**
