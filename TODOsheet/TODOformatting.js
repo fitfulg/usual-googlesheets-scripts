@@ -95,18 +95,6 @@ function applyFormatToAllTODO() {
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
     const totalRows = sheet.getMaxRows();  // Get the total number of rows
     let range = sheet.getRange(1, 1, totalRows, 8);  // Define the range covering all rows and 8 columns
-    if (range) {
-        Format(range);  // Apply formatting to the range
-        applyBorders(range);  // Apply borders to the range
-    }
-
-    Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
-    applyThickBorders(sheet.getRange(1, 3, 11, 1));  // Apply thick borders to a specific range
-    applyThickBorders(sheet.getRange(1, 4, 21, 1));  // Apply thick borders to another range
-    applyThickBorders(sheet.getRange(1, 5, 21, 1));  // Apply thick borders to yet another range
-
-    Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
-    setCellContentAndStyleTODO();  // Set cell content and styles
 
     Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
     for (const column in cellStyles) {
@@ -134,6 +122,19 @@ function applyFormatToAllTODO() {
 
     Logger.log('applyFormatToAllTODO()/updateDateColorsTODO() called');
     updateDateColorsTODO();
+
+    if (range) {
+        Format(range);  // Apply formatting to the range
+        applyBorders(range);
+    }
+
+    Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
+    applyThickBorders(sheet.getRange(1, 3, 11, 1));
+    applyThickBorders(sheet.getRange(1, 4, 21, 1));
+    applyThickBorders(sheet.getRange(1, 5, 21, 1));
+
+    Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
+    setCellContentAndStyleTODO();  // Set cell content and styles
 }
 
 /**

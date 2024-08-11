@@ -29,7 +29,7 @@ function onOpen() {
 
         if (shouldRunUpdates(lastHash, currentHash)) {
             isLoaded = false;
-            runAllFunctionsTODO(); // point B
+            runAllFunctionsTODO();
             docProperties.setProperty('lastHash', currentHash);
             Logger.log('Running all update functions');
             isLoaded = true
@@ -40,9 +40,9 @@ function onOpen() {
         if (isLoaded) {
             createMenusTODO();
             translateSheetTODO();
-            applyFormatToAllTODO();
             customCellBGColorTODO();
             updateCellCommentTODO();
+            applyFormatToAllTODO();
             ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
         }
     } catch (e) {
