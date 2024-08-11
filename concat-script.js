@@ -7,7 +7,7 @@
 const ui = SpreadsheetApp.getUi();
 const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 const getDataRange = () => sheet.getDataRange();
-const datePattern = /\d{2}\/\d{2}\/\d{2}$/;
+const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 
 // state management
 let isPieChartVisible = false;
@@ -1643,15 +1643,29 @@ function updateDateColorsTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
 
+    // Patrón para detectar fechas con y sin salto de línea
+    const datePatternWithoutNewline = /\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy sin salto de línea
+    const datePatternWithNewline = /\n\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy con salto de línea
+
     for (const column of columns) {
         const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
-            Logger.log(`updateDateColorsTODO(): Checking if cell ${cellValue} contains a date that matches the pattern ${datePattern}`);
+            Logger.log(`updateDateColorsTODO(): Checking if cell ${cellValue} contains a date`);
 
-            if (datePattern.test(cellValue)) {
-                const dateText = cellValue.match(datePattern)[0].trim();
+            let dateText = null;
+
+            // Primero, intentamos coincidir con el patrón con salto de línea
+            if (datePatternWithNewline.test(cellValue)) {
+                dateText = cellValue.match(datePatternWithNewline)[0].trim();
+            }
+            // Si no encuentra, intenta con el patrón sin salto de línea
+            else if (datePatternWithoutNewline.test(cellValue)) {
+                dateText = cellValue.match(datePatternWithoutNewline)[0].trim();
+            }
+
+            if (dateText) {
                 const cellDate = new Date(dateText.split('/').reverse().join('/'));
                 const today = new Date();
 
@@ -1702,6 +1716,7 @@ function updateDateColorsTODO() {
         Logger.log(`updateDateColorsTODO(): Updated date colors for column ${column}`);
     }
 }
+
 
 
 
