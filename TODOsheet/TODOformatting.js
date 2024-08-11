@@ -96,22 +96,6 @@ function applyFormatToAllTODO() {
     const totalRows = sheet.getMaxRows();  // Get the total number of rows
     let range = sheet.getRange(1, 1, totalRows, 8);  // Define the range covering all rows and 8 columns
 
-    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
-    for (const column in cellStyles) {
-        const { limit, priority, value } = cellStyles[column];
-
-        // Validate if the limit and priority are available in the selected language
-        const translatedLimit = limit?.[language];
-        const translatedPriority = priority?.[language];
-
-        if (translatedLimit !== undefined && translatedPriority !== undefined) {
-            checkAndSetColumnTODO(column.charAt(0), translatedLimit, translatedPriority);  // Apply column-specific settings
-            Logger.log(`applyFormatToAllTODO(): translatedText set for column ${column} - limit: ${translatedLimit}, priority: ${translatedPriority}`);
-        } else {
-            Logger.log(`applyFormatToAllTODO(): limit or priority not found for column ${column} and language ${language}`);
-        }
-    }
-
     Logger.log('applyFormatToAllTODO()/exampleTextTODO(): setting example text');
     for (const column in exampleTexts) {
         const { text } = exampleTexts[column];
@@ -135,6 +119,22 @@ function applyFormatToAllTODO() {
 
     Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
     setCellContentAndStyleTODO();  // Set cell content and styles
+
+    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
+    for (const column in cellStyles) {
+        const { limit, priority, value } = cellStyles[column];
+
+        // Validate if the limit and priority are available in the selected language
+        const translatedLimit = limit?.[language];
+        const translatedPriority = priority?.[language];
+
+        if (translatedLimit !== undefined && translatedPriority !== undefined) {
+            checkAndSetColumnTODO(column.charAt(0), translatedLimit, translatedPriority);  // Apply column-specific settings
+            Logger.log(`applyFormatToAllTODO(): translatedText set for column ${column} - limit: ${translatedLimit}, priority: ${translatedPriority}`);
+        } else {
+            Logger.log(`applyFormatToAllTODO(): limit or priority not found for column ${column} and language ${language}`);
+        }
+    }
 }
 
 /**
