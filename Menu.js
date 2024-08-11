@@ -17,7 +17,7 @@ function onOpen() {
     const docProperties = PropertiesService.getDocumentProperties();
     const language = docProperties.getProperty('language') || 'English';
 
-    saveSnapshotTODO() // point A
+    // saveSnapshotTODO() // point A
 
     Logger.log('Current language: ' + language);
     try {
@@ -79,7 +79,7 @@ function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
     setupDropdownTODO();
     removeMultipleDatesTODO();
-    restoreSnapshotTODO(); // point B
+    // restoreSnapshotTODO(); // point B
     // functions that are meant to run on load
     pushUpEmptyCellsTODO();
     updateDaysLeftCounterTODO();
