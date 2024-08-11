@@ -147,18 +147,39 @@ function applyFormatToAllTODO() {
  */
 function checkAndSetColumnTODO(column, limit, priority) {
     Logger.log(`checkAndSetColumnTODO called for column: ${column}, limit: ${limit}, priority: ${priority}`);
+
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
+
+    // Define messages based on the selected language
+    const messages = {
+        English: {
+            cellLimitReached: "⚠️CELL LIMIT REACHED⚠️",
+            alertMessage: "⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority
+        },
+        Spanish: {
+            cellLimitReached: "⚠️LÍMITE DE CELDAS ALCANZADO⚠️",
+            alertMessage: "⚠️LÍMITE DE CELDAS ALCANZADO⚠️ \npara la prioridad: " + priority
+        },
+        Catalan: {
+            cellLimitReached: "⚠️LÍMIT DE CEL·LES ASSOLIT⚠️",
+            alertMessage: "⚠️LÍMIT DE CEL·LES ASSOLIT⚠️ \nper a la prioritat: " + priority
+        }
+    };
+
+    const message = messages[language];
+
     const dataRange = getDataRange();
     const values = sheet.getRange(column + "2:" + column + dataRange.getLastRow()).getValues().flat();
     const occupied = values.filter(String).length;
     const range = sheet.getRange(column + "2:" + column + dataRange.getLastRow());
 
     if (occupied > limit) {
-        // red with thicker border
+        // Set red border with thicker style
         range.setBorder(true, true, true, true, true, true, "#FF0000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-        sheet.getRange(column + "1").setValue("⚠️CELL LIMIT REACHED⚠️");
-        SpreadsheetApp.getUi().alert("⚠️CELL LIMIT REACHED⚠️ \nfor priority: " + priority);
+        sheet.getRange(column + "1").setValue(message.cellLimitReached);
+        SpreadsheetApp.getUi().alert(message.alertMessage);
     } else {
-        // black with thicker border
+        // Set black border with thicker style
         range.setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
         sheet.getRange(column + "1").setValue(priority);
     }
