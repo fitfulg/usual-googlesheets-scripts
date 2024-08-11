@@ -78,7 +78,6 @@ function applyGridLoaderTODO(sheet) {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
-    Utilities.sleep(2000);
     updateDateColorsTODO();
     setupDropdownTODO();
     removeMultipleDatesTODO();

@@ -96,7 +96,6 @@ function applyGridLoaderTODO(sheet) {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
-    Utilities.sleep(2000);
     updateDateColorsTODO();
     setupDropdownTODO();
     removeMultipleDatesTODO();
@@ -783,6 +782,7 @@ function applyFormatToAllTODO() {
         exampleTextTODO(column, translatedText);  // Set example text for the column
         Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
     }
+    updateDateColorsTODO();
 }
 
 /**
@@ -1257,10 +1257,10 @@ const exampleTexts = {
 
 
 const dateColorConfig = {
-    C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
-    // C: { warning: 3, danger: 6, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
-    D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
-    // D: { warning: 3, danger: 6, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
+    // C: { warning: 7, danger: 30, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
+    C: { warning: 3, danger: 6, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' }, // 1 week, 1 month
+    // D: { warning: 90, danger: 180, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
+    D: { warning: 3, danger: 6, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
     E: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
     F: { warning: 180, danger: 365, warningColor: '#FFA500', dangerColor: '#FF0000', defaultColor: '#A9A9A9' },
     G: { warning: 0, danger: 0, warningColor: '#A9A9A9', dangerColor: '#A9A9A9', defaultColor: '#A9A9A9' }, // Always default
