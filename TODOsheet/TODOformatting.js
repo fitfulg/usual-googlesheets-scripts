@@ -131,6 +131,8 @@ function applyFormatToAllTODO() {
         exampleTextTODO(column, translatedText);  // Set example text for the column
         Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
     }
+
+    Logger.log('applyFormatToAllTODO()/updateDateColorsTODO() called');
     updateDateColorsTODO();
 }
 

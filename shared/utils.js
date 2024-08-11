@@ -216,6 +216,18 @@ function preserveStylesAndLinks(originalTextValue, newTextValueBuilder, offset) 
     Logger.log('preserveStylesAndLinks completed');
 }
 
+/**
+ * Converts a date string in the format dd/MM/yy to a JavaScript Date object.
+ * 
+ * @param {string} dateString - La fecha en formato dd/MM/yy.
+ * @return {Date} - Un objeto Date de JavaScript.
+ */
+function parseDate(dateString) {
+    const [day, month, year] = dateString.split('/').map(Number);
+    const fullYear = year + 2000;  // Assume years are in the 21st century
+    return new Date(fullYear, month - 1, day);  // Months are 0-based
+}
+
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -227,6 +239,7 @@ if (typeof module !== 'undefined' && module.exports) {
         saveSnapshot,
         restoreSnapshot,
         processCells,
-        preserveStylesAndLinks
+        preserveStylesAndLinks,
+        parseDate
     };
 }
