@@ -121,8 +121,8 @@ const cellStyles = {
     "E1": {
         value: {
             "English": "LOW PRIORITY",
-            "Spanish": "BAJA PRIORIDAD",
-            "Catalan": "BAIXA PRIORITAT"
+            "Spanish": "PRIORIDAD BAJA",
+            "Catalan": "PRIORITAT BAIXA"
         },
         limit: {
             "English": 20,
@@ -131,8 +131,8 @@ const cellStyles = {
         },
         priority: {
             "English": "LOW PRIORITY",
-            "Spanish": "BAJA PRIORIDAD",
-            "Catalan": "BAIXA PRIORITAT"
+            "Spanish": "PRIORIDAD BAJA",
+            "Catalan": "PRIORITAT BAIXA"
         },
         fontWeight: "bold",
         fontColor: null,
