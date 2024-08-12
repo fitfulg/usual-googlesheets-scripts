@@ -7,7 +7,7 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 
 // state management
 let isPieChartVisible = false;
-let isLoaded = true;
+let isLoaded = false;
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {

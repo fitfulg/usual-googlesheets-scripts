@@ -11,7 +11,7 @@ const datePattern = /\n\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy
 
 // state management
 let isPieChartVisible = false;
-let isLoaded = true;
+let isLoaded = false;
 
 
 // Contents of ./Menu.js
@@ -42,27 +42,21 @@ function onOpen() {
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
-        ss.toast(toastMessages.loading[language], 'Status:', 13);
-        applyGridLoaderTODO(sheet)
 
         if (shouldRunUpdates(lastHash, currentHash)) {
-            isLoaded = false;
+            isLoaded = false
+            ss.toast(toastMessages.loading[language], 'Status:', 15);
+            applyGridLoaderTODO(sheet);
             runAllFunctionsTODO();
             docProperties.setProperty('lastHash', currentHash);
             Logger.log('Running all update functions');
-            isLoaded = true
+            ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
         } else {
+            isLoaded = true
+            ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
             Logger.log('It is not necessary to run all functions, the data has not changed significantly.');
         }
 
-        if (isLoaded) {
-            createMenusTODO();
-            translateSheetTODO();
-            customCellBGColorTODO();
-            updateCellCommentTODO();
-            applyFormatToAllTODO();
-            ss.toast(toastMessages.updateComplete[language], 'Status:', 5);
-        }
     } catch (e) {
         Logger.log('Error: ' + e.toString());
         ui.alert('Error during processing: ' + e.toString());
@@ -97,10 +91,13 @@ function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
     setupDropdownTODO();
     removeMultipleDatesTODO();
-    // restoreSnapshotTODO(); // point B
-    // functions that are meant to run on load
     pushUpEmptyCellsTODO();
     updateDaysLeftCounterTODO();
+    createMenusTODO();
+    translateSheetTODO();
+    customCellBGColorTODO();
+    updateCellCommentTODO();
+    applyFormatToAllTODO(); // overwrites the grid loader
     Logger.log('All functions called successfully!');
 }
 
