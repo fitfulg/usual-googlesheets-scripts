@@ -256,9 +256,8 @@ function removeMultipleDatesTODO() {
     for (const column of columns) {
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
-            const cellValue = cell.getValue();
             const richTextValue = cell.getRichTextValue();
-            const text = richTextValue ? richTextValue.getText() : cellValue;
+            let text = richTextValue ? richTextValue.getText() : cell.getValue();
 
             Logger.log(`removeMultipleDatesTODO(): Checking cell ${column}${row}: ${text}`);
 
@@ -266,44 +265,31 @@ function removeMultipleDatesTODO() {
             if (dateMatches && dateMatches.length > 1) {
                 Logger.log(`removeMultipleDatesTODO(): Found dates in ${column}${row}: ${dateMatches.join(', ')}`);
 
-                const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
-                Logger.log(`removeMultipleDatesTODO(): Today is: ${today}`);
+                // Keep only the last date
+                const lastDate = dateMatches[dateMatches.length - 1];
+                text = text.replace(/\d{2}\/\d{2}\/\d{2}/g, '').trim();
+                text += `\n${lastDate}`;
 
-                const datesToKeep = [today];
-                for (let date of dateMatches) {
-                    if (date !== today) {
-                        datesToKeep.push(date);
-                    }
-                }
-                Logger.log(`removeMultipleDatesTODO(): Dates to keep: ${datesToKeep.join(', ')}`);
+                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${text}`);
 
-                let updatedText = text;
-                for (let date of datesToKeep) {
-                    let lastOccurrence = updatedText.lastIndexOf(date);
-                    if (lastOccurrence !== -1) {
-                        updatedText = updatedText.substring(0, lastOccurrence) + updatedText.substring(lastOccurrence).replace(new RegExp(date, 'g'), '');
-                    }
-                }
-                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
-
-                updatedText = updatedText.replace(new RegExp(`\\b(${dateMatches.join('|')})\\b`, 'g'), '').trim() + `\n${today}`;
-                Logger.log(`removeMultipleDatesTODO(): Updated text for ${column}${row}: ${updatedText}`);
-
-                let builder = SpreadsheetApp.newRichTextValue().setText(updatedText);
+                let builder = SpreadsheetApp.newRichTextValue().setText(text);
                 let currentPos = 0;
 
-                for (let part of updatedText.split('\n')) {
+                // Apply the same text styles to the new text
+                const lines = text.split('\n');
+                for (let i = 0; i < lines.length; i++) {
+                    const part = lines[i];
                     let startPos = currentPos;
                     let endPos = startPos + part.length;
+
                     if (/\d{2}\/\d{2}\/\d{2}/.test(part)) {
                         builder.setTextStyle(startPos, endPos, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
                     } else {
                         let style = richTextValue.getTextStyle(startPos, endPos);
                         builder.setTextStyle(startPos, endPos, style);
                     }
-                    currentPos += part.length + 1;
+                    currentPos += part.length + 1; // +1 for the newline character
                 }
-                Logger.log(`removeMultipleDatesTODO(): Updated rich text value for ${column}${row}: ${builder.build().getText()}`);
 
                 const richTextResult = builder.build();
                 cell.setRichTextValue(richTextResult);
@@ -341,8 +327,16 @@ function handleExpirationDateTODO(range, originalValue, newValue, columnLetter, 
             Logger.log('Error: daysLeft is NaN');
             return;
         }
+        // Remove the old expiration date
+        let updatedText = newValue.replace(expiresDatePattern, '').trim();
+        updatedText = updatedText.replace(/\d{2}\/\d{2}\/\d{2}/g, '').trim(); // Remove any other dates
 
-        const updatedText = newValue.replace(expiresDatePattern, '').trim() + `\nExpires in (${daysLeft}) days`;
+        const expiresTextPattern = /Expires in \(\d+\) days/;
+        updatedText = updatedText.replace(expiresTextPattern, '').trim();
+
+        // Add the new expiration information
+        updatedText += `\nExpires in (${daysLeft}) days\n${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`;
+
         range.setValue(updatedText);
 
         Logger.log(`Updated cell ${columnLetter}${row} with expiration information: ${updatedText}`);
