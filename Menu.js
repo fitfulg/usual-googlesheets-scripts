@@ -81,6 +81,7 @@ function runAllFunctionsTODO() {
     translateSheetTODO();
     customCellBGColorTODO();
     updateCellCommentTODO();
+    updateTipsCellTODO();
     applyFormatToAllTODO(); // overwrites the grid loader
     Logger.log('All functions called successfully!');
 }

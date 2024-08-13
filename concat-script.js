@@ -99,6 +99,7 @@ function runAllFunctionsTODO() {
     translateSheetTODO();
     customCellBGColorTODO();
     updateCellCommentTODO();
+    updateTipsCellTODO();
     applyFormatToAllTODO(); // overwrites the grid loader
     Logger.log('All functions called successfully!');
 }
@@ -678,47 +679,109 @@ function removeCheckboxesTODO() {
 // TODOsheet/TODOlibrary.js: dateColorConfig
 
 /**
- * Updates the comment for a specific cell with version and feature details.
+ * Updates the colors of the dates based on the priority of the column.
+ *  
+ * @customfunction
+ */
+function updateTipsCellTODO() {
+    Logger.log('updateTipsCellTODO called');
+    const cell = sheet.getRange("I2");
+
+    const tips = {
+        English: "💡 To add an expiration date countdown, simply add the date in the format **dd/mm/yyyy** to the desired cell.(Don't forget to add the asterisks)",
+        Spanish: "💡 Para añadir una fecha de expiración a modo de cuenta atrás en días, basta con añadir la fecha en formato **dd/mm/yyyy** a la celda en cuestión. (No olvides añadir los asteriscos)",
+        Catalan: "💡 Per afegir una data de caducitat en mode compte enrere en dies, només cal afegir la data en format **dd/mm/yyyy** a la cel·la en qüestió. (No oblidis afegir els asteriscs)"
+    };
+
+    const titles = {
+        English: "💡Tips",
+        Spanish: "💡Consejos",
+        Catalan: "💡Consells"
+    };
+
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
+    const tipText = tips[language];
+    const titleText = titles[language];
+
+    cell.setNote(tipText);
+    cell.setValue(titleText);
+    cell.setFontWeight("bold");
+    cell.setFontSize(12);
+    cell.setHorizontalAlignment("center");
+    cell.setVerticalAlignment("middle");
+    cell.setBackground("#efefef");
+    cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
+
+    Logger.log('Tips cell updated with tips for language: ' + language);
+}
+
+/**
+ * Updates the cell comment with the latest changes.
  * 
  * @customfunction
  */
 function updateCellCommentTODO() {
     Logger.log('updateCellCommentTODO called');
-    const cell = sheet.getRange("I2");
+    const cell = sheet.getRange("I3");
     const version = "v1.2";
-    const emoji = "💡";
-    const changes = `\n
-        - A checkbox is added by default from the 3rd to the 8th column when a cell is written or modified.\n
-        - You can add, mark, restore and delete checkboxes in cells by selecting them and using the "Custom Formats" menu.\n
-        - The "days left" counter is updated daily in the 8th column. When the counter reaches zero, the cell is cleared.\n
-        - A snapshot of the sheet can be saved and restored from the "Custom Formats" menu.\n
-        - Snapshots are automatically saved and restored when the sheet is reloaded so that the last state is always preserved.\n
+    cell.setValue(version);
 
-        OLD FEATURES: \n
-        - There is an indicative limit of cells for each priority. In the end the objective of a TODO is none other than to complete the tasks and that they do not accumulate. Once this limit is reached, a warning is activated for the entire column.
-        This feature does not block cells, that is, you can continue occupying cells even if you have the warning.\n
-        - You can apply some custom formats that do not require to refresh the page from the "Custom Formats" menu.\n
-        - The date color change times are different for each column, with HIGH PRIORITY being the fastest to change and LOW PRIORITY being the slowest.\n
-        - The Piechart can be shown or hidden directly using its dropdown cell.\n
-        - Empty cells that are deleted are occupied by their immediately lower cell.\n
-    `;
+    const changes = {
+        English: `
+            NEW FEATURES:
+            - A checkbox is added by default from the 3rd to the 8th column when a cell is written or modified.
+            - You can add, mark, restore, and delete checkboxes in cells by selecting them and using the "Custom Formats" menu.
+            - The "days left" counter is updated daily in the 8th column. When the counter reaches zero, the cell is cleared.
+            - A snapshot of the sheet can be saved and restored from the "Custom Formats" menu.
+            - Snapshots are automatically saved and restored when the sheet is reloaded so that the last state is always preserved.
+            OLD FEATURES:
+            - Indicative limit of cells for each priority, with a warning when the limit is reached.
+            - Custom formats can be applied without refreshing the page from the "Custom Formats" menu.
+            - Date color change times vary by column priority.
+            - The Piechart can be shown or hidden using its dropdown cell.
+            - Deleted empty cells are replaced by the immediately lower cell.
+        `,
+        Spanish: `
+            NUEVAS FUNCIONES:
+            - Se añade una casilla de verificación por defecto desde la 3ª a la 8ª columna cuando se escribe o modifica una celda.
+            - Puedes agregar, marcar, restaurar y eliminar casillas en las celdas seleccionándolas y usando el menú "Formatos personalizados".
+            - El contador de "días restantes" se actualiza diariamente en la 8ª columna. Cuando el contador llega a cero, la celda se borra.
+            - Se puede guardar y restaurar una instantánea de la hoja desde el menú "Formatos personalizados".
+            - Las instantáneas se guardan y restauran automáticamente cuando se recarga la hoja para que siempre se conserve el último estado.
+            FUNCIONES ANTIGUAS:
+            - Límite indicativo de celdas para cada prioridad, con una advertencia cuando se alcanza el límite.
+            - Se pueden aplicar formatos personalizados sin necesidad de refrescar la página desde el menú "Formatos personalizados".
+            - Los tiempos de cambio de color de las fechas varían según la prioridad de la columna.
+            - El gráfico circular se puede mostrar u ocultar usando su celda desplegable.
+            - Las celdas vacías eliminadas son reemplazadas por la celda inmediatamente inferior.
+        `,
+        Catalan: `
+            NOVES FUNCIONS:
+            - S'afegeix una casella de verificació per defecte des de la 3a fins a la 8a columna quan s'escriu o es modifica una cel·la.
+            - Pots afegir, marcar, restaurar i eliminar caselles en les cel·les seleccionades seleccionant-les i utilitzant el menú "Formats personalitzats".
+            - El comptador de "dies restants" s'actualitza diàriament a la 8a columna. Quan el comptador arriba a zero, la cel·la s'esborra.
+            - Es pot desar i restaurar una instantània del full des del menú "Formats personalitzats".
+            - Les instantànies es guarden i es restauren automàticament quan es recarrega el full per tal que sempre es conservi l'últim estat.
+            FUNCIONS ANTIGUES:
+            - Límite indicatiu de cel·les per a cada prioritat, amb una advertència quan s'assoleix el límit.
+            - Es poden aplicar formats personalitzats sense necessitat de refrescar la pàgina des del menú "Formats personalitzats".
+            - Els temps de canvi de color de les dates varien segons la prioritat de la columna.
+            - El gràfic circular es pot mostrar o ocultar utilitzant la seva cel·la desplegable.
+            - Les cel·les buides eliminades són reemplaçades per la cel·la immediatament inferior.
+        `
+    };
 
-    const comment = `Versión: ${version}\n NEW FEATURES:\n${changes}`;
+    const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
+    const comment = `Version: ${version}\n${changes[language]}`;
+
     cell.setComment(comment);
     cell.setBackground("#efefef");
     cell.setBorder(true, true, true, true, true, true, '#D3D3D3', SpreadsheetApp.BorderStyle.SOLID_THICK);
-
-    // Create RichTextValue with different font sizes
-    const richText = SpreadsheetApp.newRichTextValue()
-        .setText(`${version}\n${emoji}`)
-        .setTextStyle(0, version.length, SpreadsheetApp.newTextStyle().setFontSize(8).build())
-        .setTextStyle(version.length + 1, version.length + 2, SpreadsheetApp.newTextStyle().setFontSize(20).build())
-        .setTextStyle(version.length + 2, version.length + 3, SpreadsheetApp.newTextStyle().setFontSize(20).build())
-        .build();
-
-    cell.setRichTextValue(richText);
     Format(cell);
+
+    Logger.log('Cell comment updated with changes for language: ' + language);
 }
+
 
 /**
  * Sets example text for a specific column if the cells are empty.
@@ -1960,7 +2023,7 @@ function removeMultipleDatesTODO() {
             if (dateMatches && dateMatches.length > 1) {
                 Logger.log(`removeMultipleDatesTODO(): Found dates in ${column}${row}: ${dateMatches.join(', ')}`);
 
-                // Mantener solo la última fecha
+                // Keep only the last date
                 const lastDate = dateMatches[dateMatches.length - 1];
                 text = text.replace(/\d{2}\/\d{2}\/\d{2}/g, '').trim();
                 text += `\n${lastDate}`;
@@ -1970,7 +2033,7 @@ function removeMultipleDatesTODO() {
                 let builder = SpreadsheetApp.newRichTextValue().setText(text);
                 let currentPos = 0;
 
-                // Aplicar estilo
+                // Apply the same text styles to the new text
                 const lines = text.split('\n');
                 for (let i = 0; i < lines.length; i++) {
                     const part = lines[i];
@@ -1994,8 +2057,6 @@ function removeMultipleDatesTODO() {
     }
     Logger.log('End removeMultipleDatesTODO');
 }
-
-
 
 /**
  * Handles the expiration date in a cell.
@@ -2024,16 +2085,14 @@ function handleExpirationDateTODO(range, originalValue, newValue, columnLetter, 
             Logger.log('Error: daysLeft is NaN');
             return;
         }
-
-        // Remover la fecha actual (sin eliminar "Expires in...")
+        // Remove the old expiration date
         let updatedText = newValue.replace(expiresDatePattern, '').trim();
-        updatedText = updatedText.replace(/\d{2}\/\d{2}\/\d{2}/g, '').trim(); // Elimina cualquier fecha vieja
+        updatedText = updatedText.replace(/\d{2}\/\d{2}\/\d{2}/g, '').trim(); // Remove any other dates
 
-        // Si hay un "Expires in..." existente, eliminarlo también
         const expiresTextPattern = /Expires in \(\d+\) days/;
         updatedText = updatedText.replace(expiresTextPattern, '').trim();
 
-        // Luego agrega el nuevo texto "Expires in (days)..."
+        // Add the new expiration information
         updatedText += `\nExpires in (${daysLeft}) days\n${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`;
 
         range.setValue(updatedText);
@@ -2051,8 +2110,6 @@ function handleExpirationDateTODO(range, originalValue, newValue, columnLetter, 
 
     return false; // No expiration date found
 }
-
-
 
 /**
  * Calculates the number of days left until the expiration date.
