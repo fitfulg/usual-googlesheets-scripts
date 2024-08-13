@@ -328,6 +328,7 @@ function removeMultipleDatesTODO() {
  * @return {boolean} True if the expiration date was found and updated, false otherwise.
  */
 function handleExpirationDateTODO(range, originalValue, newValue, columnLetter, row, e) {
+    Logger.log(`handleExpirationDateTODO called for cell ${columnLetter}${row}`);
     const expiresDatePattern = /\*\*(\d{2}\/\d{2}\/\d{4})\*\*/;
     const match = newValue.match(expiresDatePattern);
 
@@ -383,6 +384,37 @@ function calcExpirationDaysTODO(dateString) {
     return daysLeft;
 }
 
+/**
+ * Updates the "Expires in (n) days" text for all cells that contain it.
+ * This function should be called on sheet open or reload to ensure that all expiration dates are accurate.
+ * 
+ * @customfunction
+ */
+function updateExpirationDatesTODO() {
+    Logger.log('updateExpirationDatesTODO called');
+    const dataRange = getDataRange();
+    const values = dataRange.getValues();
+
+    for (let row = 1; row < values.length; row++) {
+        for (let col = 0; col < values[row].length; col++) {
+            const cell = sheet.getRange(row + 1, col + 1);
+            const cellValue = values[row][col].toString();
+            const expiresDatePattern = /\*\*(\d{2}\/\d{2}\/\d{4})\*\*/;
+            const expiresTextPattern = /Expires in \(\d+\) days/;
+
+            if (expiresDatePattern.test(cellValue) || expiresTextPattern.test(cellValue)) {
+                Logger.log(`Updating expiration for cell at row ${row + 1}, column ${col + 1}`);
+
+                const originalValue = cell.getValue();
+                const columnLetter = String.fromCharCode(64 + col + 1);
+
+                handleExpirationDateTODO(cell, originalValue, cellValue, columnLetter, row + 1, null);
+            }
+        }
+    }
+    Logger.log('Finished updateExpirationDatesTODO');
+}
+
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -392,6 +424,7 @@ if (typeof module !== 'undefined' && module.exports) {
         updateDaysLeftCellTODO,
         parseDaysLeftTODO,
         handleExpirationDateTODO,
-        calcExpirationDaysTODO
+        calcExpirationDaysTODO,
+        updateExpirationDatesTODO
     }
 }

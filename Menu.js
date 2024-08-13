@@ -3,6 +3,7 @@
 // shared/formatting: applyFormatToSelected, applyFormatToAll
 // TODOsheet/TODOformatting.js: applyFormatToAllTODO, customCeilBGColorTODO, createPieChartTODO, deleteAllChartsTODO, updateDateColorsTODO, setupDropdownTODO, pushUpEmptyCellsTODO, updateCellCommentTODO, removeMultipleDatesTODO, updateDaysLeftTODO
 // TODOsheet/TODOcheckbox.js: addCheckboxToCellTODO, addCheckboxesToSelectedCellsTODO, markCheckboxSelectedCellsTODO, markAllCheckboxesSelectedCellsTODO, removeCheckboxesFromSelectedCellsTODO
+// TODOsheet/TODOtimeHandle.js: updateExpirationDatesTODO, updateDaysLeftCounterTODO
 
 /**
  * Initializes the UI menu in the spreadsheet.
@@ -75,6 +76,7 @@ function runAllFunctionsTODO() {
     removeMultipleDatesTODO();
     pushUpEmptyCellsTODO();
     updateDaysLeftCounterTODO();
+    updateExpirationDatesTODO();
     createMenusTODO();
     translateSheetTODO();
     customCellBGColorTODO();
