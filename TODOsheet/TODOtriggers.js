@@ -1,6 +1,7 @@
 // globals.js: sheet
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
 // TODOsheet/TODOformatting.js: shiftCellsUpTODO, handleColumnEditTODO, addCheckboxToCellTODO
+// TODOsheet/TODOtimeHandle.js: handleExpirationDateTODO
 
 /**
  * Track changes in specified columns and add the date.
@@ -30,8 +31,12 @@ function onEdit(e) {
 
         const originalValue = e.oldValue || '';
         const newValue = range.getValue().toString();
-
         Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
+
+        if (handleExpirationDateTODO(range, originalValue, newValue, columnLetter, row, e)) {
+            Logger.log('onEdit()/handleExpirationDate(): Handled expiration date');
+            return;
+        }
 
         if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
             Logger.log(`onEdit(): Shifting cells up for column ${column}`);
@@ -52,6 +57,7 @@ function onEdit(e) {
         Logger.log(`Error stack: ${error.stack}`);
     }
 }
+
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {

@@ -347,37 +347,54 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
 
     const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
 
-    // Reemplazar el patrón (n) days left por la fecha actual
-    const daysLeftPattern = /\(\d+\) days left/;
-    if (daysLeftPattern.test(updatedText)) {
-        updatedText = updatedText.replace(daysLeftPattern, dateFormatted);
-        Logger.log(`Replaced (n) days left with today's date: "${updatedText}"`);
-    } else if (!/\d{2}\/\d{2}\/\d{2}/.test(updatedText)) {
-        updatedText = updatedText + '\n' + dateFormatted;
+    // Add the date if it's not present
+    const datePattern = /\d{2}\/\d{2}\/\d{2}$/;
+    if (!datePattern.test(updatedText)) {
+        updatedText = `${updatedText}\n${dateFormatted}`;
         Logger.log(`No date found, updated text with new date: "${updatedText}"`);
-    } else {
-        updatedText = updatedText.replace(/\d{2}\/\d{2}\/\d{2}/, dateFormatted);
-        Logger.log(`Replaced date with new date: "${updatedText}"`);
     }
 
-    Logger.log(`Updated text: "${updatedText}"`);
+    // Add a checkbox if it's not present
+    if (!updatedText.startsWith('☑️')) {
+        updatedText = `☑️${updatedText}`;
+        Logger.log(`Checkbox added to the start of the text: "${updatedText}"`);
+    }
 
+    // Apply rich text formatting
     const newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
         .setText(updatedText)
         .setTextStyle(0, updatedText.length, SpreadsheetApp.newTextStyle().build());
 
     const lastLineIndex = updatedText.lastIndexOf('\n');
     Logger.log(`Last line index: ${lastLineIndex}`);
+
     if (lastLineIndex !== -1) {
+        // Apply style to the date
+        const dateStartIdx = updatedText.search(datePattern);
+        const dateEndIdx = updatedText.length;
         const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
         newRichTextValueBuilder.setTextStyle(
-            lastLineIndex + 1,
-            updatedText.length,
+            dateStartIdx,
+            dateEndIdx,
             SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
         );
-        Logger.log(`Applied style to last line: ${lastLineIndex + 1} to ${updatedText.length}`);
+        Logger.log(`Applied style to date: ${dateStartIdx} to ${dateEndIdx}`);
+
+        // Apply style to "Expires in..." text
+        const expiresPattern = /Expires in \(\d+\) days/;
+        const expiresStartIdx = updatedText.search(expiresPattern);
+        if (expiresStartIdx !== -1) {
+            const expiresEndIdx = expiresStartIdx + updatedText.match(expiresPattern)[0].length;
+            newRichTextValueBuilder.setTextStyle(
+                expiresStartIdx,
+                expiresEndIdx,
+                SpreadsheetApp.newTextStyle().setItalic(true).build()
+            );
+            Logger.log(`Applied style to "Expires in..." text: ${expiresStartIdx} to ${expiresEndIdx}`);
+        }
     }
 
+    // Preserve links from the original text
     const originalText = originalRichTextValue.getText();
     Logger.log(`Preserving links from original text: ${originalText}`);
     for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {

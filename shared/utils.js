@@ -228,6 +228,19 @@ function parseDate(dateString) {
     return new Date(fullYear, month - 1, day);  // Months are 0-based
 }
 
+/**
+ * Converts a date string in the format dd/MM/yyyy to a JavaScript Date object.
+ * 
+ * @param {string} dateString - La fecha en formato dd/MM/yyyy.
+ * @return {Date} - Un objeto Date de JavaScript.
+ */
+function parseFullYearDate(dateString) {
+    Logger.log(`Parsing date string with full year: ${dateString}`);
+    const [day, month, year] = dateString.split('/').map(Number);
+    const date = new Date(year, month - 1, day);  // Months are 0-based in JavaScript's Date object
+    Logger.log(`Parsed date: ${date}`);
+    return date;
+}
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -240,6 +253,7 @@ if (typeof module !== 'undefined' && module.exports) {
         restoreSnapshot,
         processCells,
         preserveStylesAndLinks,
-        parseDate
+        parseDate,
+        parseFullYearDate
     };
 }
