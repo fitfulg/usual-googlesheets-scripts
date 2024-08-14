@@ -43,7 +43,7 @@ function onOpen() {
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
-
+        createMenusTODO();
         if (shouldRunUpdates(lastHash, currentHash)) {
             isLoaded = false
             ss.toast(toastMessages.loading[language], 'Status:', 15);
@@ -95,7 +95,6 @@ function runAllFunctionsTODO() {
     pushUpEmptyCellsTODO();
     updateDaysLeftCounterTODO();
     updateExpirationDatesTODO();
-    createMenusTODO();
     translateSheetTODO();
     customCellBGColorTODO();
     updateCellCommentTODO();
