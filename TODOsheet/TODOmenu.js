@@ -24,6 +24,8 @@ function createMenusTODO() {
         'markAllCheckboxesInSelectedCells': 'markAllCheckboxesTODO',
         'restoreCheckboxes': 'restoreCheckboxesTODO',
         'removeAllCheckboxesInSelectedCells': 'removeCheckboxesTODO',
+        'enableDefaultAdditions': 'enableDefaultAdditionsTODO',
+        'disableDefaultAdditions': 'disableDefaultAdditionsTODO',
         'applyFormat': 'applyFormatToSelected',
         'applyFormatToAll': 'applyFormatToAll',
         'createPieChart': 'createPieChartTODO',

@@ -251,6 +251,7 @@ const menuLanguage = [
         }
     }
 ]
+
 const menuTodoSheet = [
     {
         title: {
@@ -293,6 +294,16 @@ const menuTodoSheet = [
                 English: 'Remove All Checkboxes in Selected Cells',
                 Spanish: 'Eliminar Todas las Casillas en las Celdas Seleccionadas',
                 Catalan: 'Eliminar Totes les Caselles a les Cel·les Seleccionades'
+            },
+            enableDefaultAdditions: {
+                English: 'Enable Default Additions in Cells',
+                Spanish: 'Habilitar Adiciones por Defecto en las Celdas',
+                Catalan: 'Habilitar Addicions per Defecte a les Cel·les'
+            },
+            disableDefaultAdditions: {
+                English: 'Disable Default Additions in Cells',
+                Spanish: 'Deshabilitar Adiciones por Defecto en las Celdas',
+                Catalan: 'Deshabilitar les Addicions per Defecte a les Cel·les'
             },
             saveSnapshot: {
                 English: 'Save Snapshot',
@@ -359,12 +370,14 @@ const menus = [
             { key: 'markAllCheckboxesInSelectedCells', separatorAfter: false },
             { key: 'restoreCheckboxes', separatorAfter: false },
             { key: 'removeAllCheckboxesInSelectedCells', separatorAfter: true },
+            { key: 'enableDefaultAdditions', separatorAfter: false },
+            { key: 'disableDefaultAdditions', separatorAfter: true },
             { key: 'saveSnapshot', separatorAfter: false },
             { key: 'restoreSnapshot', separatorAfter: true },
             { key: 'createPieChart', separatorAfter: false },
             { key: 'deletePieCharts', separatorAfter: true },
             { key: 'versionAndFeatureDetails', separatorAfter: false },
-            { key: 'logHelloWorld', separatorAfter: false }
+            { key: 'logHelloWorld', separatorAfter: false },
         ],
         suffix: ''
     },
@@ -386,6 +399,7 @@ const menus = [
         suffix: ''
     }
 ];
+
 
 const toastMessages = {
     loading: {

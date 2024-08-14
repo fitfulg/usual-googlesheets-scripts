@@ -1422,6 +1422,7 @@ const menuLanguage = [
         }
     }
 ]
+
 const menuTodoSheet = [
     {
         title: {
@@ -1464,6 +1465,16 @@ const menuTodoSheet = [
                 English: 'Remove All Checkboxes in Selected Cells',
                 Spanish: 'Eliminar Todas las Casillas en las Celdas Seleccionadas',
                 Catalan: 'Eliminar Totes les Caselles a les Cel·les Seleccionades'
+            },
+            enableDefaultAdditions: {
+                English: 'Enable Default Additions in Cells',
+                Spanish: 'Habilitar Adiciones por Defecto en las Celdas',
+                Catalan: 'Habilitar Addicions per Defecte a les Cel·les'
+            },
+            disableDefaultAdditions: {
+                English: 'Disable Default Additions in Cells',
+                Spanish: 'Deshabilitar Adiciones por Defecto en las Celdas',
+                Catalan: 'Deshabilitar les Addicions per Defecte a les Cel·les'
             },
             saveSnapshot: {
                 English: 'Save Snapshot',
@@ -1530,12 +1541,14 @@ const menus = [
             { key: 'markAllCheckboxesInSelectedCells', separatorAfter: false },
             { key: 'restoreCheckboxes', separatorAfter: false },
             { key: 'removeAllCheckboxesInSelectedCells', separatorAfter: true },
+            { key: 'enableDefaultAdditions', separatorAfter: false },
+            { key: 'disableDefaultAdditions', separatorAfter: true },
             { key: 'saveSnapshot', separatorAfter: false },
             { key: 'restoreSnapshot', separatorAfter: true },
             { key: 'createPieChart', separatorAfter: false },
             { key: 'deletePieCharts', separatorAfter: true },
             { key: 'versionAndFeatureDetails', separatorAfter: false },
-            { key: 'logHelloWorld', separatorAfter: false }
+            { key: 'logHelloWorld', separatorAfter: false },
         ],
         suffix: ''
     },
@@ -1557,6 +1570,7 @@ const menus = [
         suffix: ''
     }
 ];
+
 
 const toastMessages = {
     loading: {
@@ -1601,6 +1615,8 @@ function createMenusTODO() {
         'markAllCheckboxesInSelectedCells': 'markAllCheckboxesTODO',
         'restoreCheckboxes': 'restoreCheckboxesTODO',
         'removeAllCheckboxesInSelectedCells': 'removeCheckboxesTODO',
+        'enableDefaultAdditions': 'enableDefaultAdditionsTODO',
+        'disableDefaultAdditions': 'disableDefaultAdditionsTODO',
         'applyFormat': 'applyFormatToSelected',
         'applyFormatToAll': 'applyFormatToAll',
         'createPieChart': 'createPieChartTODO',
@@ -2288,7 +2304,6 @@ function translateSheetTODO() {
 // TODOsheet/TODOtoggleFn.js: handlePieChartToggleTODO
 // TODOsheet/TODOformatting.js: shiftCellsUpTODO, handleColumnEditTODO, addCheckboxToCellTODO
 // TODOsheet/TODOtimeHandle.js: handleExpirationDateTODO
-
 /**
  * Track changes in specified columns and add the date.
  * @param {GoogleAppsScript.Events.SheetsOnEdit} e - The event object for the edit trigger.
@@ -2297,6 +2312,9 @@ function translateSheetTODO() {
 function onEdit(e) {
     Logger.log('onEdit triggered');
     try {
+        let isEnabledDefaultAdditions = PropertiesService.getScriptProperties().getProperty('isEnabledDefaultAdditions') === 'true';
+        Logger.log(`isEnabledDefaultAdditions at start of onEdit: ${isEnabledDefaultAdditions}`);
+
         if (!e || !e.range) {
             Logger.log('Edit event is undefined or does not have range property');
             return;
@@ -2309,6 +2327,7 @@ function onEdit(e) {
         const totalRows = sheet.getMaxRows();
 
         Logger.log(`onEdit triggered: column ${column}, row ${row}`);
+        Logger.log(`isEnabledDefaultAdditions is currently: ${isEnabledDefaultAdditions}`);
 
         if (column === 9 && row === 1) {
             handlePieChartToggleTODO(range);
@@ -2319,24 +2338,33 @@ function onEdit(e) {
         const newValue = range.getValue().toString();
         Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
 
-        if (handleExpirationDateTODO(range, originalValue, newValue, columnLetter, row, e)) {
-            Logger.log('onEdit()/handleExpirationDate(): Handled expiration date');
-            return;
-        }
-
+        // Shift cells up, independent of default additions
         if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
             Logger.log(`onEdit(): Shifting cells up for column ${column}`);
             shiftCellsUpTODO(column, 2, totalRows);
             return;
         }
 
-        if (row >= 2 && column >= 3 && column <= 8) {
-            Logger.log(`onEdit()/handleColumnEditTODO(): Handling column edit for column ${column}`);
-            handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
-            if (newValue && !newValue.includes('☑️')) {
-                Logger.log(`onEdit(): Adding default checkbox to cell ${columnLetter}${row}`);
-                addCheckboxToCellTODO(range);
+        // only handle default additions if enabled
+        if (isEnabledDefaultAdditions) {
+            Logger.log('Default additions are enabled.');
+
+            if (handleExpirationDateTODO(range, originalValue, newValue, columnLetter, row, e)) {
+                Logger.log('onEdit()/handleExpirationDate(): Handled expiration date');
+                return;
             }
+
+            if (row >= 2 && column >= 3 && column <= 8) {
+                Logger.log(`onEdit()/handleColumnEditTODO(): Handling column edit for column ${column}`);
+                handleColumnEditTODO(range, originalValue, newValue, columnLetter, row, e);
+
+                if (newValue && !newValue.includes('☑️')) {
+                    Logger.log(`onEdit(): Adding default checkbox to cell ${columnLetter}${row}`);
+                    addCheckboxToCellTODO(range);
+                }
+            }
+        } else {
+            Logger.log('Default additions are disabled.');
         }
     } catch (error) {
         Logger.log(`Error in onEdit: ${error.message}`);
@@ -2344,4 +2372,22 @@ function onEdit(e) {
     }
 }
 
+/**
+ * Enable default additions on cell edit.
+ * @customfunction
+ */
+function enableDefaultAdditionsTODO() {
+    Logger.log('enableDefaultAdditionsTODO called');
+    PropertiesService.getScriptProperties().setProperty('isEnabledDefaultAdditions', 'true');
+    Logger.log('Default additions on cell edit are enabled.');
+}
 
+/**
+ * Disable default additions on cell edit.
+ * @customfunction
+ */
+function disableDefaultAdditionsTODO() {
+    Logger.log('disableDefaultAdditionsTODO called');
+    PropertiesService.getScriptProperties().setProperty('isEnabledDefaultAdditions', 'false');
+    Logger.log('Default additions on cell edit are disabled.');
+}
