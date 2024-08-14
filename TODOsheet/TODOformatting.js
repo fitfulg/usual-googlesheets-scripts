@@ -14,9 +14,12 @@ function updateTipsCellTODO() {
     const cell = sheet.getRange("I2");
 
     const tips = {
-        English: "💡 To add an expiration date countdown, simply add the date in the format **dd/mm/yyyy** to the desired cell.(Don't forget to add the asterisks)",
-        Spanish: "💡 Para añadir una fecha de expiración a modo de cuenta atrás en días, basta con añadir la fecha en formato **dd/mm/yyyy** a la celda en cuestión. (No olvides añadir los asteriscos)",
-        Catalan: "💡 Per afegir una data de caducitat en mode compte enrere en dies, només cal afegir la data en format **dd/mm/yyyy** a la cel·la en qüestió. (No oblidis afegir els asteriscs)"
+        English: "💡 To add an expiration date countdown, simply add the date in the format **dd/mm/yyyy** to the desired cell. (Don't forget to add the asterisks)\n" +
+            "🔔 To set an alarm for a certain number of days before expiration, add the format **al(n)** after the date, where (n) is the number of days. For example: **05/09/2024**+**al10**.",
+        Spanish: "💡 Para añadir una fecha de expiración a modo de cuenta atrás en días, basta con añadir la fecha en formato **dd/mm/yyyy** a la celda en cuestión. (No olvides añadir los asteriscos)\n" +
+            "🔔 Para establecer una alarma para un cierto número de días antes de la expiración, añade el formato **al(n)** después de la fecha, donde (n) es el número de días. Por ejemplo: **05/09/2024**+**al10**.",
+        Catalan: "💡 Per afegir una data de caducitat en mode compte enrere en dies, només cal afegir la data en format **dd/mm/yyyy** a la cel·la en qüestió. (No oblidis afegir els asteriscs)\n" +
+            "🔔 Per establir una alarma per a un cert nombre de dies abans de la caducitat, afegeix el format **al(n)** després de la data, on (n) és el nombre de dies. Per exemple: **05/09/2024**+**al10**."
     };
 
     const titles = {
@@ -40,6 +43,7 @@ function updateTipsCellTODO() {
 
     Logger.log('Tips cell updated with tips for language: ' + language);
 }
+
 
 /**
  * Updates the cell comment with the latest changes.
