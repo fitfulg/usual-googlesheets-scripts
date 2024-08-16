@@ -945,8 +945,8 @@ function customCellBGColorTODO() {
     Logger.log('customCellBGColorTODO called');
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
-    setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
-    setColumnBackground(sheet, 7, '#d3d3d3', 2); // Column G: Light gray 3
+    setColumnBackground(sheet, 6, '#eef7ff', 2); // Column F: Light blue 3
+    setColumnBackground(sheet, 7, '#fff1f1', 2); // Column G: Light red 3
 
     // Apply white background to columns B, C, D, E, H, I starting from row 2
     let whiteColumns = [2, 3, 4, 5, 8, 9]; // Makes cell I2 momentarily white(column 8) while loading rest of the sheet. Useful for testing. Then turns dark gray(updateCellCommentTODO)
@@ -1107,7 +1107,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
         // Apply style to the date
         const dateStartIdx = updatedText.search(datePattern);
         const dateEndIdx = updatedText.length;
-        const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
+        const color = '#A9A9A9'; // Gris oscuro
         newRichTextValueBuilder.setTextStyle(
             dateStartIdx,
             dateEndIdx,
@@ -1123,7 +1123,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
             newRichTextValueBuilder.setTextStyle(
                 expiresStartIdx,
                 expiresEndIdx,
-                SpreadsheetApp.newTextStyle().setItalic(true).build()
+                SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
             );
             Logger.log(`Applied style to "Expires in..." text: ${expiresStartIdx} to ${expiresEndIdx}`);
         }
@@ -1222,7 +1222,7 @@ const cellStyles = {
         },
         fontWeight: "bold",
         fontColor: "#000000",
-        backgroundColor: "#FFC0CB",
+        backgroundColor: "#eef7ff",
         alignment: "center"
     },
     "G1": {
@@ -1233,7 +1233,7 @@ const cellStyles = {
         },
         fontWeight: "bold",
         fontColor: "#000000",
-        backgroundColor: "#b7b7b7",
+        backgroundColor: "#fff1f1",
         alignment: "center"
     },
     "H1": {
@@ -1791,10 +1791,9 @@ function updateDateColorsTODO() {
     const expiresPattern = /Expires in \(\d+\) days/;  // Expires in (n) days
 
     for (const column of columns) {
-        const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
-            const cellValue = cell.getValue();
+            let cellValue = cell.getValue();
             Logger.log(`updateDateColorsTODO(): Checking cell ${cell.getA1Notation()} for date and expiration`);
 
             // Extract the date from the cell
@@ -1820,12 +1819,12 @@ function updateDateColorsTODO() {
                 const dateIndex = cellValue.indexOf(dateText);
                 const expiresIndex = cellValue.indexOf(`Expires in`);
 
-                // Style the date
-                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(config.defaultColor).build());
+                // Style the date and "Expires in" text with gray dark color
+                const darkGrayColor = '#A9A9A9';
+                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(darkGrayColor).build());
 
-                // Style the "Expires in"
                 if (expiresIndex !== -1) {
-                    richTextValueBuilder.setTextStyle(expiresIndex, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(config.defaultColor).build());
+                    richTextValueBuilder.setTextStyle(expiresIndex, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(darkGrayColor).build());
                 }
 
                 cell.setRichTextValue(richTextValueBuilder.build());
@@ -1833,6 +1832,7 @@ function updateDateColorsTODO() {
         }
     }
 }
+
 
 /**
  * Updates the days left counter for each cell in column H.
@@ -2123,7 +2123,7 @@ function updateExpirationDatesTODO() {
         const cellValue = cell.getValue();
 
         if (cellValue.includes("Expires in")) {
-            // Recalcula y actualiza los días restantes
+            // recalculate the expiration date
             let expirationDateMatch = cellValue.match(/\d{2}\/\d{2}\/\d{2}$/);
             if (expirationDateMatch) {
                 let expirationDate = parseDate(expirationDateMatch[0]);
@@ -2134,8 +2134,16 @@ function updateExpirationDatesTODO() {
                     cellValue = cellValue.replace(/Expires in \(\d+\) days/, `Expires in (${diffDays}) days`);
                     cell.setValue(cellValue);
                 } else {
-                    // Optional: clear cell or mark as expired
-                    cell.setValue(cellValue.replace(/Expires in \(\d+\) days/, "Expired"));
+                    const newText = cellValue.replace(/Expires in \(\d+\) days/, "EXPIRED");
+                    const richText = SpreadsheetApp.newRichTextValue()
+                        .setText(newText)
+                        .setTextStyle(newText.indexOf("EXPIRED"), newText.indexOf("EXPIRED") + "EXPIRED".length,
+                            SpreadsheetApp.newTextStyle()
+                                .setBold(true)
+                                .setForegroundColor("#FF0000") // red
+                                .build())
+                        .build();
+                    cell.setRichTextValue(richText);
                 }
             }
         }

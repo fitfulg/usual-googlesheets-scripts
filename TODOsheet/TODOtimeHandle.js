@@ -61,6 +61,7 @@ function updateDateColorsTODO() {
     }
 }
 
+
 /**
  * Updates the days left counter for each cell in column H.
  * If the counter reaches zero, the cell is cleared.
@@ -350,7 +351,7 @@ function updateExpirationDatesTODO() {
         const cellValue = cell.getValue();
 
         if (cellValue.includes("Expires in")) {
-            // Recalcula y actualiza los días restantes
+            // recalculate the expiration date
             let expirationDateMatch = cellValue.match(/\d{2}\/\d{2}\/\d{2}$/);
             if (expirationDateMatch) {
                 let expirationDate = parseDate(expirationDateMatch[0]);
@@ -361,8 +362,16 @@ function updateExpirationDatesTODO() {
                     cellValue = cellValue.replace(/Expires in \(\d+\) days/, `Expires in (${diffDays}) days`);
                     cell.setValue(cellValue);
                 } else {
-                    // Optional: clear cell or mark as expired
-                    cell.setValue(cellValue.replace(/Expires in \(\d+\) days/, "Expired"));
+                    const newText = cellValue.replace(/Expires in \(\d+\) days/, "EXPIRED");
+                    const richText = SpreadsheetApp.newRichTextValue()
+                        .setText(newText)
+                        .setTextStyle(newText.indexOf("EXPIRED"), newText.indexOf("EXPIRED") + "EXPIRED".length,
+                            SpreadsheetApp.newTextStyle()
+                                .setBold(true)
+                                .setForegroundColor("#FF0000") // red
+                                .build())
+                        .build();
+                    cell.setRichTextValue(richText);
                 }
             }
         }

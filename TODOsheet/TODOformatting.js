@@ -272,8 +272,8 @@ function customCellBGColorTODO() {
     Logger.log('customCellBGColorTODO called');
     // Apply background colors to specific columns
     setColumnBackground(sheet, 1, '#d3d3d3', 2); // Column A: Light gray 3
-    setColumnBackground(sheet, 6, '#fff1f1', 2); // Column F: Light pink
-    setColumnBackground(sheet, 7, '#d3d3d3', 2); // Column G: Light gray 3
+    setColumnBackground(sheet, 6, '#eef7ff', 2); // Column F: Light blue 3
+    setColumnBackground(sheet, 7, '#fff1f1', 2); // Column G: Light red 3
 
     // Apply white background to columns B, C, D, E, H, I starting from row 2
     let whiteColumns = [2, 3, 4, 5, 8, 9]; // Makes cell I2 momentarily white(column 8) while loading rest of the sheet. Useful for testing. Then turns dark gray(updateCellCommentTODO)

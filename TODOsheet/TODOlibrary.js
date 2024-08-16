@@ -51,7 +51,7 @@ const cellStyles = {
         },
         fontWeight: "bold",
         fontColor: "#000000",
-        backgroundColor: "#FFC0CB",
+        backgroundColor: "#eef7ff",
         alignment: "center"
     },
     "G1": {
@@ -62,7 +62,7 @@ const cellStyles = {
         },
         fontWeight: "bold",
         fontColor: "#000000",
-        backgroundColor: "#b7b7b7",
+        backgroundColor: "#fff1f1",
         alignment: "center"
     },
     "H1": {
