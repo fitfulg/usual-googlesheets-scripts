@@ -19,6 +19,7 @@ function saveSnapshotTODO() {
     Logger.log("Snapshot saved, excluding specified cells.");
 }
 
+
 /**
  * Restores the sheet snapshot and applies custom formatting for dates and "days left".
  *

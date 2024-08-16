@@ -20,6 +20,7 @@ function extractUrls(richTextValue) {
     return urls;
 }
 
+
 /**
  * Checks if two arrays are equal.
  *
