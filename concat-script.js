@@ -1107,7 +1107,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
         // Apply style to the date
         const dateStartIdx = updatedText.search(datePattern);
         const dateEndIdx = updatedText.length;
-        const color = '#A9A9A9'; // Gris oscuro
+        const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
         newRichTextValueBuilder.setTextStyle(
             dateStartIdx,
             dateEndIdx,
@@ -1123,7 +1123,7 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
             newRichTextValueBuilder.setTextStyle(
                 expiresStartIdx,
                 expiresEndIdx,
-                SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
+                SpreadsheetApp.newTextStyle().setItalic(true).build()
             );
             Logger.log(`Applied style to "Expires in..." text: ${expiresStartIdx} to ${expiresEndIdx}`);
         }
@@ -1791,9 +1791,10 @@ function updateDateColorsTODO() {
     const expiresPattern = /Expires in \(\d+\) days/;  // Expires in (n) days
 
     for (const column of columns) {
+        const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
-            let cellValue = cell.getValue();
+            const cellValue = cell.getValue();
             Logger.log(`updateDateColorsTODO(): Checking cell ${cell.getA1Notation()} for date and expiration`);
 
             // Extract the date from the cell
@@ -1819,12 +1820,12 @@ function updateDateColorsTODO() {
                 const dateIndex = cellValue.indexOf(dateText);
                 const expiresIndex = cellValue.indexOf(`Expires in`);
 
-                // Style the date and "Expires in" text with gray dark color
-                const darkGrayColor = '#A9A9A9';
-                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(darkGrayColor).build());
+                // Style the date
+                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(config.defaultColor).build());
 
+                // Style the "Expires in"
                 if (expiresIndex !== -1) {
-                    richTextValueBuilder.setTextStyle(expiresIndex, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(darkGrayColor).build());
+                    richTextValueBuilder.setTextStyle(expiresIndex, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(config.defaultColor).build());
                 }
 
                 cell.setRichTextValue(richTextValueBuilder.build());
