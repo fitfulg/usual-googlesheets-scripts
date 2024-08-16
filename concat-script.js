@@ -1787,94 +1787,50 @@ function updateDateColorsTODO() {
     const dataRange = getDataRange();
     const lastRow = dataRange.getLastRow();
 
-    const datePatternWithoutNewline = /\d{2}\/\d{2}\/\d{2}$/; // dd/MM/yy without line break
-    const datePatternWithNewline = /\n\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy with line break
-    const expiresPattern = /Expires in \(\d+\) days/; // Pattern for "Expires in (n) days"
+    const datePattern = /\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy
+    const expiresPattern = /Expires in \(\d+\) days/;  // Expires in (n) days
 
     for (const column of columns) {
         const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             const cellValue = cell.getValue();
-            Logger.log(`updateDateColorsTODO(): Checking if cell ${cellValue} contains a date`);
+            Logger.log(`updateDateColorsTODO(): Checking cell ${cell.getA1Notation()} for date and expiration`);
 
-            let dateText = null;
-            let expiresText = null;
+            // Extract the date from the cell
+            let dateText = cellValue.match(datePattern);
+            if (dateText) {
+                dateText = dateText[0];
+                const cellDate = parseDate(dateText);
+                const today = new Date();
+                const diffDays = Math.floor((cellDate - today) / (1000 * 60 * 60 * 24));
 
-            // Check if the cell value contains a date in the format dd/MM/yy
-            if (datePatternWithNewline.test(cellValue)) {
-                dateText = cellValue.match(datePatternWithNewline)[0].trim();
-            } else if (datePatternWithoutNewline.test(cellValue)) {
-                dateText = cellValue.match(datePatternWithoutNewline)[0].trim();
-            }
-
-            // Check if the cell contains the "Expires in (n) days" text
-            if (expiresPattern.test(cellValue)) {
-                expiresText = cellValue.match(expiresPattern)[0];
-            }
-
-            if (dateText || expiresText) {
-                const originalRichTextValue = cell.getRichTextValue();
-                const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
-
-                if (dateText) {
-                    const cellDate = parseDate(dateText);
-                    const today = new Date();
-
-                    // Set both dates to midnight to compare only the date part
-                    today.setHours(0, 0, 0, 0);
-                    cellDate.setHours(0, 0, 0, 0);
-
-                    const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
-                    Logger.log(`Date: ${dateText}, CellDate: ${cellDate}, Today: ${today}, diffDays: ${diffDays}`);
-
-                    let color = config.defaultColor || '#A9A9A9'; // Default color (dark gray)
-                    if (diffDays >= config.danger) {
-                        color = config.dangerColor;
-                        Logger.log(`Setting danger color for ${dateText}`);
-                    } else if (diffDays >= config.warning) {
-                        color = config.warningColor;
-                        Logger.log(`Setting warning color for ${dateText}`);
+                // Update or add "Expires in (n) days"
+                if (diffDays >= 0) {
+                    const expiresInText = `Expires in (${diffDays}) days`;
+                    if (expiresPattern.test(cellValue)) {
+                        cellValue = cellValue.replace(expiresPattern, expiresInText);
                     } else {
-                        Logger.log(`Setting default color for ${dateText}`);
-                    }
-
-                    const startIdx = cellValue.indexOf(dateText);
-                    const endIdx = startIdx + dateText.length;
-
-                    richTextValueBuilder.setTextStyle(
-                        startIdx,
-                        endIdx,
-                        SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
-                    );
-                }
-
-                if (expiresText) {
-                    const startIdx = cellValue.indexOf(expiresText);
-                    const endIdx = startIdx + expiresText.length;
-
-                    richTextValueBuilder.setTextStyle(
-                        startIdx,
-                        endIdx,
-                        SpreadsheetApp.newTextStyle().setItalic(true).build()
-                    );
-                }
-
-                // Preserve original links and styles
-                if (originalRichTextValue) {
-                    for (let i = 0; i < cellValue.length; i++) {
-                        const url = originalRichTextValue.getLinkUrl(i, i + 1);
-                        if (url) {
-                            richTextValueBuilder.setLinkUrl(i, i + 1, url);
-                        }
+                        cellValue += `\n${expiresInText}`;
                     }
                 }
 
-                const richTextValue = richTextValueBuilder.build();
-                cell.setRichTextValue(richTextValue);
+                // Update the rich text value with new expiration and date
+                const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
+                const dateIndex = cellValue.indexOf(dateText);
+                const expiresIndex = cellValue.indexOf(`Expires in`);
+
+                // Style the date
+                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(config.defaultColor).build());
+
+                // Style the "Expires in"
+                if (expiresIndex !== -1) {
+                    richTextValueBuilder.setTextStyle(expiresIndex, cellValue.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(config.defaultColor).build());
+                }
+
+                cell.setRichTextValue(richTextValueBuilder.build());
             }
         }
-        Logger.log(`updateDateColorsTODO(): Updated date colors for column ${column}`);
     }
 }
 
@@ -2160,26 +2116,30 @@ function calcExpirationDaysTODO(dateString) {
 function updateExpirationDatesTODO() {
     Logger.log('updateExpirationDatesTODO called');
     const dataRange = getDataRange();
-    const values = dataRange.getValues();
+    const lastRow = dataRange.getLastRow();
 
-    for (let row = 1; row < values.length; row++) {
-        for (let col = 0; col < values[row].length; col++) {
-            const cell = sheet.getRange(row + 1, col + 1);
-            const cellValue = values[row][col].toString();
-            const expiresDatePattern = /\*\*(\d{2}\/\d{2}\/\d{4})\*\*/;
-            const expiresTextPattern = /Expires in \(\d+\) days/;
+    for (let row = 2; row <= lastRow; row++) {
+        const cell = sheet.getRange(`C${row}`);
+        const cellValue = cell.getValue();
 
-            if (expiresDatePattern.test(cellValue) || expiresTextPattern.test(cellValue)) {
-                Logger.log(`Updating expiration for cell at row ${row + 1}, column ${col + 1}`);
+        if (cellValue.includes("Expires in")) {
+            // Recalcula y actualiza los días restantes
+            let expirationDateMatch = cellValue.match(/\d{2}\/\d{2}\/\d{2}$/);
+            if (expirationDateMatch) {
+                let expirationDate = parseDate(expirationDateMatch[0]);
+                let today = new Date();
+                let diffDays = Math.floor((expirationDate - today) / (1000 * 60 * 60 * 24));
 
-                const originalValue = cell.getValue();
-                const columnLetter = String.fromCharCode(64 + col + 1);
-
-                handleExpirationDateTODO(cell, originalValue, cellValue, columnLetter, row + 1, null);
+                if (diffDays >= 0) {
+                    cellValue = cellValue.replace(/Expires in \(\d+\) days/, `Expires in (${diffDays}) days`);
+                    cell.setValue(cellValue);
+                } else {
+                    // Optional: clear cell or mark as expired
+                    cell.setValue(cellValue.replace(/Expires in \(\d+\) days/, "Expired"));
+                }
             }
         }
     }
-    Logger.log('Finished updateExpirationDatesTODO');
 }
 
 // for testing
