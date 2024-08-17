@@ -28,7 +28,7 @@ function onOpen() {
         createMenusTODO();
         if (shouldRunUpdates(lastHash, currentHash)) {
             isLoaded = false
-            ss.toast(toastMessages.loading[language], 'Status:', 15);
+            ss.toast(toastMessages.loading[language], 'Status:', 45);
             applyGridLoaderTODO(sheet);
             runAllFunctionsTODO();
             docProperties.setProperty('lastHash', currentHash);

@@ -141,11 +141,12 @@ function exampleTextTODO(column, exampleText) {
     if (firstCellEmpty) {
         const cell = sheet.getRange(column + "2");
         cell.setValue(exampleText);  // Set example text if the first cell is empty
-        Logger.log(`Example text set for column ${column} at ${column}2: ${exampleText}`);
+        Logger.log(`Example text set for column ${column} at ${column} 2: ${exampleText}`);
     } else {
         Logger.log(`Column ${column} is not empty at ${column}2, skipping setting example text.`);
     }
 }
+
 
 /**
  * Applies formatting to the entire sheet and sets example text.
@@ -155,49 +156,157 @@ function exampleTextTODO(column, exampleText) {
 function applyFormatToAllTODO() {
     Logger.log('applyFormatToAllTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-    const totalRows = sheet.getMaxRows();  // Get the total number of rows
-    let range = sheet.getRange(1, 1, totalRows, 8);  // Define the range covering all rows and 8 columns
+    const totalRows = sheet.getMaxRows();
+    const range = sheet.getRange(1, 1, totalRows, 8);
 
-    Logger.log('applyFormatToAllTODO()/exampleTextTODO(): setting example text');
-    for (const column in exampleTexts) {
-        const { text } = exampleTexts[column];
-        const translatedText = text[language];  // Get the example text based on the selected language
-        exampleTextTODO(column, translatedText);  // Set example text for the column
-        Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
-    }
+    // Step 1: Preserve only relevant hyperlinks
+    Logger.log('applyFormatToAllTODO()/preserveRelevantHyperlinks() called');
+    const preservedLinks = preserveRelevantHyperlinks(range);
 
     Logger.log('applyFormatToAllTODO()/updateDateColorsTODO() called');
-    updateDateColorsTODO();
+    updateDateColorsTODO();  // Update date colors selectively
+
+    Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
+    setCellContentAndStyleTODO();
+
+    Logger.log('applyFormatToAllTODO()/exampleTextTODO(): setting example text');
+    applyExampleTexts(language);
 
     if (range) {
-        Format(range);  // Apply formatting to the range
+        Format(range);
         applyBorders(range);
     }
+
+    // Step 2: Restore only the relevant hyperlinks
+    Logger.log('applyFormatToAllTODO()/restoreRelevantHyperlinks() called');
+    restoreRelevantHyperlinks(range, preservedLinks);
 
     Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
     applyThickBorders(sheet.getRange(1, 3, 11, 1));
     applyThickBorders(sheet.getRange(1, 4, 21, 1));
     applyThickBorders(sheet.getRange(1, 5, 21, 1));
 
-    Logger.log('applyFormatToAllTODO()/setCellContentAndStyle(): setting cell content and style');
-    setCellContentAndStyleTODO();  // Set cell content and styles
-
     Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
-    for (const column in cellStyles) {
-        const { limit, priority, value } = cellStyles[column];
+    applyColumnStyles(language);
+}
 
-        // Validate if the limit and priority are available in the selected language
+/**
+ * Preserves only the relevant hyperlinks in the range.
+ *  
+ * @param {Range} range - The range to preserve hyperlinks.
+ * @returns {RichTextValue[][]} The preserved hyperlinks.
+ * @customfunction
+ */
+function preserveRelevantHyperlinks(range) {
+    const richTextValues = range.getRichTextValues();
+    const preservedLinks = [];
+
+    for (let row = 0; row < richTextValues.length; row++) {
+        preservedLinks[row] = [];
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const richText = richTextValues[row][col];
+            if (richText.getLinkUrl() || richText.getText().includes('Expires in')) {
+                preservedLinks[row][col] = richText;  // Preserve only relevant rich text
+            } else {
+                preservedLinks[row][col] = null;
+            }
+        }
+    }
+    return preservedLinks;
+}
+
+/**
+ * Restores only the relevant hyperlinks in the range.
+ * 
+ * @param {Range} range - The range to restore hyperlinks.
+ * @param {RichTextValue[][]} preservedLinks - The preserved hyperlinks.
+ * @customfunction
+ * @returns {void}
+ */
+function restoreRelevantHyperlinks(range, preservedLinks) {
+    for (let row = 0; row < preservedLinks.length; row++) {
+        for (let col = 0; col < preservedLinks[row].length; col++) {
+            if (preservedLinks[row][col] !== null) {
+                const newRichText = preservedLinks[row][col];
+                range.getCell(row + 1, col + 1).setRichTextValue(newRichText);
+            }
+        }
+    }
+}
+
+/**
+ * Applies example texts to specific columns.
+ * 
+ * @param {string} language - The language to apply example texts.
+ * @customfunction
+ * @returns {void}
+ */
+function applyExampleTexts(language) {
+    for (const column in exampleTexts) {
+        const { text } = exampleTexts[column];
+        const translatedText = text[language];
+        exampleTextTODO(column, translatedText);
+        Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
+    }
+}
+/**
+ * Applies column styles based on the language.
+ * 
+ * @param {string} language - The language to apply column styles.
+ * @customfunction
+ * @returns {void}
+ */
+function applyColumnStyles(language) {
+    for (const column in cellStyles) {
+        const { limit, priority } = cellStyles[column];
+
         const translatedLimit = limit?.[language];
         const translatedPriority = priority?.[language];
 
         if (translatedLimit !== undefined && translatedPriority !== undefined) {
-            checkAndSetColumnTODO(column.charAt(0), translatedLimit, translatedPriority);  // Apply column-specific settings
+            checkAndSetColumnTODO(column.charAt(0), translatedLimit, translatedPriority);
             Logger.log(`applyFormatToAllTODO(): translatedText set for column ${column} - limit: ${translatedLimit}, priority: ${translatedPriority}`);
         } else {
             Logger.log(`applyFormatToAllTODO(): limit or priority not found for column ${column} and language ${language}`);
         }
     }
 }
+
+// function updateExpiresTextStyle() {
+//     const totalRows = sheet.getMaxRows();
+//     let range = sheet.getRange(1, 1, totalRows, 8);
+//     let richTextValues = range.getRichTextValues();
+
+//     for (let row = 0; row < richTextValues.length; row++) {
+//         for (let col = 0; col < richTextValues[row].length; col++) {
+//             let richText = richTextValues[row][col];
+//             let text = richText.getText();
+
+//             // Encontrar la posición de "Expires in" y el salto de línea antes de la fecha
+//             let expiresInIndex = text.indexOf("Expires in");
+//             let dateIndex = text.indexOf("\n", expiresInIndex);
+
+//             if (expiresInIndex !== -1) {
+//                 // Crear un nuevo texto enriquecido
+//                 let builder = SpreadsheetApp.newRichTextValue().setText(text);
+
+//                 // Aplicar estilo solo a "Expires in"
+//                 builder.setTextStyle(expiresInIndex, dateIndex !== -1 ? dateIndex : text.length,
+//                     SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor("#0000FF").build());
+
+//                 // Restaurar estilo original para la fecha (si existe)
+//                 if (dateIndex !== -1) {
+//                     let originalDateStyle = richText.getTextStyle(dateIndex, text.length);
+//                     builder.setTextStyle(dateIndex, text.length, originalDateStyle);
+//                 }
+
+//                 // Construir y asignar el nuevo RichTextValue
+//                 richTextValues[row][col] = builder.build();
+//             }
+//         }
+//     }
+//     range.setRichTextValues(richTextValues);
+// }
 
 /**
  * Checks and sets the column based on the limit of occupied cells.
@@ -426,68 +535,54 @@ function updateRichTextTODO(range, originalValue, newValue, columnLetter, row, e
     const dateFormatted = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy");
     Logger.log(`Today's date: ${dateFormatted}`);
 
-    const originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
+    let originalRichTextValue;
+    try {
+        originalRichTextValue = range.getRichTextValue() || SpreadsheetApp.newRichTextValue().setText(originalValue).build();
+    } catch (error) {
+        Logger.log(`Error getting original rich text value: ${error.message}`);
+        return;
+    }
 
-    // Add the date if it's not present
+    // Add the date if it's not already present
     const datePattern = /\d{2}\/\d{2}\/\d{2}$/;
     if (!datePattern.test(updatedText)) {
         updatedText = `${updatedText}\n${dateFormatted}`;
         Logger.log(`No date found, updated text with new date: "${updatedText}"`);
     }
 
-    // Add a checkbox if it's not present
+    // Add a checkbox if it's not already present
     if (!updatedText.startsWith('☑️')) {
         updatedText = `☑️${updatedText}`;
         Logger.log(`Checkbox added to the start of the text: "${updatedText}"`);
     }
 
-    // Apply rich text formatting
-    const newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
-        .setText(updatedText)
-        .setTextStyle(0, updatedText.length, SpreadsheetApp.newTextStyle().build());
+    try {
+        // Apply the updated text to the cell
+        const newRichTextValueBuilder = SpreadsheetApp.newRichTextValue()
+            .setText(updatedText);
 
-    const lastLineIndex = updatedText.lastIndexOf('\n');
-    Logger.log(`Last line index: ${lastLineIndex}`);
+        // preserve links from the original text
+        const originalText = originalRichTextValue.getText();
+        Logger.log(`Preserving links from original text: ${originalText}`);
+        for (let i = 0; i < originalText.length && i < updatedText.length; i++) {
+            const url = originalRichTextValue.getLinkUrl(i, i + 1);
+            if (url) {
+                newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
+            }
+        }
 
-    if (lastLineIndex !== -1) {
-        // Apply style to the date
+        // Apply italic style to the date
         const dateStartIdx = updatedText.search(datePattern);
-        const dateEndIdx = updatedText.length;
-        const color = columnLetter === 'H' ? '#FF0000' : '#A9A9A9';
-        newRichTextValueBuilder.setTextStyle(
-            dateStartIdx,
-            dateEndIdx,
-            SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(color).build()
-        );
-        Logger.log(`Applied style to date: ${dateStartIdx} to ${dateEndIdx}`);
-
-        // Apply style to "Expires in..." text
-        const expiresPattern = /Expires in \(\d+\) days/;
-        const expiresStartIdx = updatedText.search(expiresPattern);
-        if (expiresStartIdx !== -1) {
-            const expiresEndIdx = expiresStartIdx + updatedText.match(expiresPattern)[0].length;
-            newRichTextValueBuilder.setTextStyle(
-                expiresStartIdx,
-                expiresEndIdx,
-                SpreadsheetApp.newTextStyle().setItalic(true).build()
-            );
-            Logger.log(`Applied style to "Expires in..." text: ${expiresStartIdx} to ${expiresEndIdx}`);
+        if (dateStartIdx !== -1) {
+            const dateEndIdx = updatedText.length;
+            newRichTextValueBuilder.setTextStyle(dateStartIdx, dateEndIdx, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor('#A9A9A9').build());
         }
-    }
 
-    // Preserve links from the original text
-    const originalText = originalRichTextValue.getText();
-    Logger.log(`Preserving links from original text: ${originalText}`);
-    for (let i = 0; i < Math.min(lastLineIndex !== -1 ? lastLineIndex : updatedText.length, originalText.length); i++) {
-        const url = originalRichTextValue.getLinkUrl(i, i + 1);
-        if (url) {
-            newRichTextValueBuilder.setLinkUrl(i, i + 1, url);
-        }
-        Logger.log(`Preserved link for index: ${i}`);
+        range.setRichTextValue(newRichTextValueBuilder.build());
+        Logger.log(`Set new rich text value for cell ${columnLetter}${row}`);
+    } catch (error) {
+        Logger.log(`Error in updateRichTextTODO: ${error.message}`);
     }
-
-    range.setRichTextValue(newRichTextValueBuilder.build());
-    Logger.log(`Set new rich text value for cell ${columnLetter}${row}`);
 }
 
 /**
@@ -526,6 +621,7 @@ if (typeof module !== 'undefined' && module.exports) {
         updateRichTextTODO,
         shiftCellsUpTODO,
         handleColumnEditTODO,
-        updateTipsCellTODO
+        updateTipsCellTODO,
+
     }
 }
