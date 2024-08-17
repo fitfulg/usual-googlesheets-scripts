@@ -1008,34 +1008,20 @@ function shiftCellsUpTODO(column, startRow, endRow) {
     const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
     const values = range.getValues();
     const richTextValues = range.getRichTextValues();
-    const notes = range.getNotes();
-    const comments = [];
 
     let hasChanges = false;
 
-    // retrieve all comments from the cells in the range
-    for (let i = 0; i < values.length; i++) {
-        const cell = sheet.getRange(startRow + i, column);
-        const comment = cell.getComment();
-        comments.push(comment);
-    }
-
-    // shift the content upwards
     for (let i = 0; i < values.length - 1; i++) {
         if (values[i][0] === '' && values[i + 1][0] !== '') {
             Logger.log(`Empty cell found at row ${i + startRow}, shifting cells up`);
 
-            // Shift values, rich text, notes, and comments
             values[i][0] = values[i + 1][0];
             richTextValues[i][0] = richTextValues[i + 1][0];
-            notes[i][0] = notes[i + 1][0];
-            comments[i] = comments[i + 1];
 
-            // Clear the original cell after shifting
+            moveNoteToUpperCell(sheet, startRow + i + 1, startRow + i, column);
+
             values[i + 1][0] = '';
             richTextValues[i + 1][0] = SpreadsheetApp.newRichTextValue().setText('').build();
-            notes[i + 1][0] = '';
-            comments[i + 1] = '';
 
             hasChanges = true;
             Logger.log(`After shifting: Row ${i + startRow}, New Value: ${values[i][0]}, New RichText: ${richTextValues[i][0].getText()}`);
@@ -1046,21 +1032,25 @@ function shiftCellsUpTODO(column, startRow, endRow) {
         Logger.log(`Setting values for range: ${startRow} to ${endRow}, column: ${column}`);
         range.setValues(values);
         range.setRichTextValues(richTextValues);
-        range.setNotes(notes); // Apply updated notes
-
-        // Apply updated comments
-        for (let i = 0; i < values.length; i++) {
-            const cell = sheet.getRange(startRow + i, column);
-            if (comments[i]) {
-                cell.setComment(comments[i]);
-            } else if (cell.getComment()) {
-                // Only try to remove the comment if it exists
-                cell.removeComment();
-            }
-        }
     }
 
     Logger.log(`shiftCellsUpTODO completed for column: ${column}`);
+}
+
+/**
+ * Moves the note from one cell to another.
+ * 
+ * @param {Sheet} sheet - The sheet object.
+ * @param {number} fromRow - The row number to move the note from.
+ * @param {number} toRow - The row number to move the note to.
+ * @param {number} column - The column number.
+ * @returns {void}
+ * @customfunction
+ */
+function moveNoteToUpperCell(sheet, fromRow, toRow, column) {
+    const note = sheet.getRange(fromRow, column).getNote();
+    sheet.getRange(toRow, column).setNote(note);
+    sheet.getRange(fromRow, column).setNote('');
 }
 
 /**
