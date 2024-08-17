@@ -1008,34 +1008,35 @@ function shiftCellsUpTODO(column, startRow, endRow) {
     const range = sheet.getRange(startRow, column, endRow - startRow + 1, 1);
     const values = range.getValues();
     const richTextValues = range.getRichTextValues();
-    const notes = range.getNotes(); // Retrieve the notes from the cells
-    const comments = []; // Array to store comments
+
+    // Arrays to store comments and notes
+    const comments = [];
+    const notes = [];
+
+    for (let i = 0; i < values.length; i++) {
+        const cell = sheet.getRange(startRow + i, column);
+        comments[i] = cell.getComment();
+        notes[i] = cell.getNote();
+    }
 
     let hasChanges = false;
 
-    // First, retrieve all comments from the cells in the range
-    for (let i = 0; i < values.length; i++) {
-        const cell = sheet.getRange(startRow + i, column);
-        const comment = cell.getComment();
-        comments.push(comment);
-    }
-
-    // Next, shift the content upwards
     for (let i = 0; i < values.length - 1; i++) {
         if (values[i][0] === '' && values[i + 1][0] !== '') {
             Logger.log(`Empty cell found at row ${i + startRow}, shifting cells up`);
 
-            // Shift values, rich text, notes, and comments
             values[i][0] = values[i + 1][0];
             richTextValues[i][0] = richTextValues[i + 1][0];
-            notes[i][0] = notes[i + 1][0];
-            comments[i] = comments[i + 1];
 
-            // Clear the original cell after shifting
             values[i + 1][0] = '';
             richTextValues[i + 1][0] = SpreadsheetApp.newRichTextValue().setText('').build();
-            notes[i + 1][0] = '';
+
+            // Shift comments and notes
+            comments[i] = comments[i + 1];
+            notes[i] = notes[i + 1];
+
             comments[i + 1] = '';
+            notes[i + 1] = '';
 
             hasChanges = true;
             Logger.log(`After shifting: Row ${i + startRow}, New Value: ${values[i][0]}, New RichText: ${richTextValues[i][0].getText()}`);
@@ -1046,22 +1047,25 @@ function shiftCellsUpTODO(column, startRow, endRow) {
         Logger.log(`Setting values for range: ${startRow} to ${endRow}, column: ${column}`);
         range.setValues(values);
         range.setRichTextValues(richTextValues);
-        range.setNotes(notes); // Apply the updated notes
 
-        // Apply the updated comments
+        // Apply comments and notes after shifting
         for (let i = 0; i < values.length; i++) {
             const cell = sheet.getRange(startRow + i, column);
             if (comments[i]) {
                 cell.setComment(comments[i]);
-            } else if (cell.getComment()) {
-                // Only try to remove the comment if it exists
+            } else {
                 cell.removeComment();
+            }
+            if (notes[i]) {
+                cell.setNote(notes[i]);
+            } else {
+                cell.clearNote();
             }
         }
     }
-
     Logger.log(`shiftCellsUpTODO completed for column: ${column}`);
 }
+
 
 
 
