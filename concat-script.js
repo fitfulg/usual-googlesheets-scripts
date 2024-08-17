@@ -2106,20 +2106,14 @@ function calcExpirationDaysTODO(dateString) {
     const expirationDate = parseFullYearDate(dateString);
     Logger.log(`Parsed expiration date: ${expirationDate}`);
 
-    // Get today's date
+    // Get today's date and clear time portion
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Clear time portion to ensure comparison is on date only
-    Logger.log(`Today's date: ${today}`);
+    today.setHours(0, 0, 0, 0); // Reset hours to midnight to compare only dates
+    Logger.log(`Today's date (time cleared): ${today}`);
 
-    // Calculate UTC values to avoid issues with time zones
-    const expirationDateUTC = Date.UTC(expirationDate.getFullYear(), expirationDate.getMonth(), expirationDate.getDate());
-    const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-
-    const timeDiff = expirationDateUTC - todayUTC;
-    Logger.log(`Time difference in milliseconds: ${timeDiff}`);
-
-    // Calculate days left
-    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    // Calculate the difference in days between the expiration date and today
+    const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+    const daysLeft = Math.ceil((expirationDate.getTime() - today.getTime()) / oneDayInMilliseconds);
     Logger.log(`Days left: ${daysLeft}`);
 
     return daysLeft;
