@@ -108,7 +108,6 @@ function updateCellCommentTODO() {
     Logger.log('Cell comment updated with changes for language: ' + language);
 }
 
-
 /**
  * Sets example text for a specific column if the cells are empty.
  * 
@@ -147,7 +146,6 @@ function exampleTextTODO(column, exampleText) {
     }
 }
 
-
 /**
  * Applies formatting to the entire sheet and sets example text.
  * 
@@ -159,7 +157,6 @@ function applyFormatToAllTODO() {
     const totalRows = sheet.getMaxRows();
     const range = sheet.getRange(1, 1, totalRows, 8);
 
-    // Step 1: Preserve only relevant hyperlinks
     Logger.log('applyFormatToAllTODO()/preserveRelevantHyperlinks() called');
     const preservedLinks = preserveRelevantHyperlinks(range);
 
@@ -177,24 +174,26 @@ function applyFormatToAllTODO() {
         applyBorders(range);
     }
 
-    // Step 2: Restore only the relevant hyperlinks
     Logger.log('applyFormatToAllTODO()/restoreRelevantHyperlinks() called');
     restoreRelevantHyperlinks(range, preservedLinks);
+
+    Logger.log('applyFormatToAllTODO()/applyExpiresTextStyle() called');
+    applyExpiresTextStyle();
+
+    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
+    applyColumnStyles(language);
 
     Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
     applyThickBorders(sheet.getRange(1, 3, 11, 1));
     applyThickBorders(sheet.getRange(1, 4, 21, 1));
     applyThickBorders(sheet.getRange(1, 5, 21, 1));
-
-    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
-    applyColumnStyles(language);
 }
 
 /**
- * Preserves only the relevant hyperlinks in the range.
- *  
- * @param {Range} range - The range to preserve hyperlinks.
- * @returns {RichTextValue[][]} The preserved hyperlinks.
+ * Preserves relevant hyperlinks in the specified range.
+ * 
+ * @param {Range} range - The range to preserve hyperlinks in.
+ * @return {Array} The preserved hyperlinks.
  * @customfunction
  */
 function preserveRelevantHyperlinks(range) {
@@ -216,10 +215,10 @@ function preserveRelevantHyperlinks(range) {
 }
 
 /**
- * Restores only the relevant hyperlinks in the range.
+ * Restores the relevant hyperlinks in the specified range.
  * 
- * @param {Range} range - The range to restore hyperlinks.
- * @param {RichTextValue[][]} preservedLinks - The preserved hyperlinks.
+ * @param {Range} range - The range to restore hyperlinks in.
+ * @param {Array} preservedLinks - The preserved hyperlinks.
  * @customfunction
  * @returns {void}
  */
@@ -235,11 +234,10 @@ function restoreRelevantHyperlinks(range, preservedLinks) {
 }
 
 /**
- * Applies example texts to specific columns.
+ * Sets the example text for each column in the sheet.
  * 
- * @param {string} language - The language to apply example texts.
+ * @param {language} language - The language to set the content in.
  * @customfunction
- * @returns {void}
  */
 function applyExampleTexts(language) {
     for (const column in exampleTexts) {
@@ -249,12 +247,12 @@ function applyExampleTexts(language) {
         Logger.log(`applyFormatToAllTODO(): example text set for column ${column} - translatedText: ${translatedText}`);
     }
 }
+
 /**
- * Applies column styles based on the language.
+ * Sets the column content and style based on the language.
  * 
- * @param {string} language - The language to apply column styles.
+ * @param {language} language - The language to set the content in.
  * @customfunction
- * @returns {void}
  */
 function applyColumnStyles(language) {
     for (const column in cellStyles) {
@@ -272,41 +270,31 @@ function applyColumnStyles(language) {
     }
 }
 
-// function updateExpiresTextStyle() {
-//     const totalRows = sheet.getMaxRows();
-//     let range = sheet.getRange(1, 1, totalRows, 8);
-//     let richTextValues = range.getRichTextValues();
+/**
+ * Sets the expiration date text style in the sheet.
+ * 
+ * @customfunction
+ * @returns {void}
+ */
+function applyExpiresTextStyle() {
+    const range = sheet.getRange(1, 1, sheet.getMaxRows(), 8);
+    const richTextValues = range.getRichTextValues();
 
-//     for (let row = 0; row < richTextValues.length; row++) {
-//         for (let col = 0; col < richTextValues[row].length; col++) {
-//             let richText = richTextValues[row][col];
-//             let text = richText.getText();
+    for (let row = 0; row < richTextValues.length; row++) {
+        for (let col = 0; col < richTextValues[row].length; col++) {
+            const richText = richTextValues[row][col];
+            const text = richText.getText();
+            const expiresInIndex = text.indexOf('Expires in');
+            const dateIndex = text.search(/\d{2}\/\d{2}\/\d{2}/);  // Assuming the date format is DD/MM/YY
 
-//             // Encontrar la posición de "Expires in" y el salto de línea antes de la fecha
-//             let expiresInIndex = text.indexOf("Expires in");
-//             let dateIndex = text.indexOf("\n", expiresInIndex);
-
-//             if (expiresInIndex !== -1) {
-//                 // Crear un nuevo texto enriquecido
-//                 let builder = SpreadsheetApp.newRichTextValue().setText(text);
-
-//                 // Aplicar estilo solo a "Expires in"
-//                 builder.setTextStyle(expiresInIndex, dateIndex !== -1 ? dateIndex : text.length,
-//                     SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor("#0000FF").build());
-
-//                 // Restaurar estilo original para la fecha (si existe)
-//                 if (dateIndex !== -1) {
-//                     let originalDateStyle = richText.getTextStyle(dateIndex, text.length);
-//                     builder.setTextStyle(dateIndex, text.length, originalDateStyle);
-//                 }
-
-//                 // Construir y asignar el nuevo RichTextValue
-//                 richTextValues[row][col] = builder.build();
-//             }
-//         }
-//     }
-//     range.setRichTextValues(richTextValues);
-// }
+            if (expiresInIndex !== -1 && dateIndex !== -1) {
+                const builder = richText.copy();
+                builder.setTextStyle(expiresInIndex, dateIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
+                range.getCell(row + 1, col + 1).setRichTextValue(builder.build());
+            }
+        }
+    }
+}
 
 /**
  * Checks and sets the column based on the limit of occupied cells.
@@ -409,7 +397,6 @@ function setCellContentAndStyleTODO() {
         setCellStyle(cell, translatedValue, fontWeight, fontColor, backgroundColor, alignment);
     }
 }
-
 
 /**
  * Sets up a dropdown menu in cell I1 with options to show or hide the pie chart.
@@ -622,6 +609,10 @@ if (typeof module !== 'undefined' && module.exports) {
         shiftCellsUpTODO,
         handleColumnEditTODO,
         updateTipsCellTODO,
-
+        applyExpiresTextStyle,
+        applyColumnStyles,
+        applyExampleTexts,
+        preserveRelevantHyperlinks,
+        restoreRelevantHyperlinks
     }
 }
