@@ -278,6 +278,10 @@ function handleExpirationDateTODO(range, originalValue, newValue, columnLetter, 
             return;
         }
 
+        // Save the expiration date in the cell note
+        const expirationDate = parseFullYearDate(dateString);
+        range.setNote(`Expiration Date: ${expirationDate.toISOString()}`);
+
         // Remove the old expiration date and reset text
         let updatedText = newValue.replace(expiresDatePattern, '').trim();
         updatedText = updatedText.replace(/\d{2}\/\d{2}\/\d{2}/g, '').trim(); // Remove any other dates
@@ -286,11 +290,15 @@ function handleExpirationDateTODO(range, originalValue, newValue, columnLetter, 
         const expiresTextPattern = /Expires in \(\d+\) days|Expires today|EXPIRED/;
         updatedText = updatedText.replace(expiresTextPattern, '').trim();
 
+        // Get today's date
+        const today = new Date();
+        const todayFormatted = Utilities.formatDate(today, Session.getScriptTimeZone(), "dd/MM/yy");
+
         // Add the new expiration information based on daysLeft
         if (daysLeft > 0) {
-            updatedText += `\nExpires in (${daysLeft}) days\n${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`;
+            updatedText += `\nExpires in (${daysLeft}) days\n${todayFormatted}`;
         } else if (daysLeft === 0) {
-            updatedText += `\nExpires today\n${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yy")}`;
+            updatedText += `\nExpires today\n${todayFormatted}`;
         } else {
             updatedText += "\nEXPIRED";
         }
@@ -331,7 +339,7 @@ function calcExpirationDaysTODO(dateString) {
 
     // Calculate the difference in days between the expiration date and today
     const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
-    const daysLeft = Math.ceil((expirationDate.getTime() - today.getTime()) / oneDayInMilliseconds);
+    const daysLeft = Math.floor((expirationDate - today) / oneDayInMilliseconds);
     Logger.log(`Days left: ${daysLeft}`);
 
     return daysLeft;
@@ -353,18 +361,36 @@ function updateExpirationDatesTODO() {
     for (let row = 2; row < values.length; row++) { // Start from row 2 to skip header
         for (let col = 2; col < values[row].length; col++) { // Assuming columns start from C (index 2) to H (index 7)
             const cellValue = values[row][col];
+            const cell = sheet.getRange(row + 1, col + 1);
 
             if (typeof cellValue === 'string' && cellValue.includes('**')) {
-                const cell = sheet.getRange(row + 1, col + 1); // Convert to 1-based index for range
                 const originalValue = cell.getValue();
                 const newValue = originalValue.toString();
 
                 Logger.log(`Processing cell ${cell.getA1Notation()}`);
 
-                // Handle expiration date
-                const columnLetter = String.fromCharCode(64 + col + 1); // Convert column index to letter
-                if (handleExpirationDateTODO(cell, originalValue, newValue, columnLetter, row + 1, {})) {
-                    Logger.log(`Cell ${cell.getA1Notation()} updated with expiration information.`);
+                const note = cell.getNote();
+                let expirationDate = null;
+                if (note && note.includes('Expiration Date:')) {
+                    expirationDate = new Date(note.replace('Expiration Date: ', ''));
+                }
+
+                if (expirationDate) {
+                    const daysLeft = calcExpirationDaysTODO(Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yyyy"));
+                    Logger.log(`Calculated days left: ${daysLeft} for date: ${expirationDate}`);
+
+                    let updatedText = newValue.replace(/\d{2}\/\d{2}\/\d{4}/g, '').trim(); // Remove any other dates
+                    updatedText = updatedText.replace(/Expires in \(\d+\) days|Expires today|EXPIRED/, '').trim();
+
+                    if (daysLeft > 0) {
+                        updatedText += `\nExpires in (${daysLeft}) days\n${Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yy")}`;
+                    } else if (daysLeft === 0) {
+                        updatedText += `\nExpires today\n${Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yy")}`;
+                    } else {
+                        updatedText += "\nEXPIRED";
+                    }
+
+                    cell.setValue(updatedText);
                 }
             }
         }
@@ -372,7 +398,6 @@ function updateExpirationDatesTODO() {
 
     Logger.log('updateExpirationDatesTODO completed');
 }
-
 
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
