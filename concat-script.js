@@ -781,22 +781,41 @@ function applyFormatToAllTODO() {
  * @customfunction
  */
 function preserveRelevantHyperlinks(range) {
+    Logger.log('preserveRelevantHyperlinks called');
     const richTextValues = range.getRichTextValues();
     const preservedLinks = [];
+    const maxRows = Math.min(richTextValues.length, 40); // Limitar a las primeras 40 filas
 
-    for (let row = 0; row < richTextValues.length; row++) {
+    for (let row = 0; row < maxRows; row++) {
+        let rowHasRelevantData = false;
         preservedLinks[row] = [];
-        for (let col = 0; col < richTextValues[row].length; col++) {
+        for (let col = 1; col <= 6; col++) { // Solo procesamos columnas B a H (índices 1 a 6)
             const richText = richTextValues[row][col];
-            if (richText.getLinkUrl() || richText.getText().includes('Expires in')) {
-                preservedLinks[row][col] = richText;  // Preserve only relevant rich text
+            const cellText = richText.getText().trim();
+
+            if (cellText === '') {
+                preservedLinks[row][col] = null;  // Omitimos celdas vacías
+                continue;
+            }
+
+            if (richText.getLinkUrl() || cellText.includes('Expires in')) {
+                preservedLinks[row][col] = richText;  // Preservamos solo el rich text relevante
+                rowHasRelevantData = true;
+                Logger.log(`Row ${row + 1}, Column ${col + 1}: Relevant data preserved.`);
             } else {
                 preservedLinks[row][col] = null;
             }
         }
+
+        if (!rowHasRelevantData) {
+            preservedLinks[row] = null;  // Eliminamos filas sin datos relevantes para ahorrar memoria
+        }
     }
+
+    Logger.log(`preserveRelevantHyperlinks completed: Total rows preserved ${preservedLinks.length}`);
     return preservedLinks;
 }
+
 
 /**
  * Restores the relevant hyperlinks in the specified range.
@@ -807,14 +826,24 @@ function preserveRelevantHyperlinks(range) {
  * @returns {void}
  */
 function restoreRelevantHyperlinks(range, preservedLinks) {
-    for (let row = 0; row < preservedLinks.length; row++) {
-        for (let col = 0; col < preservedLinks[row].length; col++) {
-            if (preservedLinks[row][col] !== null) {
-                const newRichText = preservedLinks[row][col];
-                range.getCell(row + 1, col + 1).setRichTextValue(newRichText);
+    Logger.log('restoreRelevantHyperlinks called');
+    const richTextValues = range.getRichTextValues();
+
+    const maxRows = Math.min(preservedLinks.length, 40); // Limitar a las primeras 40 filas
+
+    for (let row = 0; row < maxRows; row++) {
+        if (preservedLinks[row] !== null) {
+            for (let col = 1; col <= 6; col++) { // Procesamos columnas B a H (índices 1 a 6)
+                if (preservedLinks[row][col] !== null) {
+                    richTextValues[row][col] = preservedLinks[row][col];
+                    Logger.log(`Row ${row + 1}, Column ${col + 1}: Restoring preserved data.`);
+                }
             }
         }
     }
+
+    range.setRichTextValues(richTextValues); // Aplicamos todos los cambios de una sola vez
+    Logger.log('restoreRelevantHyperlinks completed');
 }
 
 /**
@@ -1803,42 +1832,63 @@ function updateDateColorsTODO() {
     const datePattern = /\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy
     const expiresPattern = /Expires in \(\d+\) days/;  // Expires in (n) days
 
+    // Crear un índice previo para las celdas que contienen fechas o "Expires in"
+    const cellsToUpdate = [];
+
     for (const column of columns) {
-        const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             let cellValue = cell.getValue();
-            Logger.log(`updateDateColorsTODO(): Checking cell ${cell.getA1Notation()} for date and expiration`);
-
-            let dateText = cellValue.match(datePattern);
-            if (dateText) {
-                dateText = dateText[0];
-                const cellDate = parseDate(dateText);
-                const today = new Date();
-                const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
-
-                let dateColor = config.defaultColor;
-                if (diffDays >= config.danger) {
-                    dateColor = config.dangerColor;
-                } else if (diffDays >= config.warning) {
-                    dateColor = config.warningColor;
-                }
-
-                const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
-                const dateIndex = cellValue.indexOf(dateText);
-                const expiresIndex = cellValue.indexOf(`Expires in`);
-
-                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(dateColor).build());
-
-                if (expiresIndex !== -1) {
-                    const endIndex = expiresIndex + `Expires in (${diffDays}) days`.length;
-                    richTextValueBuilder.setTextStyle(expiresIndex, endIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
-                }
-
-                cell.setRichTextValue(richTextValueBuilder.build());
+            if (datePattern.test(cellValue) || expiresPattern.test(cellValue)) {
+                cellsToUpdate.push({ cell, cellValue, column, row });
+                Logger.log(`Identified cell ${column}${row} for update: ${cellValue}`);
             }
         }
     }
+
+    Logger.log(`Total cells to update: ${cellsToUpdate.length}`);
+
+    // Procesar solo las celdas identificadas en el índice
+    cellsToUpdate.forEach(({ cell, cellValue, column, row }) => {
+        const config = dateColorConfig[column];
+
+        let dateText = cellValue.match(datePattern);
+        if (dateText) {
+            dateText = dateText[0];
+            const cellDate = parseDate(dateText);
+            const today = new Date();
+            const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
+
+            Logger.log(`Processing cell ${column}${row}: ${cellValue}`);
+            Logger.log(`Days difference: ${diffDays}`);
+
+            let dateColor = config.defaultColor;
+            if (diffDays >= config.danger) {
+                dateColor = config.dangerColor;
+                Logger.log(`Applying danger color: ${config.dangerColor}`);
+            } else if (diffDays >= config.warning) {
+                dateColor = config.warningColor;
+                Logger.log(`Applying warning color: ${config.warningColor}`);
+            } else {
+                Logger.log(`Applying default color: ${config.defaultColor}`);
+            }
+
+            const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
+            const dateIndex = cellValue.indexOf(dateText);
+            const expiresIndex = cellValue.indexOf(`Expires in`);
+
+            richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(dateColor).build());
+
+            if (expiresIndex !== -1) {
+                const endIndex = expiresIndex + `Expires in (${diffDays}) days`.length;
+                Logger.log(`Setting Expires in style from ${expiresIndex} to ${endIndex}`);
+                richTextValueBuilder.setTextStyle(expiresIndex, endIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
+            }
+
+            Logger.log(`Updating cell ${column}${row} with new styles`);
+            cell.setRichTextValue(richTextValueBuilder.build());
+        }
+    });
 }
 
 /**

@@ -17,42 +17,63 @@ function updateDateColorsTODO() {
     const datePattern = /\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy
     const expiresPattern = /Expires in \(\d+\) days/;  // Expires in (n) days
 
+    // index the cells to update
+    const cellsToUpdate = [];
+
     for (const column of columns) {
-        const config = dateColorConfig[column];
         for (let row = 2; row <= lastRow; row++) {
             const cell = sheet.getRange(`${column}${row}`);
             let cellValue = cell.getValue();
-            Logger.log(`updateDateColorsTODO(): Checking cell ${cell.getA1Notation()} for date and expiration`);
-
-            let dateText = cellValue.match(datePattern);
-            if (dateText) {
-                dateText = dateText[0];
-                const cellDate = parseDate(dateText);
-                const today = new Date();
-                const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
-
-                let dateColor = config.defaultColor;
-                if (diffDays >= config.danger) {
-                    dateColor = config.dangerColor;
-                } else if (diffDays >= config.warning) {
-                    dateColor = config.warningColor;
-                }
-
-                const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
-                const dateIndex = cellValue.indexOf(dateText);
-                const expiresIndex = cellValue.indexOf(`Expires in`);
-
-                richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(dateColor).build());
-
-                if (expiresIndex !== -1) {
-                    const endIndex = expiresIndex + `Expires in (${diffDays}) days`.length;
-                    richTextValueBuilder.setTextStyle(expiresIndex, endIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
-                }
-
-                cell.setRichTextValue(richTextValueBuilder.build());
+            if (datePattern.test(cellValue) || expiresPattern.test(cellValue)) {
+                cellsToUpdate.push({ cell, cellValue, column, row });
+                Logger.log(`Identified cell ${column}${row} for update: ${cellValue}`);
             }
         }
     }
+
+    Logger.log(`Total cells to update: ${cellsToUpdate.length}`);
+
+    // process indexed cells
+    cellsToUpdate.forEach(({ cell, cellValue, column, row }) => {
+        const config = dateColorConfig[column];
+
+        let dateText = cellValue.match(datePattern);
+        if (dateText) {
+            dateText = dateText[0];
+            const cellDate = parseDate(dateText);
+            const today = new Date();
+            const diffDays = Math.floor((today - cellDate) / (1000 * 60 * 60 * 24));
+
+            Logger.log(`Processing cell ${column}${row}: ${cellValue}`);
+            Logger.log(`Days difference: ${diffDays}`);
+
+            let dateColor = config.defaultColor;
+            if (diffDays >= config.danger) {
+                dateColor = config.dangerColor;
+                Logger.log(`Applying danger color: ${config.dangerColor}`);
+            } else if (diffDays >= config.warning) {
+                dateColor = config.warningColor;
+                Logger.log(`Applying warning color: ${config.warningColor}`);
+            } else {
+                Logger.log(`Applying default color: ${config.defaultColor}`);
+            }
+
+            const richTextValueBuilder = SpreadsheetApp.newRichTextValue().setText(cellValue);
+            const dateIndex = cellValue.indexOf(dateText);
+            const expiresIndex = cellValue.indexOf(`Expires in`);
+
+            richTextValueBuilder.setTextStyle(dateIndex, dateIndex + dateText.length, SpreadsheetApp.newTextStyle().setItalic(true).setForegroundColor(dateColor).build());
+
+            if (expiresIndex !== -1) {
+                const endIndex = expiresIndex + `Expires in (${diffDays}) days`.length;
+                Logger.log(`Setting Expires in style from ${expiresIndex} to ${endIndex}`);
+                richTextValueBuilder.setTextStyle(expiresIndex, endIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
+            }
+
+            Logger.log(`Updating cell ${column}${row} with new styles`);
+            cell.setRichTextValue(richTextValueBuilder.build());
+        }
+    });
 }
 
 /**

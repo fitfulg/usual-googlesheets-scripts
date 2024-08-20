@@ -197,22 +197,41 @@ function applyFormatToAllTODO() {
  * @customfunction
  */
 function preserveRelevantHyperlinks(range) {
+    Logger.log('preserveRelevantHyperlinks called');
     const richTextValues = range.getRichTextValues();
     const preservedLinks = [];
+    const maxRows = Math.min(richTextValues.length, 40); // Limited to 40 rows
 
-    for (let row = 0; row < richTextValues.length; row++) {
+    for (let row = 0; row < maxRows; row++) {
+        let rowHasRelevantData = false;
         preservedLinks[row] = [];
-        for (let col = 0; col < richTextValues[row].length; col++) {
+        for (let col = 1; col <= 6; col++) { // columns B to H 
             const richText = richTextValues[row][col];
-            if (richText.getLinkUrl() || richText.getText().includes('Expires in')) {
-                preservedLinks[row][col] = richText;  // Preserve only relevant rich text
+            const cellText = richText.getText().trim();
+
+            if (cellText === '') {
+                preservedLinks[row][col] = null;  // Omit empty cells
+                continue;
+            }
+
+            if (richText.getLinkUrl() || cellText.includes('Expires in')) {
+                preservedLinks[row][col] = richText;
+                rowHasRelevantData = true;
+                Logger.log(`Row ${row + 1}, Column ${col + 1}: Relevant data preserved.`);
             } else {
                 preservedLinks[row][col] = null;
             }
         }
+
+        if (!rowHasRelevantData) {
+            preservedLinks[row] = null;  // delete rows with no relevant data
+        }
     }
+
+    Logger.log(`preserveRelevantHyperlinks completed: Total rows preserved ${preservedLinks.length}`);
     return preservedLinks;
 }
+
 
 /**
  * Restores the relevant hyperlinks in the specified range.
@@ -223,14 +242,24 @@ function preserveRelevantHyperlinks(range) {
  * @returns {void}
  */
 function restoreRelevantHyperlinks(range, preservedLinks) {
-    for (let row = 0; row < preservedLinks.length; row++) {
-        for (let col = 0; col < preservedLinks[row].length; col++) {
-            if (preservedLinks[row][col] !== null) {
-                const newRichText = preservedLinks[row][col];
-                range.getCell(row + 1, col + 1).setRichTextValue(newRichText);
+    Logger.log('restoreRelevantHyperlinks called');
+    const richTextValues = range.getRichTextValues();
+
+    const maxRows = Math.min(preservedLinks.length, 40); // Limited to 40 rows
+
+    for (let row = 0; row < maxRows; row++) {
+        if (preservedLinks[row] !== null) {
+            for (let col = 1; col <= 6; col++) { // columns B to H 
+                if (preservedLinks[row][col] !== null) {
+                    richTextValues[row][col] = preservedLinks[row][col];
+                    Logger.log(`Row ${row + 1}, Column ${col + 1}: Restoring preserved data.`);
+                }
             }
         }
     }
+
+    range.setRichTextValues(richTextValues); // apply all restored rich text values at once
+    Logger.log('restoreRelevantHyperlinks completed');
 }
 
 /**
