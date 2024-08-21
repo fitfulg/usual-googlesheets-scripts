@@ -890,7 +890,9 @@ function applyColumnStyles(language) {
  * @returns {void}
  */
 function applyExpiresTextStyle() {
-    const range = sheet.getRange(1, 1, sheet.getMaxRows(), 8);
+    Logger.log('applyExpiresTextStyle called');
+    const totalRows = Math.min(40, sheet.getMaxRows()); // Limited to 40 rows
+    const range = sheet.getRange(1, 1, totalRows, 8);
     const richTextValues = range.getRichTextValues();
 
     for (let row = 0; row < richTextValues.length; row++) {
@@ -898,16 +900,32 @@ function applyExpiresTextStyle() {
             const richText = richTextValues[row][col];
             const text = richText.getText();
             const expiresInIndex = text.indexOf('Expires in');
-            const dateIndex = text.search(/\d{2}\/\d{2}\/\d{2}/);  // Assuming the date format is DD/MM/YY
+            const dateMatch = text.match(/\d{2}\/\d{2}\/\d{2}/);  // Match for the date format DD/MM/YY
 
-            if (expiresInIndex !== -1 && dateIndex !== -1) {
-                const builder = richText.copy();
-                builder.setTextStyle(expiresInIndex, dateIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
-                range.getCell(row + 1, col + 1).setRichTextValue(builder.build());
+            if (expiresInIndex !== -1 && dateMatch) {
+                const dateIndex = text.indexOf(dateMatch[0]);  // Get the starting index of the date
+
+                // Ensure indices are valid and in order
+                if (expiresInIndex < dateIndex && expiresInIndex >= 0 && dateIndex >= 0) {
+                    const builder = richText.copy();
+
+                    // Preserve existing text styles
+                    const existingStyle = richText.getTextStyle(0, text.length);
+
+                    // Apply the new styles only to the "Expires in" and date sections
+                    builder.setTextStyle(0, text.length, existingStyle); // Preserve the existing style
+                    builder.setTextStyle(expiresInIndex, dateIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
+
+                    range.getCell(row + 1, col + 1).setRichTextValue(builder.build());
+                } else {
+                    Logger.log(`Skipping invalid indices for styling in cell ${row + 1}, ${col + 1}`);
+                }
             }
         }
     }
 }
+
+
 
 /**
  * Checks and sets the column based on the limit of occupied cells.
@@ -2196,39 +2214,65 @@ function updateExpirationDatesTODO() {
     const range = sheet.getRange(2, 3, lastRow - 1, 6); // from row 2, Columns C to H
     const values = range.getValues();
 
+    Logger.log(`Total rows being processed: ${lastRow - 1}`);
+
     for (let row = 2; row < values.length; row++) { // Start from row 2 to skip header
         for (let col = 2; col < values[row].length; col++) { // Assuming columns start from C (index 2) to H (index 7)
-            const cellValue = values[row][col];
             const cell = sheet.getRange(row + 1, col + 1);
+            const cellValue = cell.getValue();
 
-            if (typeof cellValue === 'string' && cellValue.includes('**')) {
-                const originalValue = cell.getValue();
-                const newValue = originalValue.toString();
-
-                Logger.log(`Processing cell ${cell.getA1Notation()}`);
-
+            if (typeof cellValue === 'string' && cellValue.includes('Expires')) {
                 const note = cell.getNote();
+
                 let expirationDate = null;
                 if (note && note.includes('Expiration Date:')) {
                     expirationDate = new Date(note.replace('Expiration Date: ', ''));
+                    Logger.log(`Parsed expiration date from note: ${expirationDate}`);
+                } else {
+                    Logger.log(`No expiration date found in note for cell ${cell.getA1Notation()}`);
                 }
 
                 if (expirationDate) {
                     const daysLeft = calcExpirationDaysTODO(Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yyyy"));
-                    Logger.log(`Calculated days left: ${daysLeft} for date: ${expirationDate}`);
+                    Logger.log(`Calculated days left: ${daysLeft} for expiration date: ${expirationDate}`);
 
-                    let updatedText = newValue.replace(/\d{2}\/\d{2}\/\d{4}/g, '').trim(); // Remove any other dates
-                    updatedText = updatedText.replace(/Expires in \(\d+\) days|Expires today|EXPIRED/, '').trim();
+                    // Obtain the existing RichTextValue to preserve formatting
+                    let richText = cell.getRichTextValue();
+                    let newText = "";
 
                     if (daysLeft > 0) {
-                        updatedText += `\nExpires in (${daysLeft}) days\n${Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yy")}`;
+                        newText = `Expires in (${daysLeft}) days`;
                     } else if (daysLeft === 0) {
-                        updatedText += `\nExpires today\n${Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yy")}`;
+                        newText = `Expires today`;
                     } else {
-                        updatedText += "\nEXPIRED";
+                        newText = "EXPIRED";
                     }
 
-                    cell.setValue(updatedText);
+                    // Find and replace only the expiration part of the text
+                    let textToReplace = /Expires in \(\d+\) days|Expires today|EXPIRED/;
+                    let updatedText = cellValue.replace(textToReplace, newText);
+
+                    // Create a new RichTextValue builder based on the updated text
+                    let builder = SpreadsheetApp.newRichTextValue();
+                    builder.setText(updatedText);
+
+                    // Preserve original formatting by applying styles from the original RichTextValue
+                    let runs = richText.getRuns();
+                    let offset = 0;
+
+                    for (let i = 0; i < runs.length; i++) {
+                        let runText = runs[i].getText();
+                        let runStyle = runs[i].getTextStyle();
+                        if (offset + runText.length <= updatedText.length) {
+                            builder.setTextStyle(offset, offset + runText.length, runStyle);
+                        }
+                        offset += runText.length;
+                    }
+
+                    // Apply the updated RichTextValue to the cell
+                    cell.setRichTextValue(builder.build());
+
+                    Logger.log(`Final updated rich text for cell ${cell.getA1Notation()}: ${updatedText}`);
                 }
             }
         }
@@ -2236,6 +2280,7 @@ function updateExpirationDatesTODO() {
 
     Logger.log('updateExpirationDatesTODO completed');
 }
+
 
 // for testing
 

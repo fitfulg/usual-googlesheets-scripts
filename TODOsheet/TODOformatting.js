@@ -306,7 +306,9 @@ function applyColumnStyles(language) {
  * @returns {void}
  */
 function applyExpiresTextStyle() {
-    const range = sheet.getRange(1, 1, sheet.getMaxRows(), 8);
+    Logger.log('applyExpiresTextStyle called');
+    const totalRows = Math.min(40, sheet.getMaxRows()); // Limited to 40 rows
+    const range = sheet.getRange(1, 1, totalRows, 8);
     const richTextValues = range.getRichTextValues();
 
     for (let row = 0; row < richTextValues.length; row++) {
@@ -314,16 +316,32 @@ function applyExpiresTextStyle() {
             const richText = richTextValues[row][col];
             const text = richText.getText();
             const expiresInIndex = text.indexOf('Expires in');
-            const dateIndex = text.search(/\d{2}\/\d{2}\/\d{2}/);  // Assuming the date format is DD/MM/YY
+            const dateMatch = text.match(/\d{2}\/\d{2}\/\d{2}/);  // Match for the date format DD/MM/YY
 
-            if (expiresInIndex !== -1 && dateIndex !== -1) {
-                const builder = richText.copy();
-                builder.setTextStyle(expiresInIndex, dateIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
-                range.getCell(row + 1, col + 1).setRichTextValue(builder.build());
+            if (expiresInIndex !== -1 && dateMatch) {
+                const dateIndex = text.indexOf(dateMatch[0]);  // Get the starting index of the date
+
+                // Ensure indices are valid and in order
+                if (expiresInIndex < dateIndex && expiresInIndex >= 0 && dateIndex >= 0) {
+                    const builder = richText.copy();
+
+                    // Preserve existing text styles
+                    const existingStyle = richText.getTextStyle(0, text.length);
+
+                    // Apply the new styles only to the "Expires in" and date sections
+                    builder.setTextStyle(0, text.length, existingStyle); // Preserve the existing style
+                    builder.setTextStyle(expiresInIndex, dateIndex, SpreadsheetApp.newTextStyle().setForegroundColor('#0000FF').setItalic(true).build());
+
+                    range.getCell(row + 1, col + 1).setRichTextValue(builder.build());
+                } else {
+                    Logger.log(`Skipping invalid indices for styling in cell ${row + 1}, ${col + 1}`);
+                }
             }
         }
     }
 }
+
+
 
 /**
  * Checks and sets the column based on the limit of occupied cells.
