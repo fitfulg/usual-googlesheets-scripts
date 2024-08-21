@@ -22,7 +22,7 @@ function onEdit(e) {
         const column = range.getColumn();
         const row = range.getRow();
         const columnLetter = String.fromCharCode(64 + column);
-        const totalRows = sheet.getMaxRows();
+        const totalRows = Math.min(40, sheet.getMaxRows()); // Limit to 40 rows
 
         Logger.log(`onEdit triggered: column ${column}, row ${row}`);
         Logger.log(`isEnabledDefaultAdditions is currently: ${isEnabledDefaultAdditions}`);

@@ -738,7 +738,7 @@ function exampleTextTODO(column, exampleText) {
 function applyFormatToAllTODO() {
     Logger.log('applyFormatToAllTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-    const totalRows = sheet.getMaxRows();
+    const totalRows = Math.min(40, sheet.getMaxRows()); // Limited to 40 rows
     const range = sheet.getRange(1, 1, totalRows, 8);
 
     Logger.log('applyFormatToAllTODO()/preserveRelevantHyperlinks() called');
@@ -784,22 +784,22 @@ function preserveRelevantHyperlinks(range) {
     Logger.log('preserveRelevantHyperlinks called');
     const richTextValues = range.getRichTextValues();
     const preservedLinks = [];
-    const maxRows = Math.min(richTextValues.length, 40); // Limitar a las primeras 40 filas
+    const maxRows = Math.min(richTextValues.length, 40); // Limited to 40 rows
 
     for (let row = 0; row < maxRows; row++) {
         let rowHasRelevantData = false;
         preservedLinks[row] = [];
-        for (let col = 1; col <= 6; col++) { // Solo procesamos columnas B a H (índices 1 a 6)
+        for (let col = 1; col <= 6; col++) { // columns B to H 
             const richText = richTextValues[row][col];
             const cellText = richText.getText().trim();
 
             if (cellText === '') {
-                preservedLinks[row][col] = null;  // Omitimos celdas vacías
+                preservedLinks[row][col] = null;  // Omit empty cells
                 continue;
             }
 
             if (richText.getLinkUrl() || cellText.includes('Expires in')) {
-                preservedLinks[row][col] = richText;  // Preservamos solo el rich text relevante
+                preservedLinks[row][col] = richText;
                 rowHasRelevantData = true;
                 Logger.log(`Row ${row + 1}, Column ${col + 1}: Relevant data preserved.`);
             } else {
@@ -808,7 +808,7 @@ function preserveRelevantHyperlinks(range) {
         }
 
         if (!rowHasRelevantData) {
-            preservedLinks[row] = null;  // Eliminamos filas sin datos relevantes para ahorrar memoria
+            preservedLinks[row] = null;  // delete rows with no relevant data
         }
     }
 
@@ -829,11 +829,11 @@ function restoreRelevantHyperlinks(range, preservedLinks) {
     Logger.log('restoreRelevantHyperlinks called');
     const richTextValues = range.getRichTextValues();
 
-    const maxRows = Math.min(preservedLinks.length, 40); // Limitar a las primeras 40 filas
+    const maxRows = Math.min(preservedLinks.length, 40); // Limited to 40 rows
 
     for (let row = 0; row < maxRows; row++) {
         if (preservedLinks[row] !== null) {
-            for (let col = 1; col <= 6; col++) { // Procesamos columnas B a H (índices 1 a 6)
+            for (let col = 1; col <= 6; col++) { // columns B to H 
                 if (preservedLinks[row][col] !== null) {
                     richTextValues[row][col] = preservedLinks[row][col];
                     Logger.log(`Row ${row + 1}, Column ${col + 1}: Restoring preserved data.`);
@@ -842,7 +842,7 @@ function restoreRelevantHyperlinks(range, preservedLinks) {
         }
     }
 
-    range.setRichTextValues(richTextValues); // Aplicamos todos los cambios de una sola vez
+    range.setRichTextValues(richTextValues); // apply all restored rich text values at once
     Logger.log('restoreRelevantHyperlinks completed');
 }
 
@@ -968,7 +968,7 @@ function checkAndSetColumnTODO(column, limit, priority) {
  */
 function setColumnBackground(sheet, col, color, startRow = 2) {
     Logger.log(`setColumnBackground called for column: ${col}, color: ${color}, startRow: ${startRow}`);
-    let totalRows = sheet.getMaxRows();
+    let totalRows = Math.min(40, sheet.getMaxRows()); // Limited to 40 rows
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
 }
@@ -1096,7 +1096,7 @@ function moveNoteToUpperCell(sheet, fromRow, toRow, column) {
 function pushUpEmptyCellsTODO() {
     Logger.log('pushUpEmptyCellsTODO called');
     const range = sheet.getDataRange();
-    const numRows = range.getNumRows();
+    const numRows = Math.min(40, range.getNumRows()); // Limited to 40 rows
     const numCols = range.getNumColumns();
 
     for (let col = 1; col <= numCols; col++) {
@@ -1832,7 +1832,7 @@ function updateDateColorsTODO() {
     const datePattern = /\d{2}\/\d{2}\/\d{2}$/;  // dd/MM/yy
     const expiresPattern = /Expires in \(\d+\) days/;  // Expires in (n) days
 
-    // Crear un índice previo para las celdas que contienen fechas o "Expires in"
+    // index the cells to update
     const cellsToUpdate = [];
 
     for (const column of columns) {
@@ -1848,7 +1848,7 @@ function updateDateColorsTODO() {
 
     Logger.log(`Total cells to update: ${cellsToUpdate.length}`);
 
-    // Procesar solo las celdas identificadas en el índice
+    // process indexed cells
     cellsToUpdate.forEach(({ cell, cellValue, column, row }) => {
         const config = dateColorConfig[column];
 
@@ -1916,7 +1916,8 @@ function updateDaysLeftCounterTODO() {
         Logger.log(`Days elapsed since last update: ${daysElapsed}`);
     }
 
-    const range = sheet.getRange('H2:H' + sheet.getLastRow());
+    const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows for performance
+    const range = sheet.getRange('H2:H' + lastRow);
     const richTextValues = range.getRichTextValues();
     Logger.log("Starting to update days left for each cell.");
 
@@ -2036,7 +2037,7 @@ function parseDaysLeftTODO(value) {
 function removeMultipleDatesTODO() {
     Logger.log('removeMultipleDatesTODO called');
     const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();
+    const lastRow = Math.min(40, dataRange.getLastRow()); // Limit to 40 rows for performance
     const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
     for (const column of columns) {
@@ -2191,7 +2192,8 @@ function updateExpirationDatesTODO() {
     Logger.log('updateExpirationDatesTODO called');
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = sheet.getDataRange(); // Gets the full range of data
+    const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows for performance
+    const range = sheet.getRange(2, 3, lastRow - 1, 6); // from row 2, Columns C to H
     const values = range.getValues();
 
     for (let row = 2; row < values.length; row++) { // Start from row 2 to skip header
@@ -2377,7 +2379,7 @@ function onEdit(e) {
         const column = range.getColumn();
         const row = range.getRow();
         const columnLetter = String.fromCharCode(64 + column);
-        const totalRows = sheet.getMaxRows();
+        const totalRows = Math.min(40, sheet.getMaxRows()); // Limit to 40 rows
 
         Logger.log(`onEdit triggered: column ${column}, row ${row}`);
         Logger.log(`isEnabledDefaultAdditions is currently: ${isEnabledDefaultAdditions}`);

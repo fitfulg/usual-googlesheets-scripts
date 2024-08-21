@@ -101,7 +101,8 @@ function updateDaysLeftCounterTODO() {
         Logger.log(`Days elapsed since last update: ${daysElapsed}`);
     }
 
-    const range = sheet.getRange('H2:H' + sheet.getLastRow());
+    const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows for performance
+    const range = sheet.getRange('H2:H' + lastRow);
     const richTextValues = range.getRichTextValues();
     Logger.log("Starting to update days left for each cell.");
 
@@ -221,7 +222,7 @@ function parseDaysLeftTODO(value) {
 function removeMultipleDatesTODO() {
     Logger.log('removeMultipleDatesTODO called');
     const dataRange = getDataRange();
-    const lastRow = dataRange.getLastRow();
+    const lastRow = Math.min(40, dataRange.getLastRow()); // Limit to 40 rows for performance
     const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
     for (const column of columns) {
@@ -376,7 +377,8 @@ function updateExpirationDatesTODO() {
     Logger.log('updateExpirationDatesTODO called');
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const range = sheet.getDataRange(); // Gets the full range of data
+    const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows for performance
+    const range = sheet.getRange(2, 3, lastRow - 1, 6); // from row 2, Columns C to H
     const values = range.getValues();
 
     for (let row = 2; row < values.length; row++) { // Start from row 2 to skip header

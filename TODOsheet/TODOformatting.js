@@ -154,7 +154,7 @@ function exampleTextTODO(column, exampleText) {
 function applyFormatToAllTODO() {
     Logger.log('applyFormatToAllTODO called');
     const language = PropertiesService.getDocumentProperties().getProperty('language') || 'English';
-    const totalRows = sheet.getMaxRows();
+    const totalRows = Math.min(40, sheet.getMaxRows()); // Limited to 40 rows
     const range = sheet.getRange(1, 1, totalRows, 8);
 
     Logger.log('applyFormatToAllTODO()/preserveRelevantHyperlinks() called');
@@ -384,7 +384,7 @@ function checkAndSetColumnTODO(column, limit, priority) {
  */
 function setColumnBackground(sheet, col, color, startRow = 2) {
     Logger.log(`setColumnBackground called for column: ${col}, color: ${color}, startRow: ${startRow}`);
-    let totalRows = sheet.getMaxRows();
+    let totalRows = Math.min(40, sheet.getMaxRows()); // Limited to 40 rows
     let range = sheet.getRange(startRow, col, totalRows - startRow + 1, 1);
     range.setBackground(color);
 }
@@ -512,7 +512,7 @@ function moveNoteToUpperCell(sheet, fromRow, toRow, column) {
 function pushUpEmptyCellsTODO() {
     Logger.log('pushUpEmptyCellsTODO called');
     const range = sheet.getDataRange();
-    const numRows = range.getNumRows();
+    const numRows = Math.min(40, range.getNumRows()); // Limited to 40 rows
     const numCols = range.getNumColumns();
 
     for (let col = 1; col <= numCols; col++) {
