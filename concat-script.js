@@ -909,13 +909,13 @@ function applyFormatToAllTODO() {
     Logger.log('applyFormatToAllTODO()/applyExpiresTextStyle() called');
     applyExpiresTextStyle();
 
-    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
-    applyColumnStyles(language);
-
     Logger.log('applyFormatToAllTODO()/applyThickBorders(): applying thick borders');
     applyThickBorders(sheet.getRange(1, 3, 11, 1));
     applyThickBorders(sheet.getRange(1, 4, 21, 1));
     applyThickBorders(sheet.getRange(1, 5, 21, 1));
+
+    Logger.log('applyFormatToAllTODO()/checkAndSetColumnTODO(): checking and setting columns');
+    applyColumnStyles(language);
 }
 
 /**
@@ -960,7 +960,6 @@ function preserveRelevantHyperlinks(range) {
     Logger.log(`preserveRelevantHyperlinks completed: Total rows preserved ${preservedLinks.length}`);
     return preservedLinks;
 }
-
 
 /**
  * Restores the relevant hyperlinks in the specified range.
@@ -1069,8 +1068,6 @@ function applyExpiresTextStyle() {
         }
     }
 }
-
-
 
 /**
  * Checks and sets the column based on the limit of occupied cells.
