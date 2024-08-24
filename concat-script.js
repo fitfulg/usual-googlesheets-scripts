@@ -792,7 +792,6 @@ function updateCellCommentTODO() {
             - You can add, mark, restore, and delete checkboxes in cells by selecting them and using the "Custom Formats" menu.
             - The "days left" counter is updated daily in the 8th column. When the counter reaches zero, the cell is cleared.
             - A snapshot of the sheet can be saved and restored from the "Custom Formats" menu.
-            - Snapshots are automatically saved and restored when the sheet is reloaded so that the last state is always preserved.
             - Indicative limit of cells for each priority, with a warning when the limit is reached.
             - Custom formats can be applied without refreshing the page from the "Custom Formats" menu.
             - Date color change times vary by column priority.
@@ -809,7 +808,6 @@ function updateCellCommentTODO() {
             - Puedes agregar, marcar, restaurar y eliminar casillas en las celdas seleccionándolas y usando el menú "Formatos personalizados".
             - El contador de "días restantes" se actualiza diariamente en la 8ª columna. Cuando el contador llega a cero, la celda se borra.
             - Se puede guardar y restaurar una instantánea de la hoja desde el menú "Formatos personalizados".
-            - Las instantáneas se guardan y restauran automáticamente cuando se recarga la hoja para que siempre se conserve el último estado.
             - Límite indicativo de celdas para cada prioridad, con una advertencia cuando se alcanza el límite.
             - Se pueden aplicar formatos personalizados sin necesidad de refrescar la página desde el menú "Formatos personalizados".
             - Los tiempos de cambio de color de las fechas varían según la prioridad de la columna.
@@ -826,7 +824,6 @@ function updateCellCommentTODO() {
             - Pots afegir, marcar, restaurar i eliminar caselles en les cel·les seleccionades seleccionant-les i utilitzant el menú "Formats personalitzats".
             - El comptador de "dies restants" s'actualitza diàriament a la 8a columna. Quan el comptador arriba a zero, la cel·la s'esborra.
             - Es pot desar i restaurar una instantània del full des del menú "Formats personalitzats".
-            - Les instantànies es guarden i es restauren automàticament quan es recarrega el full per tal que sempre es conservi l'últim estat.
             - Límite indicatiu de cel·les per a cada prioritat, amb una advertència quan s'assoleix el límit.
             - Es poden aplicar formats personalitzats sense necessitat de refrescar la pàgina des del menú "Formats personalitzats".
             - Els temps de canvi de color de les dates varien segons la prioritat de la columna.
