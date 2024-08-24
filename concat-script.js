@@ -778,18 +778,21 @@ function updateTipsCellTODO() {
 function updateCellCommentTODO() {
     Logger.log('updateCellCommentTODO called');
     const cell = sheet.getRange("I3");
-    const version = "v1.2";
+    const version = "v1.3";
     cell.setValue(version);
 
     const changes = {
         English: `
             NEW FEATURES:
+            - You can now add an expiration date to your cells. It is a countdown by days. See the "Tips" cell for more information.
+            - Cells with expiration dates come with notes added that are used to calculate and update the expiration days.
+            - You can now enable or disable all the functionalities that are added by default when writing in a cell. For example, for a cell to have only text, without checkboxes or default date. From the "TODO Sheet"/"Enable/Disable Default Additions in Cells" menu.
+            OLD FEATURES:
             - A checkbox is added by default from the 3rd to the 8th column when a cell is written or modified.
             - You can add, mark, restore, and delete checkboxes in cells by selecting them and using the "Custom Formats" menu.
             - The "days left" counter is updated daily in the 8th column. When the counter reaches zero, the cell is cleared.
             - A snapshot of the sheet can be saved and restored from the "Custom Formats" menu.
             - Snapshots are automatically saved and restored when the sheet is reloaded so that the last state is always preserved.
-            OLD FEATURES:
             - Indicative limit of cells for each priority, with a warning when the limit is reached.
             - Custom formats can be applied without refreshing the page from the "Custom Formats" menu.
             - Date color change times vary by column priority.
@@ -798,12 +801,15 @@ function updateCellCommentTODO() {
         `,
         Spanish: `
             NUEVAS FUNCIONES:
+            - Ahora puedes agregar una fecha de vencimiento a tus celdas. Es una cuenta regresiva en días. Consulta la celda "Consejos" para obtener más información.
+            - Las celdas con fecha de expiracion vienen con notas agregadas que son usadas para calcular y actualizar los dias de expiración.
+            - Ahora puedes activar o desactivar todas las funcionalidades que se añaden por defecto al escribir en una celda. Por ejemplo para que una celda tenga solamente texto, sin casillas ni fecha por defecto. Desde el menu "Hoja TODO"/"Habilitar/Deshabilitar Adiciones por Defecto en las Celdas"
+            FUNCIONES ANTIGUAS:
             - Se añade una casilla de verificación por defecto desde la 3ª a la 8ª columna cuando se escribe o modifica una celda.
             - Puedes agregar, marcar, restaurar y eliminar casillas en las celdas seleccionándolas y usando el menú "Formatos personalizados".
             - El contador de "días restantes" se actualiza diariamente en la 8ª columna. Cuando el contador llega a cero, la celda se borra.
             - Se puede guardar y restaurar una instantánea de la hoja desde el menú "Formatos personalizados".
             - Las instantáneas se guardan y restauran automáticamente cuando se recarga la hoja para que siempre se conserve el último estado.
-            FUNCIONES ANTIGUAS:
             - Límite indicativo de celdas para cada prioridad, con una advertencia cuando se alcanza el límite.
             - Se pueden aplicar formatos personalizados sin necesidad de refrescar la página desde el menú "Formatos personalizados".
             - Los tiempos de cambio de color de las fechas varían según la prioridad de la columna.
@@ -812,12 +818,15 @@ function updateCellCommentTODO() {
         `,
         Catalan: `
             NOVES FUNCIONS:
+            - Ara pots agregar una data de venciment a les cel·les. És un compte enrere en dies. Consulta la cel·la "Consells" per obtenir més informació.
+            - Les cel·les amb data d'expiració venen amb notes agregades que són usades per calcular i actualitzar els dies d'expiració.
+            - Ara podeu activar o desactivar totes les funcionalitats que s'afegeixen per defecte en escriure en una cel·la. Per exemple perquè una cel·la tingui només text, sense caselles ni data per defecte. Des del menu "Full de TODO"/"Habilitar/Deshabilitar Addicions per Defecte a les Cel·les"
+            FUNCIONS ANTIGUES:
             - S'afegeix una casella de verificació per defecte des de la 3a fins a la 8a columna quan s'escriu o es modifica una cel·la.
             - Pots afegir, marcar, restaurar i eliminar caselles en les cel·les seleccionades seleccionant-les i utilitzant el menú "Formats personalitzats".
             - El comptador de "dies restants" s'actualitza diàriament a la 8a columna. Quan el comptador arriba a zero, la cel·la s'esborra.
             - Es pot desar i restaurar una instantània del full des del menú "Formats personalitzats".
             - Les instantànies es guarden i es restauren automàticament quan es recarrega el full per tal que sempre es conservi l'últim estat.
-            FUNCIONS ANTIGUES:
             - Límite indicatiu de cel·les per a cada prioritat, amb una advertència quan s'assoleix el límit.
             - Es poden aplicar formats personalitzats sense necessitat de refrescar la pàgina des del menú "Formats personalitzats".
             - Els temps de canvi de color de les dates varien segons la prioritat de la columna.
