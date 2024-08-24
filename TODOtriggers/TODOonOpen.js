@@ -73,6 +73,7 @@ function applyGridLoaderTODO(sheet) {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     setupDropdownTODO();
     removeMultipleDatesTODO();
     pushUpEmptyCellsTODO();
@@ -82,7 +83,8 @@ function runAllFunctionsTODO() {
     customCellBGColorTODO();
     updateCellCommentTODO();
     updateTipsCellTODO();
-    applyFormatToAllTODO(); // overwrites the grid loader
+    removeNotesFromEmptyCells(sheet) //could be dispensable (gaining load time) since it is difficult for a cell to remain empty with notes given onEdit functionality.
+    applyFormatToAllTODO(); // overwrites the grid loader. Must always be the last function called.
     Logger.log('All functions called successfully!');
 }
 

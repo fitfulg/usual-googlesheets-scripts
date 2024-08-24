@@ -175,6 +175,27 @@ function clearTextFormatting(range) {
     range.setRichTextValues(richTextValues);
 }
 
+/**
+ * Removes notes from empty cells in a sheet.
+ *
+ * @param {Sheet} sheet - The sheet to remove notes from.
+ */
+function removeNotesFromEmptyCells(sheet) {
+    const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows
+    const lastColumn = sheet.getLastColumn();
+    const range = sheet.getRange(2, 1, lastRow - 1, lastColumn); //From row 2 to lastRow
+    const values = range.getValues();
+    const notes = range.getNotes();
+
+    for (let row = 0; row < values.length; row++) {
+        for (let col = 0; col < values[row].length; col++) {
+            if (values[row][col] === "" && notes[row][col] !== "") {
+                sheet.getRange(row + 2, col + 1).setNote(""); // Clear note
+            }
+        }
+    }
+}
+
 // for testing 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -188,6 +209,7 @@ if (typeof module !== 'undefined' && module.exports) {
         updateDateWithStyle,
         createRichTextValue,
         resetTextStyle,
-        clearTextFormatting
+        clearTextFormatting,
+        removeNotesFromEmptyCells
     };
 }

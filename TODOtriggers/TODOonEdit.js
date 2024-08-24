@@ -27,19 +27,25 @@ function onEdit(e) {
         Logger.log(`onEdit triggered: column ${column}, row ${row}`);
         Logger.log(`isEnabledDefaultAdditions is currently: ${isEnabledDefaultAdditions}`);
 
-        if (column === 9 && row === 1) {
-            handlePieChartToggleTODO(range);
-            return;
-        }
-
         const originalValue = e.oldValue || '';
         const newValue = range.getValue().toString();
         Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
 
-        // Shift cells up, independent of default additions
-        if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
-            Logger.log(`onEdit(): Shifting cells up for column ${column}`);
-            shiftCellsUpTODO(column, 2, totalRows);
+        // Check if the cell was cleared (newValue is empty string)
+        if (newValue === '') {
+            Logger.log(`onEdit(): Clearing format and notes for cell ${range.getA1Notation()}`);
+            range.clear({ contentsOnly: false, formatOnly: true, commentsOnly: true });
+
+            // Shift cells up if applicable
+            if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2) {
+                Logger.log(`onEdit(): Shifting cells up for column ${column}`);
+                shiftCellsUpTODO(column, 2, totalRows);
+            }
+            return;
+        }
+
+        if (column === 9 && row === 1) {
+            handlePieChartToggleTODO(range);
             return;
         }
 

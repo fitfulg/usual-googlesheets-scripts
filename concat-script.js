@@ -299,6 +299,27 @@ function clearTextFormatting(range) {
     range.setRichTextValues(richTextValues);
 }
 
+/**
+ * Removes notes from empty cells in a sheet.
+ *
+ * @param {Sheet} sheet - The sheet to remove notes from.
+ */
+function removeNotesFromEmptyCells(sheet) {
+    const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows
+    const lastColumn = sheet.getLastColumn();
+    const range = sheet.getRange(2, 1, lastRow - 1, lastColumn); //From row 2 to lastRow
+    const values = range.getValues();
+    const notes = range.getNotes();
+
+    for (let row = 0; row < values.length; row++) {
+        for (let col = 0; col < values[row].length; col++) {
+            if (values[row][col] === "" && notes[row][col] !== "") {
+                sheet.getRange(row + 2, col + 1).setNote(""); // Clear note
+            }
+        }
+    }
+}
+
 // for testing 
 
 // Contents of ./shared/utils.js
@@ -2565,19 +2586,25 @@ function onEdit(e) {
         Logger.log(`onEdit triggered: column ${column}, row ${row}`);
         Logger.log(`isEnabledDefaultAdditions is currently: ${isEnabledDefaultAdditions}`);
 
-        if (column === 9 && row === 1) {
-            handlePieChartToggleTODO(range);
-            return;
-        }
-
         const originalValue = e.oldValue || '';
         const newValue = range.getValue().toString();
         Logger.log(`onEdit(): Original value: "${originalValue}", New value: "${newValue}"`);
 
-        // Shift cells up, independent of default additions
-        if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2 && newValue.trim() === '') {
-            Logger.log(`onEdit(): Shifting cells up for column ${column}`);
-            shiftCellsUpTODO(column, 2, totalRows);
+        // Check if the cell was cleared (newValue is empty string)
+        if (newValue === '') {
+            Logger.log(`onEdit(): Clearing format and notes for cell ${range.getA1Notation()}`);
+            range.clear({ contentsOnly: false, formatOnly: true, commentsOnly: true });
+
+            // Shift cells up if applicable
+            if ((column === 1 || (column >= 3 && column <= 8)) && row >= 2) {
+                Logger.log(`onEdit(): Shifting cells up for column ${column}`);
+                shiftCellsUpTODO(column, 2, totalRows);
+            }
+            return;
+        }
+
+        if (column === 9 && row === 1) {
+            handlePieChartToggleTODO(range);
             return;
         }
 
@@ -2705,6 +2732,7 @@ function applyGridLoaderTODO(sheet) {
  */
 function runAllFunctionsTODO() {
     Logger.log('runAllFunctionsTODO triggered');
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     setupDropdownTODO();
     removeMultipleDatesTODO();
     pushUpEmptyCellsTODO();
@@ -2714,7 +2742,8 @@ function runAllFunctionsTODO() {
     customCellBGColorTODO();
     updateCellCommentTODO();
     updateTipsCellTODO();
-    applyFormatToAllTODO(); // overwrites the grid loader
+    removeNotesFromEmptyCells(sheet) //could be dispensable (gaining load time) since it is difficult for a cell to remain empty with notes given onEdit functionality.
+    applyFormatToAllTODO(); // overwrites the grid loader. Must always be the last function called.
     Logger.log('All functions called successfully!');
 }
 
