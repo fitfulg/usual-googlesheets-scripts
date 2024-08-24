@@ -76,7 +76,7 @@ function logAllDocumentProperties() {
         Logger.log(`${key}: ${lastHashProperty[key]}`);
     }
 
-    Logger.log('TIMESTAMP PROPERTIES:');
+    Logger.log('TIMESTAMP PROPERTIES for column H:');
     for (const key in timestampProperties) {
         Logger.log(`${key}: ${timestampProperties[key]}`);
     }
@@ -103,22 +103,6 @@ function removeUnusedProperties() {
 
     const unusedKeys = [
         // add here the keys that are not used as strings:
-        'H9',
-        'H17',
-        'H14',
-        'H4',
-        'H8',
-        'H7',
-        'H11',
-        'H16',
-        'H6',
-        'H2',
-        'H13',
-        'H3',
-        'H12',
-        'H10',
-        'H15',
-        'H5'
     ];
     let removedKeys = [];
 
