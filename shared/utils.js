@@ -1,5 +1,3 @@
-
-
 /**
  * Extracts URLs from a rich text value.
  *
@@ -36,6 +34,26 @@ function arraysEqual(arr1, arr2) {
     }
     Logger.log('arrays are equal');
     return true;
+}
+
+/**
+ * Stores a hash of the current date to check for expiration.
+ *
+ * @customfunction
+ * @returns {void}
+ */
+function storeExpirationDateHashTODO() {
+    Logger.log('storeExpirationDateHashTODO triggered');
+    // Create and store a hash of the current date to check for expiration
+    const today = new Date();
+    const dateString = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyyMMdd");
+    const dateHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, dateString);
+    const hashString = Utilities.base64Encode(dateHash);
+
+    const docProperties = PropertiesService.getDocumentProperties();
+    docProperties.setProperty('expirationDateHash', hashString);
+
+    Logger.log('Stored expiration date hash: ' + hashString);
 }
 
 /**
@@ -255,6 +273,7 @@ if (typeof module !== 'undefined' && module.exports) {
         processCells,
         preserveStylesAndLinks,
         parseDate,
-        parseFullYearDate
+        parseFullYearDate,
+        storeExpirationDateHashTODO,
     };
 }

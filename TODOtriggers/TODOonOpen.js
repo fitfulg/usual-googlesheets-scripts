@@ -25,8 +25,9 @@ function onOpen() {
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
+        const isExpirationDatesUpdated = isExpirationsUpdatedDatesTODO();
         createMenusTODO();
-        if (shouldRunUpdates(lastHash, currentHash)) {
+        if (shouldRunUpdates(lastHash, currentHash) || !isExpirationDatesUpdated) {
             isLoaded = false
             ss.toast(toastMessages.loading[language], 'Status:', 45);
             applyGridLoaderTODO(sheet);

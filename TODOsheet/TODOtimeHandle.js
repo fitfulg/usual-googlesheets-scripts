@@ -403,7 +403,6 @@ function updateExpirationDatesTODO() {
                     const daysLeft = calcExpirationDaysTODO(Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yyyy"));
                     Logger.log(`Calculated days left: ${daysLeft} for expiration date: ${expirationDate}`);
 
-                    // Obtain the existing RichTextValue to preserve formatting
                     let richText = cell.getRichTextValue();
                     let newText = "";
 
@@ -415,15 +414,12 @@ function updateExpirationDatesTODO() {
                         newText = "EXPIRED";
                     }
 
-                    // Find and replace only the expiration part of the text
                     let textToReplace = /Expires in \(\d+\) days|Expires today|EXPIRED/;
                     let updatedText = cellValue.replace(textToReplace, newText);
 
-                    // Create a new RichTextValue builder based on the updated text
                     let builder = SpreadsheetApp.newRichTextValue();
                     builder.setText(updatedText);
 
-                    // Preserve original formatting by applying styles from the original RichTextValue
                     let runs = richText.getRuns();
                     let offset = 0;
 
@@ -436,7 +432,6 @@ function updateExpirationDatesTODO() {
                         offset += runText.length;
                     }
 
-                    // Apply the updated RichTextValue to the cell
                     cell.setRichTextValue(builder.build());
 
                     Logger.log(`Final updated rich text for cell ${cell.getA1Notation()}: ${updatedText}`);
@@ -444,10 +439,27 @@ function updateExpirationDatesTODO() {
             }
         }
     }
+    storeExpirationDateHashTODO();
 
     Logger.log('updateExpirationDatesTODO completed');
 }
 
+/**
+ * Checks if the expiration dates have been updated today.
+ * 
+ * @returns {boolean} True if the expiration dates have been updated today, false otherwise.
+ */
+function isExpirationsUpdatedDatesTODO() {
+    const today = new Date();
+    const dateString = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyyMMdd");
+    const dateHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, dateString);
+    const hashString = Utilities.base64Encode(dateHash);
+
+    const docProperties = PropertiesService.getDocumentProperties();
+    const savedHash = docProperties.getProperty('expirationDateHash');
+
+    return savedHash === hashString;
+}
 
 // for testing
 if (typeof module !== 'undefined' && module.exports) {
@@ -459,6 +471,7 @@ if (typeof module !== 'undefined' && module.exports) {
         parseDaysLeftTODO,
         handleExpirationDateTODO,
         calcExpirationDaysTODO,
-        updateExpirationDatesTODO
+        updateExpirationDatesTODO,
+        isExpirationsUpdatedDatesTODO
     }
 }

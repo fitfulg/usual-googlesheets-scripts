@@ -14,6 +14,133 @@ let isPieChartVisible = false;
 let isLoaded = false;
 
 
+// Contents of ./shared/documentProperties.js
+
+/**
+ * Logs all the document properties to the console.
+ * @returns {void}
+ * @customfunction
+ */
+function logAllDocumentProperties() {
+    const docProperties = PropertiesService.getDocumentProperties();
+    const allProperties = docProperties.getProperties();
+
+    const expirationDateHash = {};
+    const lastHashProperty = {};
+    const timestampProperties = {};
+    const configProperties = {};
+    const otherProperties = {};
+
+    const conditionsMap = [
+        {
+            condition: key => key === 'expirationDateHash',
+            action: key => expirationDateHash[key] = allProperties[key]
+        },
+        {
+            condition: key => key === 'lastHash',
+            action: key => lastHashProperty[key] = allProperties[key]
+        },
+        {
+            condition: key => key.toLowerCase().includes('h') && !isNaN(parseInt(key.substring(1))),
+            action: key => timestampProperties[key] = allProperties[key]
+        },
+        {
+            condition: key => key.toLowerCase().includes('last') || key.toLowerCase().includes('enable') || key.toLowerCase().includes('menus'),
+            action: key => configProperties[key] = allProperties[key]
+        }
+    ];
+
+    for (const key in allProperties) {
+        let matched = false;
+        for (const { condition, action } of conditionsMap) {
+            if (condition(key)) {
+                action(key);
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            otherProperties[key] = allProperties[key];
+        }
+    }
+
+    Logger.log('Document Properties:');
+
+    Logger.log('EXPIRATION DATE HASH:');
+    for (const key in expirationDateHash) {
+        Logger.log(`${key}: ${expirationDateHash[key]}`);
+    }
+
+    Logger.log('LAST HASH:');
+    for (const key in lastHashProperty) {
+        Logger.log(`${key}: ${lastHashProperty[key]}`);
+    }
+
+    Logger.log('TIMESTAMP PROPERTIES:');
+    for (const key in timestampProperties) {
+        Logger.log(`${key}: ${timestampProperties[key]}`);
+    }
+
+    Logger.log('CONFIG PROPERTIES:');
+    for (const key in configProperties) {
+        Logger.log(`${key}: ${configProperties[key]}`);
+    }
+
+    Logger.log('OTHER PROPERTIES:');
+    for (const key in otherProperties) {
+        Logger.log(`${key}: ${otherProperties[key]}`);
+    }
+}
+
+/**
+ * Removes unused properties from the document properties.
+ * @returns {void}
+ * @customfunction
+ */
+function removeUnusedProperties() {
+    const docProperties = PropertiesService.getDocumentProperties();
+    const allProperties = docProperties.getProperties();
+
+    const unusedKeys = [
+        // add here the keys that are not used as strings:
+        'H9',
+        'H17',
+        'H14',
+        'H4',
+        'H8',
+        'H7',
+        'H11',
+        'H16',
+        'H6',
+        'H2',
+        'H13',
+        'H3',
+        'H12',
+        'H10',
+        'H15',
+        'H5'
+    ];
+    let removedKeys = [];
+
+    for (const key of unusedKeys) {
+        if (key in allProperties) {
+            docProperties.deleteProperty(key);
+            removedKeys.push(key);
+        }
+    }
+
+    if (removedKeys.length > 0) {
+        Logger.log('Removed the following unused properties:');
+        for (const key of removedKeys) {
+            Logger.log(key);
+        }
+    } else {
+        Logger.log('No unused properties found to remove.');
+    }
+}
+
+
+
 // Contents of ./shared/formatting.js
 
 
@@ -197,8 +324,6 @@ function clearTextFormatting(range) {
 
 // Contents of ./shared/utils.js
 
-
-
 /**
  * Extracts URLs from a rich text value.
  *
@@ -235,6 +360,26 @@ function arraysEqual(arr1, arr2) {
     }
     Logger.log('arrays are equal');
     return true;
+}
+
+/**
+ * Stores a hash of the current date to check for expiration.
+ *
+ * @customfunction
+ * @returns {void}
+ */
+function storeExpirationDateHashTODO() {
+    Logger.log('storeExpirationDateHashTODO triggered');
+    // Create and store a hash of the current date to check for expiration
+    const today = new Date();
+    const dateString = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyyMMdd");
+    const dateHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, dateString);
+    const hashString = Utilities.base64Encode(dateHash);
+
+    const docProperties = PropertiesService.getDocumentProperties();
+    docProperties.setProperty('expirationDateHash', hashString);
+
+    Logger.log('Stored expiration date hash: ' + hashString);
 }
 
 /**
@@ -2236,7 +2381,6 @@ function updateExpirationDatesTODO() {
                     const daysLeft = calcExpirationDaysTODO(Utilities.formatDate(expirationDate, Session.getScriptTimeZone(), "dd/MM/yyyy"));
                     Logger.log(`Calculated days left: ${daysLeft} for expiration date: ${expirationDate}`);
 
-                    // Obtain the existing RichTextValue to preserve formatting
                     let richText = cell.getRichTextValue();
                     let newText = "";
 
@@ -2248,15 +2392,12 @@ function updateExpirationDatesTODO() {
                         newText = "EXPIRED";
                     }
 
-                    // Find and replace only the expiration part of the text
                     let textToReplace = /Expires in \(\d+\) days|Expires today|EXPIRED/;
                     let updatedText = cellValue.replace(textToReplace, newText);
 
-                    // Create a new RichTextValue builder based on the updated text
                     let builder = SpreadsheetApp.newRichTextValue();
                     builder.setText(updatedText);
 
-                    // Preserve original formatting by applying styles from the original RichTextValue
                     let runs = richText.getRuns();
                     let offset = 0;
 
@@ -2269,7 +2410,6 @@ function updateExpirationDatesTODO() {
                         offset += runText.length;
                     }
 
-                    // Apply the updated RichTextValue to the cell
                     cell.setRichTextValue(builder.build());
 
                     Logger.log(`Final updated rich text for cell ${cell.getA1Notation()}: ${updatedText}`);
@@ -2277,10 +2417,27 @@ function updateExpirationDatesTODO() {
             }
         }
     }
+    storeExpirationDateHashTODO();
 
     Logger.log('updateExpirationDatesTODO completed');
 }
 
+/**
+ * Checks if the expiration dates have been updated today.
+ * 
+ * @returns {boolean} True if the expiration dates have been updated today, false otherwise.
+ */
+function isExpirationsUpdatedDatesTODO() {
+    const today = new Date();
+    const dateString = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyyMMdd");
+    const dateHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, dateString);
+    const hashString = Utilities.base64Encode(dateHash);
+
+    const docProperties = PropertiesService.getDocumentProperties();
+    const savedHash = docProperties.getProperty('expirationDateHash');
+
+    return savedHash === hashString;
+}
 
 // for testing
 
@@ -2521,8 +2678,9 @@ function onOpen() {
         const docProperties = PropertiesService.getDocumentProperties();
         const lastHash = docProperties.getProperty('lastHash');
         const currentHash = getSheetContentHash();
+        const isExpirationDatesUpdated = isExpirationsUpdatedDatesTODO();
         createMenusTODO();
-        if (shouldRunUpdates(lastHash, currentHash)) {
+        if (shouldRunUpdates(lastHash, currentHash) || !isExpirationDatesUpdated) {
             isLoaded = false
             ss.toast(toastMessages.loading[language], 'Status:', 45);
             applyGridLoaderTODO(sheet);
