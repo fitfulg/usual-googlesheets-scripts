@@ -48,29 +48,24 @@ function logAllDocumentProperties() {
 
     Logger.log('Document Properties:');
 
-    Logger.log('EXPIRATION DATE HASH:');
-    for (const key in expirationDateHash) {
-        Logger.log(`${key}: ${expirationDateHash[key]}`);
-    }
+    logProperties('EXPIRATION DATE HASH', expirationDateHash);
+    logProperties('LAST HASH', lastHashProperty);
+    logProperties('TIMESTAMP PROPERTIES for column H', timestampProperties);
+    logProperties('CONFIG PROPERTIES', configProperties);
+    logProperties('OTHER PROPERTIES', otherProperties);
+}
 
-    Logger.log('LAST HASH:');
-    for (const key in lastHashProperty) {
-        Logger.log(`${key}: ${lastHashProperty[key]}`);
-    }
-
-    Logger.log('TIMESTAMP PROPERTIES for column H:');
-    for (const key in timestampProperties) {
-        Logger.log(`${key}: ${timestampProperties[key]}`);
-    }
-
-    Logger.log('CONFIG PROPERTIES:');
-    for (const key in configProperties) {
-        Logger.log(`${key}: ${configProperties[key]}`);
-    }
-
-    Logger.log('OTHER PROPERTIES:');
-    for (const key in otherProperties) {
-        Logger.log(`${key}: ${otherProperties[key]}`);
+/**
+ * Logs the properties of a category to the console.
+ * @param {string} categoryName The name of the category.
+ * @param {Object} properties The properties to log.
+ * @returns {void}
+ * @customfunction
+ */
+function logProperties(categoryName, properties) {
+    Logger.log(`${categoryName}:`);
+    for (const key in properties) {
+        Logger.log(`${key}: ${properties[key]}`);
     }
 }
 
