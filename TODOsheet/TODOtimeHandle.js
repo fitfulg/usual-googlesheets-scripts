@@ -378,10 +378,18 @@ function updateExpirationDatesTODO() {
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     const lastRow = Math.min(40, sheet.getLastRow()); // Limit to 40 rows for performance
-    const range = sheet.getRange(2, 3, lastRow - 1, 5); // from row 2, Columns C to G
+
+    if (lastRow < 2) {
+        Logger.log('No data rows available for processing.');
+        return;
+    }
+
+    const numRows = lastRow - 1;
+    const range = sheet.getRange(2, 3, numRows - 1, 5); // from row 2, Columns C to G
     const values = range.getValues();
 
-    Logger.log(`Total rows being processed: ${lastRow - 1}`);
+
+    Logger.log(`Total rows being processed: ${numRows}`);
 
     for (let row = 0; row < values.length; row++) { // Iterating from the start of the range
         for (let col = 0; col < values[row].length; col++) { // Iterate over the selected columns C to G
