@@ -1390,9 +1390,9 @@ const cellStyles = {
     },
     "B1": {
         value: {
-            "English": "TOMORROW",
-            "Spanish": "MAÑANA",
-            "Catalan": "DEMÀ"
+            "English": "TODAY",
+            "Spanish": "HOY",
+            "Catalan": "AVUI"
         },
         fontWeight: "bold",
         fontColor: "#FFFFFF",
