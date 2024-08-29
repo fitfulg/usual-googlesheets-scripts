@@ -6,7 +6,9 @@ The initial idea was just to practice the integration from this repo up to Googl
 
 Apps Script uses Javascript and runs on Google Cloud.
 
-##### Sample views:![Sample view](images/normal-view.png)<br />
+#### Sample views:<br />
+
+![Sample view](images/normal-view.png)<br />
 
 ![Sample view](images/cell-limit-view.png)<br />
 
@@ -31,43 +33,43 @@ To quickly test the code in Google Apps Script, you can copy the raw contents of
 
 ## New Features in v1.3.0
 
-##### Expiration Date in Cells
+#### Expiration Date in Cells
 You can now add an expiration date to your cells. It is a countdown by days. See the "Tips" cell for more information.
 
-##### Notes for Expiration Dates
+#### Notes for Expiration Dates
 Cells with expiration dates come with notes added that are used to calculate and update the expiration days.
 
-##### Enable/Disable Default Additions
+#### Enable/Disable Default Additions
 You can now enable or disable all the functionalities that are added by default when writing in a cell. For example, for a cell to have only text, without checkboxes or default date. This can be managed from the "TODO Sheet" / "Enable/Disable Default Additions in Cells" menu.
 
 ## Other Features
 
-##### Languages
+#### Languages
 You can choose to switch between English, Spanish and Catalan.
 
-##### Default Checkbox Addition
+#### Default Checkbox Addition
 A checkbox is added by default from the 3rd to the 8th column when a cell is written or modified.
 
-##### Checkbox Management
+#### Checkbox Management
 You can add, mark, restore, and delete checkboxes in cells by selecting them and using the "Custom Formats" menu.
 
-##### Daily "Days Left" Counter
+#### Daily "Days Left" Counter
 The "days left" counter is updated daily in the 8th column. When the counter reaches zero, the cell is cleared.
 
-##### Snapshot Save and Restore
+#### Snapshot Save and Restore
 A snapshot of the sheet can be saved and restored from the "Custom Formats" menu.
 
-##### Cell Priority Limits
+#### Cell Priority Limits
 Indicative limit of cells for each priority, with a warning when the limit is reached.
 
-##### Custom Format Application
+#### Custom Format Application
 Custom formats can be applied without refreshing the page from the "Custom Formats" menu.
 
-##### Date Color Change by Priority
+#### Date Color Change by Priority
 Date color change times vary by column priority.
 
-##### Piechart Toggle
+#### Piechart Toggle
 The Piechart can be shown or hidden using its dropdown cell.
 
-##### Automatic Cell Shift
+#### Automatic Cell Shift
 Deleted empty cells are replaced by the immediately lower cell.
