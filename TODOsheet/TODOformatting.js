@@ -49,7 +49,7 @@ function updateTipsCellTODO() {
 function updateCellCommentTODO() {
     Logger.log('updateCellCommentTODO called');
     const cell = sheet.getRange("I3");
-    const version = "v1.3";
+    const version = "v0.3.0";
     cell.setValue(version);
 
     const changes = {
